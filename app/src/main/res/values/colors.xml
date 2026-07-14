@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="teal_primary">#FF1A8C8C</color>
+    <color name="teal_dark">#FF0F5F5F</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="text_primary">#FF1A1A1A</color>
+    <color name="text_secondary">#FF666666</color>
+    <color name="camera_placeholder">#FF222222</color>
+    <color name="light_gray">#FFF0F0F0</color>
+    <color name="red_accent">#FFE53935</color>
+    <color name="green_arrow">#FF4CAF50</color>
+
+    <!-- Home & Saved Places Screen Colors -->
+    <color name="home_primary">#FF258799</color>
+    <color name="home_primary_light">#FF2FA3B8</color>
+    <color name="home_primary_dark">#FF1A6B78</color>
+    <color name="home_surface">#FFF7F9FA</color>
+    <color name="home_card">#FFFFFFFF</color>
+    <color name="home_text_main">#FF1A1A2E</color>
+    <color name="home_text_sub">#FF888EA8</color>
+    <color name="home_red">#FFE53935</color>
+
+    <!-- Unified Navigation Screen Colors -->
+    <color name="nav_blue">#FF1E64FF</color>
+    <color name="nav_blue_dark">#FF0A3DBF</color>
+    <color name="nav_green">#FF00C853</color>
+    <color name="nav_amber">#FFFFA726</color>
+    <color name="nav_surface">#FF0A0F1E</color>
+    <color name="nav_card">#F0121829</color>
+    <color name="path_color">#FF00BCD4</color>
+    <color name="path_shadow">#99006064</color>
+    <color name="start_green">#FF43A047</color>
+    <color name="end_red">#FFE53935</color>
+    <color name="user_blue">#FF2979FF</color>
+    <color name="walked_color">#886E6E6E</color>
+
+    <!-- Permissions Screen Colors -->
+    <color name="permission_camera">#FF167D92</color>
+    <color name="permission_location">#FF2099B9</color>
+    <color name="permission_motion">#FFC39D51</color>
+
+    <!-- Auth Gradient Colors -->
+    <color name="auth_gradient_0">#FF0F6B6B</color>
+    <color name="auth_gradient_1">#FF1A8C8C</color>
+    <color name="auth_gradient_2">#FF2FA3B8</color>
+    <color name="auth_gradient_3">#FF1A8C8C</color>
+
+    <color name="dark_gradient_0">#FF051717</color>
+    <color name="dark_gradient_1">#FF0A2D2D</color>
+    <color name="dark_gradient_2">#FF0E3A42</color>
+    <color name="dark_gradient_3">#FF0A2D2D</color>
+
+    <!-- Store Detail Colors -->
+    <color name="store_detail_bg_light">#FFF5F7FA</color>
+    <color name="store_detail_gradient_start">#FF1A1A2E</color>
+    <color name="store_detail_gradient_end">#FF16213E</color>
+
+    <!-- Static Map Colors -->
+    <color name="path_teal">#FF00897B</color>
+    <color name="path_outline">#FF004D40</color>
+    <color name="static_map_bg">#FF121212</color>
+
+    <!-- AI Voice Assistant Colors -->
+    <color name="ai_blue">#FF00BCD4</color>
+    <color name="ai_blue_deep">#FF006064</color>
+    <color name="ai_purple">#FF7C4DFF</color>
+    <color name="ai_card">#FF0D1B2A</color>
+    <color name="ai_surface">#FF112240</color>
+    <color name="ai_success">#FF00E676</color>
+    <color name="ai_error">#FFFF5252</color>
+    <color name="ai_text">#FFE8F4F8</color>
+    <color name="ai_text_muted">#FF78909C</color>
+    <color name="ai_mic_bg_inactive_start">#FF1A3550</color>
+    <color name="ai_mic_bg_inactive_end">#FF0D1B2A</color>
+
+    <!-- Chat Dialog Colors -->
+    <color name="chat_teal">#FF009688</color>
+    <color name="chat_teal_light">#FFE0F2F1</color>
+    <color name="chat_bot_bg">#FFF5F5F5</color>
+    <color name="chat_bot_text">#FF212121</color>
+    <color name="chat_divider">#FFEEEEEE</color>
+    <color name="chat_drag_handle">#FFDDDDDD</color>
+    <color name="chat_send_disabled">#FFBDBDBD</color>
+
+    <!-- Camera Overlay Custom View Colors -->
+    <color name="camera_path_dot">#FF258799</color>
+    <color name="camera_beacon">#FF32CD64</color>
+    <color name="camera_arrow_bg">#C8258799</color>
+
+    <!-- Additional Home Screen Colors -->
+    <color name="home_gradient_dark_mid">#FF0A3D42</color>
+    <color name="home_gradient_light_mid">#FF9DD8E2</color>
+    <color name="home_gradient_light_end">#FFE8F6F8</color>
+    <color name="home_search_icon_inactive">#FFAAAAAA</color>
+</resources>

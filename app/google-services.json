@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "408453005675",
+    "project_id": "mallar-4111a",
+    "storage_bucket": "mallar-4111a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:408453005675:android:3a22571cfe5648d8110c2e",
+        "android_client_info": {
+          "package_name": "com.example.mallar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEsE7LW-8NfGR-i8X_UkDOFM7CshLx9pY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <!-- Main Theme -->
+    <style name="Theme.MallAR" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="postSplashScreenTheme">@style/Theme.MallAR</item>
+
+        <!-- أهم سطر -->
+
+    </style>
+    <!-- Perfect Splash Theme -->
+<!--    <style name="Theme.App.Starting" parent="Theme.SplashScreen">-->
+
+<!--        &lt;!&ndash; نفس لون التطبيق &ndash;&gt;-->
+<!--        <item name="windowSplashScreenBackground">#1A8C8C</item>-->
+
+<!--        &lt;!&ndash; نفس اللوجو &ndash;&gt;-->
+<!--        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_main</item>-->
+
+<!--        &lt;!&ndash; سرعة الظهور &ndash;&gt;-->
+<!--        <item name="windowSplashScreenAnimationDuration">200</item>-->
+
+<!--        &lt;!&ndash; يرجع للثيم الأساسي &ndash;&gt;-->
+<!--        <item name="postSplashScreenTheme">@style/Theme.MallAR</item>-->
+
+<!--    </style>-->
+
+</resources>

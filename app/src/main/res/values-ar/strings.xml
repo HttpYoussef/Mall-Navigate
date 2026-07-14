@@ -1,0 +1,212 @@
+<resources>
+    <string name="app_name">MallAR</string>
+
+    <!-- Splash -->
+    <string name="start">ابدأ</string>
+
+    <!-- Permissions -->
+    <string name="permissions_title">مولار يحتاج إذنك</string>
+    <string name="permissions_subtitle">لمساعدتك في التنقل في المول، يحتاج مولار الوصول إلى التالي</string>
+    <string name="enable_camera">تفعيل الكاميرا</string>
+    <string name="enable_location">تفعيل الموقع</string>
+    <string name="enable_motion">تفعيل الحركة</string>
+    <string name="continue_btn">متابعة</string>
+    <string name="permission_camera_subtitle">لوضع علامات المسار</string>
+    <string name="permission_location_subtitle">لمعرفة الطابق الذي تتواجد فيه</string>
+    <string name="permission_motion_subtitle">لتقدير سرعة حركتك</string>
+
+    <!-- Phone Auth -->
+    <string name="enter_phone">أدخل رقم هاتفك</string>
+    <string name="phone_subtitle">ستصلك رسالة تحتوي على رمز مكون من ٦ أرقام</string>
+    <string name="phone_label">رقم الهاتف</string>
+    <string name="send">إرسال</string>
+    <string name="skip">تخطي</string>
+    <string name="country_code">+٢٠</string>
+    <string name="enter_phone_nl">أدخل\nرقم الهاتف</string>
+    <string name="receive_6_digit">ستصلك رسالة تحتوي على رمز مكون من ٦ أرقام</string>
+    <string name="phone_placeholder">رقم الهاتف (مثال: 10 123 456 78)</string>
+    <string name="send_code">إرسال الرمز</string>
+    <string name="welcome_back">مرحباً بعودتك</string>
+    <string name="enter_phone_signin">أدخل رقم هاتفك لتسجيل الدخول</string>
+
+    <!-- OTP -->
+    <string name="verify_code">تحقق من الرمز</string>
+    <string name="otp_subtitle">أرسلنا رمز مكون من ٦ أرقام إلى رقم هاتفك.</string>
+    <string name="verify">تحقق</string>
+    <string name="we_sent_code">أرسلنا رمزاً من ٦ أرقام إلى هاتفك</string>
+    <string name="enter_otp">أدخل الرمز المكون من ٦ أرقام</string>
+    <string name="did_not_receive">لم يصلك الرمز؟ أعد الإرسال</string>
+
+    <!-- Logo Scan -->
+    <string name="scan_instruction">وجّه الكاميرا نحو شعار متجر لتحديد موقعك</string>
+    <string name="loading_logo_scanner">جاري تحميل ماسح الشعار…</string>
+    <string name="no_logo_recognised">لم يتم التعرف على الشعار — وجه الكاميرا نحو علامة متجر وحاول مجدداً</string>
+    <string name="scanning_logo">جاري مسح الشعار…</string>
+    <string name="detecting_landmarks">🔎 جاري كشف المعالم…</string>
+    <string name="estimating_position">جاري تقدير موقعك</string>
+    <string name="currently_at">أنت متواجد حالياً في:</string>
+    <string name="not_in_map_scan_again">(غير متواجد في خريطة المول — يرجى المسح مجدداً)</string>
+    <string name="match_confidence">نسبة التطابق: %1$.0f%%</string>
+    <string name="scan_again">مسح مجدداً</string>
+
+    <!-- Store Search -->
+    <string name="search_hint">إلى أين تريد الذهاب…</string>
+    <string name="search">بحث</string>
+    <string name="no_stores_found">لم يتم العثور على متاجر</string>
+    <string name="all_stores">كل المتاجر</string>
+    <string name="category_stores">متاجر %1$s</string>
+    <string name="where_would_you_go">أين تريد الذهاب؟</string>
+    <string name="where_to_go_placeholder">إلى أين تريد الذهاب...</string>
+    <string name="where_to_go_question">أين تريد الذهاب؟</string>
+    <string name="search_destination_hint">البحث عن وجهة…</string>
+    <string name="categories">الأقسام</string>
+    <string name="search_results">النتائج (%1$d)</string>
+    <string name="see_all">عرض الكل</string>
+
+    <!-- AR Navigation -->
+    <string name="direction_left">✈ يسار:</string>
+    <string name="show_road">عرض الطريق →</string>
+    <string name="ar_mode">واقع معزز</string>
+    <string name="map_mode">خريطة</string>
+    <string name="choose_nav_mode_to">اختر طريقة التنقل إلى %1$s</string>
+    <string name="navigate">تنقل</string>
+    <string name="recalculating">جاري إعادة الحساب…</string>
+    <string name="off_path_recalculating">خارج المسار — جاري إعادة الحساب…</string>
+    <string name="you_arrived">لقد وصلت!</string>
+    <string name="ar_badge">وضع الواقع المعزز</string>
+    <string name="map_badge">وضع الخريطة</string>
+    <string name="recalculating_route">جاري إعادة حساب المسار…</string>
+    <string name="tracking_lost">فقدت الإشارة — امسح شعار متجر</string>
+    <string name="accuracy_low">الدقة منخفضة</string>
+    <string name="distance">المسافة</string>
+    <string name="eta">الوقت المتوقع</string>
+    <string name="auto">تلقائي</string>
+    <string name="guidance_straight">اذهب مباشرة</string>
+    <string name="guidance_right">انعطف يميناً</string>
+    <string name="guidance_left">انعطف يساراً</string>
+    <string name="guidance_around">استدر للخلف</string>
+    <string name="guidance_distance">خلال %1$s</string>
+    <string name="go_straight">اذهب مباشرة</string>
+    <string name="turn_left">انعطف يساراً</string>
+    <string name="turn_right">انعطف يميناً</string>
+    <string name="turn_around">استدر للخلف</string>
+    <string name="from_label">من: %1$s</string>
+    <string name="to_label">إلى: %1$s</string>
+    <string name="choose_nav_mode">اختر وضع التنقل الخاص بك</string>
+    <string name="going_to">الذهاب إلى</string>
+
+    <!-- Welcome Screen -->
+    <string name="get_started">ابدأ الآن</string>
+    <string name="loading">جاري التحميل</string>
+    <string name="welcome_title">ابحث عن المكان\nالذي تريده</string>
+    <string name="sign_in">تسجيل الدخول</string>
+    <string name="sign_up">إنشاء حساب</string>
+    <string name="skip_for_now">تخطي الآن</string>
+
+    <!-- Auth Screens -->
+    <string name="create_account">إنشاء حساب</string>
+    <string name="enter_name">أدخل اسمك للبدء</string>
+    <string name="first_name">الاسم الأول</string>
+    <string name="last_name">الاسم الأخير</string>
+    <string name="welcome_user">مرحباً بك، %1$s!</string>
+    <string name="hello_user">مرحباً بك، %1$s 👋</string>
+
+    <!-- Profile Screen -->
+    <string name="profile">الملف الشخصي</string>
+    <string name="guest">زائر</string>
+    <string name="sign_in_features">قم بتسجيل الدخول للوصول إلى كافة الميزات</string>
+    <string name="favorite_stores">المتاجر المفضلة</string>
+    <string name="no_favorites">لا توجد مفضلة بعد</string>
+    <string name="bookmark_hint">احفظ المتاجر من الشاشة الرئيسية</string>
+    <string name="saved_places">الأماكن المحفوظة</string>
+    <string name="profile_photo">الصورة الشخصية</string>
+    <string name="change_photo">تغيير الصورة</string>
+    <string name="remove">إزالة</string>
+    <string name="remove_photo">إزالة الصورة</string>
+    <string name="edit_profile">تعديل الملف الشخصي</string>
+    <string name="user_first_name">محمد</string>
+    <string name="user_last_name">إبراهيم</string>
+    <string name="joined_time">انضم منذ ٥ أسابيع</string>
+    <string name="saved_locations">الأماكن المحفوظة</string>
+    <string name="recent_places">الأماكن الأخيرة</string>
+    <string name="messages">الرسائل</string>
+    <string name="delete_account">حذف الحساب</string>
+    <string name="sign_out_btn">تسجيل الخروج</string>
+
+    <!-- Settings -->
+    <string name="preferences">التفضيلات</string>
+    <string name="language">اللغة</string>
+    <string name="dark_mode">الوضع الداكن</string>
+    <string name="sign_out">تسجيل الخروج</string>
+
+    <!-- Floor Transition -->
+    <string name="floor_transition_title">تغيير الطابق</string>
+    <string name="floor_transition_message">لقد وصلت إلى %1$s.\nيرجى الانتقال إلى الطابق %2$d ثم اضغط متابعة.</string>
+    <string name="floor_transition_continue">متابعة</string>
+    <string name="transition_escalator">السلم المتحرك</string>
+    <string name="transition_elevator">المصعد</string>
+
+    <!-- Extractions / UI Elements -->
+    <string name="press_back_exit">اضغط رجوع مرة أخرى للخروج</string>
+    <string name="dots">...</string>
+    <string name="back">رجوع</string>
+    <string name="clear">مسح</string>
+    <string name="close">إغلاق</string>
+    <string name="remove_saved">إزالة المحفوظ</string>
+    <string name="route_map_floor">خريطة الطريق · طابق %1$d</string>
+    <string name="bug">تتبع الأخطاء</string>
+    <string name="re_center">إعادة ضبط المركز</string>
+    <string name="pinch_zoom_drag_pan">قرص للتكبير • سحب للتحريك</string>
+    <string name="save_place">حفظ المكان</string>
+    <string name="done">تم</string>
+    <string name="init_map">جاري تهيئة خريطة المول…</string>
+    <string name="save_place_desc">حفظ المكان</string>
+    <string name="navigate_desc">تنقل</string>
+    <string name="remove_saved_desc">إزالة المحفوظ</string>
+    <string name="map_unavailable">الخريطة غير متوفرة</string>
+    <string name="inside_mall">داخل المول</string>
+    <string name="ask_me">اسألني</string>
+    <string name="destination_label">الوجهة</string>
+
+    <!-- Voice Assistant & Chat -->
+    <string name="voice_assistant">المساعد الصوتي</string>
+    <string name="listening">جاري الاستماع…</string>
+    <string name="thinking">جاري التفكير…</string>
+    <string name="speaking">جاري التحدث</string>
+    <string name="try_again">حاول مجدداً</string>
+    <string name="tap_to_speak">اضغط للتحدث • Tap to speak</string>
+    <string name="tap_mic_stop">اضغط على الميكروفون للتوقف</string>
+    <string name="speaking_ellipsis">جاري التحدث…</string>
+    <string name="processing">جاري المعالجة…</string>
+    <string name="ar_en_toggle">عربي • English</string>
+    <string name="lang_ar">عربي</string>
+    <string name="lang_en">EN</string>
+    <string name="chat_greeting">👋 مرحباً! أنا مساعد المول.\nاسألني زي: «ازاي اروح زارا من برشكا»\n\nHello! Ask me like: «How do I go to Zara from Bershka»</string>
+    <string name="chat_map_loading">⚠️ خريطة المول لا تزال قيد التحميل، يرجى المحاولة مرة أخرى بعد قليل.</string>
+    <string name="chat_not_understood_ar">🤔 مش فاهم. جرب تقول: «ازاي اروح زارا من برشكا»</string>
+    <string name="chat_not_understood_en">🤔 I didn\'t understand. Try: «How do I go to Zara from Bershka»</string>
+    <string name="chat_store_not_found_ar">😕 مش لاقي «%1$s» في المول. تأكد من الاسم.</string>
+    <string name="chat_store_not_found_en">😕 Couldn\'t find «%1$s» in the mall. Check the store name.</string>
+    <string name="chat_nav_prompt_ar">\n\n🗺️ اضغط «عرض الخريطة»</string>
+    <string name="chat_nav_prompt_en">\n\n🗺️ Press «Show Map»</string>
+    <string name="chat_assistant_title">مساعد المول</string>
+    <string name="chat_assistant_subtitle">اسألني عن المكان الذي تريد الذهاب إليه</string>
+    <string name="close_chat">إغلاق المحادثة</string>
+    <string name="show_map_btn">🗺️ عرض الخريطة</string>
+    <string name="send_btn">إرسال</string>
+
+    <!-- Toasts -->
+    <string name="toast_valid_phone">يرجى إدخال رقم هاتف صحيح</string>
+    <string name="toast_verification_completed">اكتمل التحقق</string>
+    <string name="toast_code_sent">تم إرسال الرمز</string>
+    <string name="toast_welcome_user">مرحباً بك، %1$s!</string>
+    <string name="toast_wrong_otp">رمز التحقق غير صحيح</string>
+    <string name="toast_login_success">تم تسجيل الدخول بنجاح</string>
+
+    <!-- Bottom Navigation -->
+    <string name="bottom_nav_home">الرئيسية</string>
+    <string name="bottom_nav_map">الخريطة</string>
+    <string name="bottom_nav_saved">المحفوظة</string>
+    <string name="bottom_nav_profile">حسابي</string>
+
+</resources>

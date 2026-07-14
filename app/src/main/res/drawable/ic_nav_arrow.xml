@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Large forward-pointing arrow -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M60,5 L110,70 L85,70 L85,115 L35,115 L35,70 L10,70 Z" />
+
+    <!-- Arrow highlight / shine -->
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M60,5 L60,70 L35,70 Z" />
+</vector>

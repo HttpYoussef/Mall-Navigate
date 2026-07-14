@@ -1,0 +1,205 @@
+<resources>
+    <string name="app_name">MallAR</string>
+
+    <!-- Splash -->
+    <string name="start">Start</string>
+
+    <!-- Permissions -->
+    <string name="permissions_title">MallAR Needs Your Permission</string>
+    <string name="permissions_subtitle">To help you navigate the mall, MallAR needs access to the following</string>
+    <string name="enable_camera">Enable Camera</string>
+    <string name="enable_location">Enable Location</string>
+    <string name="enable_motion">Enable Motion</string>
+    <string name="continue_btn">Continue</string>
+
+    <!-- Phone Auth -->
+    <string name="enter_phone">Enter your Phone Number</string>
+    <string name="phone_subtitle">You will receive a 4 digit code</string>
+    <string name="phone_label">Phone number</string>
+    <string name="send">Send</string>
+    <string name="skip">Skip</string>
+    <string name="country_code">+20</string>
+
+    <!-- OTP -->
+    <string name="verify_code">Verify Code</string>
+    <string name="otp_subtitle">We sent a 6-digit code to your phone number.</string>
+    <string name="verify">Verify</string>
+
+    <!-- logos Scan -->
+    <string name="scan_instruction">Point camera at a store logo to detect your location</string>
+
+    <!-- Store Search -->
+    <string name="search_hint">Where to go…</string>
+    <string name="search">Search</string>
+    <string name="no_stores_found">No stores found</string>
+
+
+    <!-- AR Navigation -->
+    <string name="direction_left">✈ LEFT: </string>
+    <string name="show_road">Show Road →</string>
+
+    <!-- Welcome Screen -->
+    <string name="get_started">Get Started</string>
+    <string name="loading">Loading</string>
+    <string name="welcome_title">Find the place you\nare looking for</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="skip_for_now">Skip for now</string>
+
+    <!-- Auth Screens -->
+    <string name="create_account">Create Account</string>
+    <string name="enter_name">Enter your name to get started</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="welcome_user">Welcome, %1$s!</string>
+    <string name="enter_phone_nl">Enter your\nPhone Number</string>
+    <string name="receive_6_digit">You will receive a 6 digit code</string>
+    <string name="phone_placeholder">Phone Number (e.g. 10 123 456 78)</string>
+    <string name="send_code">Send Code</string>
+    <string name="we_sent_code">We sent a 6-digit code to your phone</string>
+    <string name="enter_otp">Enter 6-digit OTP</string>
+    <string name="did_not_receive">Didn\'t receive it? Resend</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="enter_phone_signin">Enter your phone number to sign in</string>
+
+    <!-- Profile Screen -->
+    <string name="profile">Profile</string>
+    <string name="guest">Guest</string>
+    <string name="sign_in_features">Sign in to access all features</string>
+    <string name="favorite_stores">Favorite Stores</string>
+    <string name="no_favorites">No favorites yet</string>
+    <string name="bookmark_hint">Bookmark stores from the home screen</string>
+    <string name="saved_places">Saved Places</string>
+
+    <!-- Floor transition -->
+    <string name="floor_transition_title">Change floor</string>
+    <string name="floor_transition_message">You have reached the %1$s.\nPlease move to Floor %2$d and press Continue.</string>
+    <string name="floor_transition_continue">Continue</string>
+    <string name="transition_escalator">escalator</string>
+    <string name="transition_elevator">elevator</string>
+    <string name="preferences">Preferences</string>
+    <string name="language">Language</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="store_inside_mall">Store · Inside Mall</string>
+
+    <!-- Extractions -->
+    <string name="press_back_exit">Press back again to exit</string>
+    <string name="permission_camera_subtitle">Place path markers</string>
+    <string name="permission_location_subtitle">Find which floor you are on</string>
+    <string name="permission_motion_subtitle">Estimate movement speed</string>
+    <string name="dots">...</string>
+    <string name="back">Back</string>
+    <string name="clear">Clear</string>
+    <string name="close">Close</string>
+    <string name="ar_mode">AR</string>
+    <string name="map_mode">Map</string>
+    <string name="choose_nav_mode_to">Choose your navigation mode to %1$s</string>
+    <string name="remove_saved">Remove saved</string>
+    <string name="navigate">Navigate</string>
+    <string name="route_map_floor">Route Map · Floor %1$d</string>
+    <string name="bug">BUG</string>
+    <string name="re_center">Re-center</string>
+    <string name="pinch_zoom_drag_pan">Pinch to zoom • Drag to pan</string>
+    <string name="save_place">Save place</string>
+    <string name="all_stores">All Stores</string>
+    <string name="category_stores">%1$s Stores</string>
+    <string name="hello_user">Hello, %1$s 👋</string>
+    <string name="where_would_you_go">Where would you like to go?</string>
+    <string name="where_to_go_placeholder">Where to go...</string>
+    <string name="recalculating">Recalculating…</string>
+    <string name="off_path_recalculating">Off path — recalculating…</string>
+    <string name="you_arrived">You Arrived!</string>
+    <string name="done">Done</string>
+    <string name="ar_badge">AR Mode</string>
+    <string name="map_badge">Map Mode</string>
+    <string name="recalculating_route">Recalculating route…</string>
+    <string name="tracking_lost">Tracking lost — scan a store logo</string>
+    <string name="accuracy_low">Accuracy low</string>
+    <string name="distance">Distance</string>
+    <string name="eta">ETA</string>
+    <string name="auto">Auto</string>
+    <string name="guidance_straight">Go straight</string>
+    <string name="guidance_right">Turn right</string>
+    <string name="guidance_left">Turn left</string>
+    <string name="guidance_around">Turn around</string>
+    <string name="guidance_distance">in %1$s</string>
+    <string name="go_straight">Go Straight</string>
+    <string name="turn_left">Turn Left</string>
+    <string name="turn_right">Turn Right</string>
+    <string name="turn_around">Turn Around</string>
+    <string name="profile_photo">Profile photo</string>
+    <string name="change_photo">Change photo</string>
+    <string name="remove">Remove</string>
+    <string name="remove_photo">Remove photo</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="user_first_name">Mohamed</string>
+    <string name="user_last_name">Ibrahim</string>
+    <string name="joined_time">Joined 5 weeks ago</string>
+    <string name="saved_locations">Saved Locations</string>
+    <string name="recent_places">Recent Places</string>
+    <string name="messages">Messages</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="sign_out_btn">Sign out</string>
+    <string name="init_map">Initialising mall map…</string>
+    <string name="loading_logo_scanner">Loading logo scanner…</string>
+    <string name="no_logo_recognised">No logo recognised — point camera at a store sign and try again</string>
+    <string name="scanning_logo">Scanning logo…</string>
+    <string name="detecting_landmarks">🔎 Detecting landmarks…</string>
+    <string name="estimating_position">Estimating your position</string>
+    <string name="currently_at">You are currently at:</string>
+    <string name="not_in_map_scan_again">(not in mall map — please scan again)</string>
+    <string name="match_confidence">Match confidence: %1$.0f%%</string>
+    <string name="scan_again">Scan Again</string>
+    <string name="from_label">From: %1$s</string>
+    <string name="to_label">To: %1$s</string>
+    <string name="where_to_go_question">Where do you want to go?</string>
+    <string name="search_destination_hint">Search destination…</string>
+    <string name="choose_nav_mode">Choose your navigation mode</string>
+    <string name="going_to">Going to</string>
+    <string name="voice_assistant">Voice Assistant</string>
+    <string name="listening">Listening…</string>
+    <string name="thinking">Thinking…</string>
+    <string name="speaking">Speaking</string>
+    <string name="try_again">Try again</string>
+    <string name="tap_to_speak">اضغط للتحدث • Tap to speak</string>
+    <string name="tap_mic_stop">Tap mic to stop</string>
+    <string name="speaking_ellipsis">Speaking…</string>
+    <string name="processing">Processing…</string>
+    <string name="ar_en_toggle">عربي • English</string>
+    <string name="lang_ar">عربي</string>
+    <string name="lang_en">EN</string>
+    <string name="chat_greeting">👋 مرحباً! أنا مساعد المول.\nاسألني زي: «ازاي اروح زارا من برشكا»\n\nHello! Ask me like: «How do I go to Zara from Bershka»</string>
+    <string name="chat_map_loading">⚠️ Mall map is still loading, please try again in a moment.</string>
+    <string name="chat_not_understood_ar">🤔 مش فاهم. جرب تقول: «ازاي اروح زارا من برشكا»</string>
+    <string name="chat_not_understood_en">🤔 I didn\'t understand. Try: «How do I go to Zara from Bershka»</string>
+    <string name="chat_store_not_found_ar">😕 مش لاقي «%1$s» في المول. تأكد من الاسم.</string>
+    <string name="chat_store_not_found_en">😕 Couldn\'t find «%1$s» in the mall. Check the store name.</string>
+    <string name="chat_nav_prompt_ar">\n\n🗺️ اضغط «عرض الخريطة»</string>
+    <string name="chat_nav_prompt_en">\n\n🗺️ Press «Show Map»</string>
+    <string name="chat_assistant_title">Mall Assistant</string>
+    <string name="chat_assistant_subtitle">Ask me where you want to go</string>
+    <string name="close_chat">Close chat</string>
+    <string name="show_map_btn">🗺️ Show Map</string>
+    <string name="send_btn">Send</string>
+    <string name="toast_valid_phone">Enter a valid phone number</string>
+    <string name="toast_verification_completed">Verification Completed</string>
+    <string name="toast_code_sent">Code Sent</string>
+    <string name="toast_welcome_user">Welcome, %1$s!</string>
+    <string name="toast_wrong_otp">Wrong OTP</string>
+    <string name="toast_login_success">Login Success</string>
+    <string name="save_place_desc">Save place</string>
+    <string name="navigate_desc">Navigate</string>
+    <string name="remove_saved_desc">Remove saved</string>
+    <string name="map_unavailable">Map unavailable</string>
+    <string name="inside_mall">Inside Mall</string>
+    <string name="categories">Categories</string>
+    <string name="search_results">Results (%1$d)</string>
+    <string name="see_all">See all</string>
+    <string name="ask_me">Ask Me</string>
+    <string name="destination_label">Destination</string>
+    <string name="bottom_nav_home">Home</string>
+    <string name="bottom_nav_map">Map</string>
+    <string name="bottom_nav_saved">Saved</string>
+    <string name="bottom_nav_profile">Profile</string>
+</resources>
