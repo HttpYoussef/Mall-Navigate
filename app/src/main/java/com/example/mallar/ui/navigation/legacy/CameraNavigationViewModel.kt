@@ -1,4 +1,19 @@
-package com.example.mallar.ui.navigation
+/**
+ * LEGACY IMPLEMENTATION
+ *
+ * This screen represents the original camera navigation
+ * implementation used before UnifiedNavigationScreen
+ * became the primary navigation experience.
+ *
+ * It is kept only for historical reference and possible
+ * future comparison.
+ *
+ * Current production implementation:
+ * UnifiedNavigationScreen
+ */
+
+
+package com.example.mallar.ui.navigation.legacy
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +28,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-import kotlin.math.sqrt
 import com.example.mallar.ui.localization.NavigationState
 
 private const val DISPLAY_SCALE = 0.05f  // map pixels → metres

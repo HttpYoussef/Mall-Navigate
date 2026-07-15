@@ -1,4 +1,21 @@
-package com.example.mallar.ui.navigation
+/**
+ * LEGACY IMPLEMENTATION
+ *
+ * This screen represents the original camera navigation
+ * implementation used before UnifiedNavigationScreen
+ * became the primary navigation experience.
+ *
+ * It is kept only for historical reference and possible
+ * future comparison.
+ *
+ * Current production implementation:
+ * UnifiedNavigationScreen
+ */
+
+
+
+
+package com.example.mallar.ui.navigation.legacy
 
 import android.view.ViewGroup
 import androidx.camera.view.PreviewView
@@ -20,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -27,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mallar.data.GraphNode
 import com.example.mallar.data.MallGraphRepository
 import com.example.mallar.navigation.SensorFusionManager
 import com.example.mallar.navigation.StepTracker
@@ -348,7 +365,7 @@ private fun CameraNavTopBar(
 
 @Composable
 private fun NavIconButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     tint: Color,
     bgColor: Color,
     onClick: () -> Unit
@@ -471,7 +488,7 @@ private fun CameraNavBottomBar(
 
 @Composable
 private fun BottomStatItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     label: String,
     color: Color
 ) {

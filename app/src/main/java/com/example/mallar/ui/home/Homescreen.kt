@@ -65,6 +65,10 @@ private val LightCardBg      = Color(0xFFFFFFFF)
 private val LightTealAccent  = Color(0xFF258799)
 private val MutedTextSubLight = Color(0xFF888EA8)
 
+// Hero panel gradient (Home screen top zone)
+private val HeroGradientLight = listOf(Color(0xFF2AA7B8), Color(0xFF1B6E7D))
+private val HeroGradientDark  = listOf(Color(0xFF115C68), Color(0xFF08313A))
+
 // ── Category data ─────────────────────────────────────────────────────────────
 private data class Category(
     val label: String,
@@ -173,193 +177,154 @@ fun HomeScreen(
             .fillMaxSize()
             .background(currentBg)
     ) {
-        // --- Top Glow Gradient Overlay ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(260.dp)
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            currentAccent.copy(alpha = 0.12f),
-                            currentAccent.copy(alpha = 0.04f),
-                            Color.Transparent
-                        )
-                    )
-                )
-        )
-
         Column(modifier = Modifier.fillMaxSize()) {
             // ═══════════════════════════════════════ LAZY BODY ════════════════
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(bottom = 100.dp)
             ) {
-                // ── Header Section ────────────────────────────────────────────
-                item(key = "header_item") {
-                    Spacer(Modifier.height(18.dp))
-                    Row(
+                // ── Hero Panel: Greeting + Primary Search ───────────────────────
+                // Redesign: one bold, high-contrast zone owns the top of the screen
+                // so the search action is unmistakably the first thing a user sees.
+                item(key = "hero_item") {
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .statusBarsPadding()
-                            .padding(horizontal = 20.dp, vertical = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                            .background(
+                                Brush.verticalGradient(if (isDarkMode) HeroGradientDark else HeroGradientLight),
+                                RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
+                            )
                     ) {
-                        Column {
-                            Text(
-                                text = "Hello, $userName 👋",
-                                color = currentTextMain,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 24.sp,
-                                letterSpacing = (-0.5).sp
-                            )
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                text = "Where would you like to go?",
-                                color = currentTextMain.copy(alpha = 0.7f),
-                                fontSize = 15.sp
-                            )
-                        }
-
-                        // Notification Icon with glow circle
-                        Box(
+                        Column(
                             modifier = Modifier
-                                .size(44.dp)
-                                .background(if (isDarkMode) GlassCardBg.copy(alpha = 0.6f) else Color.White, CircleShape)
-                                .border(
-                                    BorderStroke(
-                                        1.dp,
-                                        if (isDarkMode) Color.White.copy(0.12f) else Color.Black.copy(0.08f)
-                                    ),
-                                    CircleShape
-                                )
-                                .clip(CircleShape)
-                                .clickable { /* Notification click */ },
-                            contentAlignment = Alignment.Center
+                                .fillMaxWidth()
+                                .statusBarsPadding()
+                                .padding(horizontal = 20.dp, vertical = 20.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications",
-                                tint = currentTextMain,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            // Accent active dot
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .background(currentAccent, CircleShape)
-                                    .align(Alignment.TopEnd)
-                                    .offset(x = (-4).dp, y = 4.dp)
-                            )
-                        }
-                    }
-                }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Hi, $userName 👋",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 26.sp,
+                                    letterSpacing = (-0.5).sp
+                                )
 
-                // ── Search & Scan Logo Row ────────────────────────────────────
-                item(key = "search_row_item") {
-                    Spacer(Modifier.height(12.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Search bar
-                        Row(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp)
-                                .background(
-                                    if (isDarkMode) GlassCardBg.copy(alpha = 0.6f) else Color.White,
-                                    RoundedCornerShape(24.dp)
-                                )
-                                .border(
-                                    BorderStroke(
-                                        if (searchFocused) 1.5.dp else 1.dp,
-                                        if (searchFocused) currentAccent else if (isDarkMode) Color.White.copy(0.08f) else Color.Black.copy(0.08f)
-                                    ),
-                                    RoundedCornerShape(24.dp)
-                                )
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = null,
-                                tint = if (searchFocused) currentAccent else currentTextSub,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(Modifier.width(10.dp))
-                            BasicTextField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it; selectedCatIdx = 0 },
-                                singleLine = true,
-                                textStyle = androidx.compose.ui.text.TextStyle(
-                                    fontSize = 15.sp,
-                                    color = currentTextMain,
-                                    fontWeight = FontWeight.Normal
-                                ),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .onFocusChanged { focusState -> searchFocused = focusState.isFocused },
-                                decorationBox = { inner ->
-                                    if (searchQuery.isEmpty()) {
-                                        Text(
-                                            text = "Search for stores, offers, or categories...",
-                                            color = currentTextSub,
-                                            fontSize = 13.sp,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
-                                    inner()
-                                }
-                            )
-                            if (searchQuery.isNotEmpty()) {
-                                IconButton(
-                                    onClick = { searchQuery = "" },
-                                    modifier = Modifier.size(28.dp)
+                                // Notification icon — translucent on-color treatment
+                                Box(
+                                    modifier = Modifier
+                                        .size(44.dp)
+                                        .background(Color.White.copy(alpha = 0.18f), CircleShape)
+                                        .clip(CircleShape)
+                                        .clickable { /* Notification click */ },
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = "Clear",
-                                        tint = currentTextSub,
-                                        modifier = Modifier.size(16.dp)
+                                        imageVector = Icons.Default.Notifications,
+                                        contentDescription = "Notifications",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .background(Color.White, CircleShape)
+                                            .align(Alignment.TopEnd)
+                                            .offset(x = (-4).dp, y = 4.dp)
                                     )
                                 }
                             }
-                        }
 
-                        Spacer(Modifier.width(10.dp))
-
-                        // Scan Logo Button
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .background(
-                                    Brush.horizontalGradient(
-                                        colors = listOf(LightTealAccent, Color(0xFF2FA3B8))
-                                    ),
-                                    RoundedCornerShape(14.dp)
-                                )
-                                .border(
-                                    BorderStroke(
-                                        1.dp,
-                                        currentAccent.copy(alpha = 0.4f)
-                                    ),
-                                    RoundedCornerShape(14.dp)
-                                )
-                                .clip(RoundedCornerShape(14.dp))
-                                .clickable { onScanClick() },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.QrCodeScanner,
-                                contentDescription = "Scan Logo",
-                                tint = Color.White,
-                                modifier = Modifier.size(20.dp)
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                text = "Find your way around the mall",
+                                color = Color.White.copy(alpha = 0.85f),
+                                fontSize = 15.sp
                             )
+
+                            Spacer(Modifier.height(20.dp))
+
+                            // Primary search capsule — merges Scan Logo as a trailing
+                            // action so there is exactly one dominant CTA on this screen.
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .shadow(10.dp, RoundedCornerShape(28.dp), clip = false)
+                                    .background(Color.White, RoundedCornerShape(28.dp))
+                                    .padding(horizontal = 18.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = null,
+                                    tint = if (isDarkMode) DeepNavyBg else LightTealAccent,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                                Spacer(Modifier.width(10.dp))
+                                BasicTextField(
+                                    value = searchQuery,
+                                    onValueChange = { searchQuery = it; selectedCatIdx = 0 },
+                                    singleLine = true,
+                                    textStyle = androidx.compose.ui.text.TextStyle(
+                                        fontSize = 16.sp,
+                                        color = Color(0xFF1A1A2E),
+                                        fontWeight = FontWeight.Medium
+                                    ),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .onFocusChanged { focusState -> searchFocused = focusState.isFocused },
+                                    decorationBox = { inner ->
+                                        if (searchQuery.isEmpty()) {
+                                            Text(
+                                                text = "Where would you like to go?",
+                                                color = Color(0xFF888EA8),
+                                                fontSize = 15.sp,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                        inner()
+                                    }
+                                )
+                                if (searchQuery.isNotEmpty()) {
+                                    IconButton(
+                                        onClick = { searchQuery = "" },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = "Clear",
+                                            tint = Color(0xFF888EA8),
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                }
+
+                                Spacer(Modifier.width(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(
+                                            (if (isDarkMode) CyanGlow else LightTealAccent).copy(alpha = 0.12f),
+                                            CircleShape
+                                        )
+                                        .clip(CircleShape)
+                                        .clickable { onScanClick() },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.QrCodeScanner,
+                                        contentDescription = "Scan Logo",
+                                        tint = if (isDarkMode) CyanGlow else LightTealAccent,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -836,9 +801,9 @@ private fun StoreRow(
 ) {
     val isVerified = remember(place.brand) {
         place.brand.equals("Zara", ignoreCase = true) ||
-        place.brand.equals("Nike", ignoreCase = true) ||
-        place.brand.equals("Starbucks", ignoreCase = true) ||
-        place.brand.equals("Tissot", ignoreCase = true)
+                place.brand.equals("Nike", ignoreCase = true) ||
+                place.brand.equals("Starbucks", ignoreCase = true) ||
+                place.brand.equals("Tissot", ignoreCase = true)
     }
 
     Row(

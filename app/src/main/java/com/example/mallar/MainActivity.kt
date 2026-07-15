@@ -24,7 +24,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.FavoritesManager
 import com.example.mallar.ui.navigation.*
-import com.example.mallar.ui.splash.SplashScreen
 import com.example.mallar.ui.auth.*
 import com.example.mallar.ui.profile.*
 import com.example.mallar.ui.parking.*
@@ -101,27 +100,9 @@ fun MallARNavGraph(context: Context) {
 
     NavHost(
         navController    = navController,
-        startDestination = "splash"
+        startDestination = if (isFirstLaunch.value) "welcome" else "home"
     ) {
 
-        // ── Splash ────────────────────────────────────────────────────────────
-        composable("splash") {
-            SplashScreen(
-                isFirstLaunch = isFirstLaunch.value,
-                onStartClick  = {
-                    if (isFirstLaunch.value) {
-                        navController.navigate("welcome") {
-                            popUpTo("splash") { inclusive = true }
-                        }
-                    } else {
-                        // Returning user → go straight to Home
-                        navController.navigate("home") {
-                            popUpTo("splash") { inclusive = true }
-                        }
-                    }
-                }
-            )
-        }
 
         // ── Welcome (first-time / sign-in / sign-up) ─────────────────────────
         composable("welcome") {
@@ -347,34 +328,6 @@ fun MallARNavGraph(context: Context) {
                     }
                 }
             )
-        }
-
-        // ── Store Search ──────────────────────────────────────────────────────
-        composable("store_search") {
-            StoreSearchScreen(
-                onStoreClick = { place ->
-                    NavigationState.selectedPlace = place
-                    navController.navigate("store_detail")
-                },
-                onBackClick  = { navController.popBackStack() }
-            )
-        }
-
-        // ── Store Detail ──────────────────────────────────────────────────────
-        composable("store_detail") {
-            val place = NavigationState.selectedPlace
-            if (place != null) {
-                StoreDetailScreen(
-                    place           = place,
-                    onBackClick     = { navController.popBackStack() },
-                    onStartNavigation = { isCameraMode ->
-                        NavigationState.startWithAr = isCameraMode
-                        navController.navigate("navigation")
-                    }
-                )
-            } else {
-                navController.popBackStack()
-            }
         }
 
         // ── Navigation ────────────────────────────────────────────────────────

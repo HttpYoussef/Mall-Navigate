@@ -1,3 +1,24 @@
+package com.example.mallar.ui.navigation.prototype
+
+/**
+ * PROTOTYPE IMPLEMENTATION
+ *
+ * Experimental AR navigation screen.
+ *
+ * Development was paused before completion.
+ *
+ * This file is intentionally preserved because the
+ * future AR navigation system will likely reuse
+ * concepts from this implementation.
+ *
+ * Not used in production.
+ */
+
+
+
+
+
+
 /*
 package com.example.mallar.ui.navigation
 
