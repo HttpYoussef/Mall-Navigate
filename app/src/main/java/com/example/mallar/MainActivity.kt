@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.FavoritesManager
 import com.example.mallar.ui.navigation.*
+import com.example.mallar.ui.splash.SplashScreen
 import com.example.mallar.ui.auth.*
 import com.example.mallar.ui.profile.*
 import com.example.mallar.ui.parking.*
@@ -100,9 +101,20 @@ fun MallARNavGraph(context: Context) {
 
     NavHost(
         navController    = navController,
-        startDestination = if (isFirstLaunch.value) "welcome" else "home"
+        startDestination = "splash"
     ) {
 
+        // ── Splash ────────────────────────────────────────────────────────────
+        composable("splash") {
+            SplashScreen(
+                isFirstLaunch = isFirstLaunch.value,
+                onStartClick = {
+                    navController.navigate("home") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                }
+            )
+        }
 
         // ── Welcome (first-time / sign-in / sign-up) ─────────────────────────
         composable("welcome") {
@@ -313,68 +325,6 @@ fun MallARNavGraph(context: Context) {
                         popUpTo(0) { inclusive = true }
                     }
                 }
-            )
-        }
-
-        // ── Settings (kept for backward compat, routes to profile) ────────────
-        composable("settings") {
-            ProfileScreen(
-                onBackClick   = { navController.popBackStack() },
-                onLogoutClick = {
-                    isFirstLaunch.value = true
-                    prefs.edit().putBoolean("is_first_launch", true).apply()
-                    navController.navigate("welcome") {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        // ── Navigation ────────────────────────────────────────────────────────
-        composable("navigation") {
-            UnifiedNavigationScreen(
-                onBackClick = { navController.popBackStack() }
-            )
-        }
-
-        // ── Parking Home ──────────────────────────────────────────────────────
-        composable("parking_home") {
-            ParkingHomeScreen(
-                onBackClick = { navController.popBackStack() },
-                onSaveLocationClick = { navController.navigate("parking_camera") },
-                onNavigateToCarClick = { navController.navigate("parking_map") },
-                onEditLocationClick = { navController.navigate("parking_scan_result") }
-            )
-        }
-
-        // ── Parking Camera ────────────────────────────────────────────────────
-        composable("parking_camera") {
-            ParkingCameraScreen(
-                onBackClick = { navController.popBackStack() },
-                onPhotoCaptured = {
-                    navController.navigate("parking_scan_result") {
-                        popUpTo("parking_camera") { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        // ── Parking Scan Result ────────────────────────────────────────────────
-        composable("parking_scan_result") {
-            ParkingScanResultScreen(
-                onBackClick = { navController.popBackStack() },
-                onSaveSuccess = {
-                    navController.navigate("parking_home") {
-                        popUpTo("parking_home") { inclusive = false }
-                    }
-                }
-            )
-        }
-
-        // ── Parking Map ───────────────────────────────────────────────────────
-        composable("parking_map") {
-            ParkingMapScreen(
-                onBackClick = { navController.popBackStack() }
             )
         }
     }
