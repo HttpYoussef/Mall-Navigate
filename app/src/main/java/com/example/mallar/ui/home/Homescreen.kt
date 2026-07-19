@@ -62,22 +62,22 @@ import java.util.Locale
 
 // ── Design Tokens ────────────────────────────────────────────────────────────
 // Dark Futuristic Mode Tokens
-private val DeepNavyBg      = Color(0xFF06131A)
-private val GlassCardBg     = Color(0xFF0D1E26)
-private val CyanGlow        = Color(0xFF19D3E6)
-private val MutedTextSubDark = Color(0xFF8BA3AD)
+internal val DeepNavyBg      = Color(0xFF06131A)
+internal val GlassCardBg     = Color(0xFF0D1E26)
+internal val CyanGlow        = Color(0xFF19D3E6)
+internal val MutedTextSubDark = Color(0xFF8BA3AD)
 
 // Parking "glass" card accent — purple, distinct from the cyan navigation accent
 // so Parking reads as its own feature without competing with Search/Navigation.
-private val ParkingPurple      = Color(0xFF8B7CF6)
-private val ParkingPurpleDeep  = Color(0xFF4C3FD9)
-private val FavoriteHeartRed   = Color(0xFFEF476F)
+internal val ParkingPurple      = Color(0xFF8B7CF6)
+internal val ParkingPurpleDeep  = Color(0xFF4C3FD9)
+internal val FavoriteHeartRed   = Color(0xFFEF476F)
 
 // Light Mode Tokens
-private val LightBg          = Color(0xFFF7F9FA)
-private val LightCardBg      = Color(0xFFFFFFFF)
-private val LightTealAccent  = Color(0xFF258799)
-private val MutedTextSubLight = Color(0xFF888EA8)
+internal val LightBg          = Color(0xFFF7F9FA)
+internal val LightCardBg      = Color(0xFFFFFFFF)
+internal val LightTealAccent  = Color(0xFF258799)
+internal val MutedTextSubLight = Color(0xFF888EA8)
 
 // ── Offers & Vouchers — real brand logos, placeholder discount copy ────────
 // Brand logos below point at real files already in app/src/main/assets/logos/
@@ -101,7 +101,7 @@ private val sampleOffers = listOf(
 )
 
 // ── Category data ─────────────────────────────────────────────────────────────
-private data class Category(
+internal data class Category(
     val label: String,
     val icon: Any,
     val categoryKey: String
@@ -130,6 +130,8 @@ fun HomeScreen(
     onSavedClick: () -> Unit = {},
     onParkingClick: () -> Unit = {},
     onNavigateToNavigation: () -> Unit = {},
+    onCategoryClick: (categoryKey: String, categoryLabel: String) -> Unit = { _, _ -> },
+    onOffersClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val isDarkMode by com.example.mallar.data.AppPreferences.isDarkMode.collectAsState()
@@ -602,7 +604,12 @@ fun HomeScreen(
                                         currentAccent = currentAccent,
                                         currentTextSub = currentTextSub,
                                         currentBorder = currentBorder,
-                                        onClick = { selectedCatIdx = idx }
+                                        onClick = {
+                                            selectedCatIdx = idx
+                                            val screenTitle = if (cat.categoryKey.isBlank()) "All Stores" else cat.label
+                                            val routeKey = cat.categoryKey.ifBlank { "all" }
+                                            onCategoryClick(routeKey, screenTitle)
+                                        }
                                     )
                                 }
                             }
@@ -622,7 +629,7 @@ fun HomeScreen(
                             visible = contentVisible,
                             enter = fadeIn(tween(280, delayMillis = 220)) + slideInVertically(tween(280, delayMillis = 220)) { it / 6 }
                         ) {
-                            SectionHeader(title = "Offers & vouchers", onSeeAll = {}, currentTextMain = currentTextMain)
+                            SectionHeader(title = "Offers & vouchers", onSeeAll = onOffersClick, currentTextMain = currentTextMain)
                         }
                     }
                     item(key = "offers_spacer2") { Spacer(Modifier.height(14.dp)) }
@@ -1055,7 +1062,7 @@ private fun PlaceCard(
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
-private fun StoreRow(
+internal fun StoreRow(
     place: Place,
     isSaved: Boolean,
     isDarkMode: Boolean,
@@ -1370,7 +1377,7 @@ private fun BottomNavTab(
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
-private fun EmptyState(currentTextSub: Color) {
+internal fun EmptyState(currentTextSub: Color) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -1950,7 +1957,7 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
-private fun DestinationConfirmSheet(
+internal fun DestinationConfirmSheet(
     place: Place,
     isDarkMode: Boolean,
     currentCardBg: Color,

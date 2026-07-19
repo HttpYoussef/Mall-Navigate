@@ -5,7 +5,14 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
-
+import android.net.Uri
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.tween
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
@@ -256,9 +263,80 @@ fun MallARNavGraph(context: Context) {
                     navController.navigate("navigation") {
                         popUpTo("home") { inclusive = false }
                     }
+                },
+                onCategoryClick = { categoryKey, categoryLabel ->
+                    navController.navigate("category/${Uri.encode(categoryKey)}/${Uri.encode(categoryLabel)}")
+
+
+                },
+                onOffersClick = {
+                    navController.navigate("offers")
                 }
             )
         }
+        composable(
+            route = "offers",
+            enterTransition = { slideInHorizontally(tween(320)) { it / 3 } + fadeIn(tween(320)) },
+            exitTransition = { fadeOut(tween(180)) },
+            popEnterTransition = { fadeIn(tween(180)) },
+            popExitTransition = { slideOutHorizontally(tween(320)) { it / 3 } + fadeOut(tween(320)) }
+        ) {
+            OffersScreen(
+                onBackClick = { navController.popBackStack() },
+                onVoucherClick = { voucherId -> navController.navigate("voucher/$voucherId") }
+            )
+        }
+
+        composable(
+            route = "voucher/{voucherId}",
+            arguments = listOf(navArgument("voucherId") { type = NavType.StringType }),
+            enterTransition = { slideInHorizontally(tween(320)) { it / 3 } + fadeIn(tween(320)) },
+            exitTransition = { fadeOut(tween(180)) },
+            popEnterTransition = { fadeIn(tween(180)) },
+            popExitTransition = { slideOutHorizontally(tween(320)) { it / 3 } + fadeOut(tween(320)) }
+        ) { backStackEntry ->
+            val voucherId = backStackEntry.arguments?.getString("voucherId").orEmpty()
+            VoucherDetailsScreen(
+                voucherId = voucherId,
+                onBackClick = { navController.popBackStack() },
+                onDestinationSelected = { place ->
+                    NavigationState.selectedPlace = place
+                    if (checkPermissionsGranted()) {
+                        navController.navigate("logo_scan_with_dest")
+                    } else {
+                        navController.navigate("permissions")
+                    }
+                }
+            )
+        }
+        composable(
+            route = "category/{categoryKey}/{categoryLabel}",
+            arguments = listOf(
+                navArgument("categoryKey") { type = NavType.StringType },
+                navArgument("categoryLabel") { type = NavType.StringType }
+            ),
+            enterTransition = { slideInHorizontally(tween(320)) { it / 3 } + fadeIn(tween(320)) },
+            exitTransition = { fadeOut(tween(180)) },
+            popEnterTransition = { fadeIn(tween(180)) },
+            popExitTransition = { slideOutHorizontally(tween(320)) { it / 3 } + fadeOut(tween(320)) }
+        ) { backStackEntry ->
+            val categoryKey = backStackEntry.arguments?.getString("categoryKey").orEmpty()
+            val categoryLabel = backStackEntry.arguments?.getString("categoryLabel").orEmpty()
+            CategoryScreen(
+                categoryKey = categoryKey,
+                categoryLabel = categoryLabel,
+                onBackClick = { navController.popBackStack() },
+                onDestinationSelected = { place ->
+                    NavigationState.selectedPlace = place
+                    if (checkPermissionsGranted()) {
+                        navController.navigate("logo_scan_with_dest")
+                    } else {
+                        navController.navigate("permissions")
+                    }
+                }
+            )
+        }
+
 
         // ── Logo Scan (destination pre-selected from HomeScreen) ──────────────
         // User has already chosen where they want to go.
