@@ -5,7 +5,6 @@ import android.util.Log
 import com.example.mallar.data.AStarPath
 import com.example.mallar.data.MallGraph
 import com.example.mallar.navigation.NavSessionState
-import com.example.mallar.navigation.NavigationSessionManager
 import com.example.mallar.ui.localization.NavigationState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +45,7 @@ class VoiceAssistantManager(private val context: Context) {
 
     var onStopNavigation: (() -> Unit)? = null
 
+    /** Provider for the current navigation state (replaces Singleton access). */
     var navStateProvider: (() -> NavSessionState?)? = null
 
     var graphProvider: (() -> MallGraph?)? = null
@@ -152,9 +152,7 @@ class VoiceAssistantManager(private val context: Context) {
     }
 
     private suspend fun handleIntent(intent: ParsedIntent, graph: MallGraph?) {
-        val navState = navStateProvider?.invoke() ?: runCatching {
-            NavigationSessionManager.instance.sessionState.value
-        }.getOrNull()
+        val navState = navStateProvider?.invoke()
 
         when (intent.intent) {
 

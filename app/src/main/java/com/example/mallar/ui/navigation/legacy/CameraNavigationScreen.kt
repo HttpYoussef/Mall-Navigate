@@ -120,8 +120,8 @@ fun CameraNavigationScreen(
     // ── Step tracker — drives dead-reckoning position ─────────────────────────
     DisposableEffect(Unit) {
         val step = StepTracker(context)
-        step.onStep = { totalSteps, _ ->
-            overlayEngineRef.value?.onStep(totalSteps)
+        step.onStep = { totalSteps, strideLength, _ ->
+            overlayEngineRef.value?.onStep(totalSteps, strideLength)
             viewModel.onStep(totalSteps)
         }
         step.start()

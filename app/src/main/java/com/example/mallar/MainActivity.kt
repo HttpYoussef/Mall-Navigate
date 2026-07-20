@@ -271,6 +271,9 @@ fun MallARNavGraph(context: Context) {
                 },
                 onOffersClick = {
                     navController.navigate("offers")
+                },
+                onVoucherClick = { voucherId ->
+                    navController.navigate("voucher/$voucherId")
                 }
             )
         }
@@ -367,6 +370,12 @@ fun MallARNavGraph(context: Context) {
                     NavigationState.startWithAr = isCameraMode
                     navController.navigate("navigation")
                 }
+            )
+        }
+        // ── Unified Navigation (Map + AR) ────────────────────────────────────
+        composable("navigation") {
+            UnifiedNavigationScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
 

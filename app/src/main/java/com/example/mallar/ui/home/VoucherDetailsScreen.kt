@@ -1,9 +1,7 @@
 package com.example.mallar.ui.home
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -15,12 +13,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,39 +30,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.Place
 import com.example.mallar.data.PlaceRepository
-import com.example.mallar.data.Voucher
 import com.example.mallar.data.VoucherRepository
+import com.example.mallar.ui.theme.SuccessGreen
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size as CoilSize
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Voucher Details Screen
-//
-// Reuses, unchanged:
-//   • PlaceRepository.load() — to resolve voucher.storeBrand into a real Place
-//     so "Start Navigation" can call the app's real onDestinationSelected
-//     callback, exactly like every other destination-selection entry point.
-//   • The same internal design tokens Home/Category/Offers already share.
-//
-// The QR code below is a DECORATIVE PLACEHOLDER (a stylised module grid with
-// the three corner finder-pattern squares real QR codes have) — it is not a
-// functional, scannable code. There's no redemption backend yet to encode a
-// meaningful payload for, so generating a "real" QR here wouldn't add UX
-// validation value. When a backend exists, swap `QrPlaceholder` for a real
-// generator (e.g. the `com.google.zxing:core` library) fed by the voucher's
-// real redemption payload — everything else on this screen stays the same.
-// ─────────────────────────────────────────────────────────────────────────────
+// ── UX State ────────────────────────────────────────────────────────────────
+private enum class RedemptionState {
+    IDLE,       // Initial state
+    REDEEMING,  // Loading/Spinning
+    SUCCESS,    // "✓ Offer Redeemed"
+    READY       // "Start Navigation"
+}
 
 @Composable
 fun VoucherDetailsScreen(
@@ -73,6 +62,7 @@ fun VoucherDetailsScreen(
     onDestinationSelected: (Place) -> Unit
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val isDarkMode by AppPreferences.isDarkMode.collectAsState()
 
     val currentBg       = if (isDarkMode) DeepNavyBg else LightBg
@@ -88,10 +78,10 @@ fun VoucherDetailsScreen(
 
     var matchedPlace by remember { mutableStateOf<Place?>(null) }
     var contentVisible by remember { mutableStateOf(false) }
+    var redemptionState by remember { mutableStateOf(RedemptionState.IDLE) }
+
     LaunchedEffect(Unit) { contentVisible = true }
 
-    // Resolve the voucher's store to a real Place via the same repository
-    // Home/Category already use — no separate/duplicated store lookup.
     LaunchedEffect(voucher?.storeBrand) {
         val brand = voucher?.storeBrand ?: return@LaunchedEffect
         val places = withContext(Dispatchers.IO) { PlaceRepository.load(context) }
@@ -99,38 +89,22 @@ fun VoucherDetailsScreen(
     }
 
     if (voucher == null) {
-        // Defensive fallback — shouldn't happen with the static placeholder set.
-        Box(
-            modifier = Modifier.fillMaxSize().background(currentBg),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier.fillMaxSize().background(currentBg), contentAlignment = Alignment.Center) {
             Text("Voucher not found", color = currentTextSub, fontSize = 14.sp)
         }
         return
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(currentBg)
-    ) {
+    Box(modifier = Modifier.fillMaxSize().background(currentBg)) {
         Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                // ── Header: back button ──────────────────────────────────────
+                // ── Header ───────────────────────────────────────────────────
                 AnimatedVisibility(
                     visible = contentVisible,
                     enter = fadeIn(tween(240)) + slideInVertically(tween(240)) { -it / 8 }
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .statusBarsPadding()
-                            .padding(horizontal = 20.dp, vertical = 14.dp)
-                    ) {
+                    Box(modifier = Modifier.statusBarsPadding().padding(horizontal = 20.dp, vertical = 14.dp)) {
                         Box(
                             modifier = Modifier
                                 .size(40.dp)
@@ -141,7 +115,7 @@ fun VoucherDetailsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
                                 tint = currentTextMain,
                                 modifier = Modifier.size(20.dp)
@@ -150,15 +124,13 @@ fun VoucherDetailsScreen(
                     }
                 }
 
-                // ── Store logo + name + offer ────────────────────────────────
+                // ── Store & Offer Info ──────────────────────────────────────
                 AnimatedVisibility(
                     visible = contentVisible,
                     enter = fadeIn(tween(260, delayMillis = 60)) + slideInVertically(tween(260, delayMillis = 60)) { it / 10 }
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Box(
@@ -221,55 +193,46 @@ fun VoucherDetailsScreen(
 
                 Spacer(Modifier.height(28.dp))
 
-                // ── QR code panel ─────────────────────────────────────────────
+                // ── QR Code Panel (Revealed on Redemption) ───────────────────
                 AnimatedVisibility(
-                    visible = contentVisible,
-                    enter = fadeIn(tween(280, delayMillis = 120)) + slideInVertically(tween(280, delayMillis = 120)) { it / 10 }
+                    visible = redemptionState == RedemptionState.SUCCESS || redemptionState == RedemptionState.READY,
+                    enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 4 }
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        val qrGlowColor by animateColorAsState(
+                            targetValue = if (redemptionState == RedemptionState.SUCCESS) SuccessGreen else currentAccent,
+                            animationSpec = tween(360),
+                            label = "qr_glow_color"
+                        )
                         Box(
                             modifier = Modifier
-                                .shadow(16.dp, RoundedCornerShape(28.dp), ambientColor = currentAccent.copy(alpha = 0.25f), spotColor = currentAccent.copy(alpha = 0.25f))
+                                .shadow(16.dp, RoundedCornerShape(28.dp), ambientColor = qrGlowColor.copy(alpha = 0.25f), spotColor = qrGlowColor.copy(alpha = 0.25f))
                                 .clip(RoundedCornerShape(28.dp))
-                                .background(
-                                    Brush.verticalGradient(
-                                        listOf(currentAccent.copy(alpha = if (isDarkMode) 0.12f else 0.06f), currentCardBg)
-                                    )
-                                )
-                                .border(BorderStroke(1.dp, Color.White.copy(alpha = if (isDarkMode) 0.08f else 0.5f)), RoundedCornerShape(28.dp))
+                                .background(Brush.verticalGradient(listOf(qrGlowColor.copy(alpha = if (isDarkMode) 0.12f else 0.06f), currentCardBg)))
+                                .border(BorderStroke(1.dp, qrGlowColor.copy(alpha = 0.4f)), RoundedCornerShape(28.dp))
                                 .padding(24.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Box(
-                                modifier = Modifier
-                                    .size(200.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(Color.White)
-                                    .padding(14.dp)
+                                modifier = Modifier.size(200.dp).clip(RoundedCornerShape(16.dp)).background(Color.White).padding(14.dp)
                             ) {
                                 QrPlaceholder(seed = voucher.id, modifier = Modifier.fillMaxSize())
                             }
                         }
 
-                        Spacer(Modifier.height(14.dp))
-                        Row(verticalAlignment = Alignment.Top) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = null,
-                                tint = currentTextSub,
-                                modifier = Modifier.size(15.dp)
-                            )
-                            Spacer(Modifier.width(6.dp))
+                        Spacer(Modifier.height(16.dp))
+                        Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(horizontal = 8.dp)) {
+                            Icon(Icons.Default.CheckCircle, null, tint = SuccessGreen, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
                             Text(
-                                text = "Show this QR code at checkout to redeem your voucher.",
-                                color = currentTextSub,
-                                fontSize = 12.sp,
-                                lineHeight = 16.sp
+                                text = "Your voucher has been redeemed successfully. Show this QR code at checkout.",
+                                color = SuccessGreen,
+                                fontSize = 13.sp,
+                                lineHeight = 18.sp,
+                                fontWeight = FontWeight.Medium
                             )
                         }
                     }
@@ -282,64 +245,86 @@ fun VoucherDetailsScreen(
                     visible = contentVisible,
                     enter = fadeIn(tween(280, delayMillis = 160)) + slideInVertically(tween(280, delayMillis = 160)) { it / 10 }
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp)
-                    ) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
                         Text("Terms & Conditions", color = currentTextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = voucher.terms,
-                            color = currentTextSub,
-                            fontSize = 12.sp,
-                            lineHeight = 18.sp
-                        )
+                        Text(text = voucher.terms, color = currentTextSub, fontSize = 12.sp, lineHeight = 18.sp)
                     }
                 }
-
                 Spacer(Modifier.height(24.dp))
             }
 
-            // ── Start Navigation — reuses the app's existing destination flow ─
-            AnimatedVisibility(
-                visible = contentVisible,
-                enter = fadeIn(tween(280, delayMillis = 200))
+            // ── Morphing Primary Action Button ───────────────────────────────
+            Box(
+                modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = 16.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .navigationBarsPadding()
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                val buttonColor by animateColorAsState(
+                    targetValue = when (redemptionState) {
+                        RedemptionState.SUCCESS -> SuccessGreen
+                        RedemptionState.READY -> if (isDarkMode) GlassCardBg else currentAccent
+                        else -> currentAccent
+                    },
+                    animationSpec = tween(400),
+                    label = "btn_color"
+                )
+
+                Button(
+                    onClick = {
+                        when (redemptionState) {
+                            RedemptionState.IDLE -> {
+                                scope.launch {
+                                    redemptionState = RedemptionState.REDEEMING
+                                    delay(500) // Loading phase
+                                    redemptionState = RedemptionState.SUCCESS
+                                    delay(800) // Success message display phase
+                                    redemptionState = RedemptionState.READY
+                                }
+                            }
+                            RedemptionState.READY -> {
+                                matchedPlace?.let(onDestinationSelected)
+                            }
+                            else -> {}
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().height(58.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    enabled = redemptionState != RedemptionState.REDEEMING &&
+                            (redemptionState != RedemptionState.READY || matchedPlace != null),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = buttonColor,
+                        contentColor = if (redemptionState == RedemptionState.READY && isDarkMode) currentAccent else Color.White,
+                        disabledContainerColor = buttonColor.copy(alpha = 0.7f),
+                        disabledContentColor = Color.White
+                    ),
+                    border = if (redemptionState == RedemptionState.READY) BorderStroke(1.5.dp, currentAccent.copy(alpha = 0.5f)) else null
                 ) {
-                    val place = matchedPlace
-                    Button(
-                        onClick = { place?.let(onDestinationSelected) },
-                        enabled = place != null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(18.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = currentAccent,
-                            contentColor = if (isDarkMode) DeepNavyBg else Color.White,
-                            disabledContainerColor = currentAccent.copy(alpha = 0.4f),
-                            disabledContentColor = (if (isDarkMode) DeepNavyBg else Color.White).copy(alpha = 0.6f)
-                        )
-                    ) {
-                        Icon(Icons.Default.Navigation, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(10.dp))
-                        Text("Start Navigation", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    }
-                    if (place == null) {
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = "Store location unavailable right now",
-                            color = currentTextSub,
-                            fontSize = 12.sp,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
+                    AnimatedContent(
+                        targetState = redemptionState,
+                        transitionSpec = { (fadeIn() + scaleIn()).togetherWith(fadeOut() + scaleOut()) },
+                        label = "btn_content_anim"
+                    ) { state ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            when (state) {
+                                RedemptionState.IDLE -> {
+                                    Icon(Icons.Default.Redeem, null, modifier = Modifier.size(20.dp))
+                                    Spacer(Modifier.width(10.dp))
+                                    Text("Redeem Offer Now", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                }
+                                RedemptionState.REDEEMING -> {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.5.dp)
+                                }
+                                RedemptionState.SUCCESS -> {
+                                    Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(22.dp))
+                                    Spacer(Modifier.width(10.dp))
+                                    Text("Offer Redeemed", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                }
+                                RedemptionState.READY -> {
+                                    Icon(Icons.Default.Navigation, null, modifier = Modifier.size(20.dp))
+                                    Spacer(Modifier.width(10.dp))
+                                    Text("Start Navigation", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -347,12 +332,6 @@ fun VoucherDetailsScreen(
     }
 }
 
-/**
- * Decorative QR-style module grid — see the file-level note above. Not a
- * functional/scannable QR code; purely a premium-looking visual placeholder
- * for the UX validation phase, deterministically generated from [seed] so it
- * looks consistent (not flickering) across recompositions.
- */
 @Composable
 private fun QrPlaceholder(seed: String, modifier: Modifier = Modifier) {
     val gridSize = 21
@@ -360,8 +339,7 @@ private fun QrPlaceholder(seed: String, modifier: Modifier = Modifier) {
     val cells = remember(seed) {
         Array(gridSize) { r ->
             BooleanArray(gridSize) { c ->
-                val inFinderZone =
-                    (r < 7 && c < 7) || (r < 7 && c >= gridSize - 7) || (r >= gridSize - 7 && c < 7)
+                val inFinderZone = (r < 7 && c < 7) || (r < 7 && c >= gridSize - 7) || (r >= gridSize - 7 && c < 7)
                 if (inFinderZone) false else random.nextBoolean()
             }
         }
@@ -369,24 +347,14 @@ private fun QrPlaceholder(seed: String, modifier: Modifier = Modifier) {
 
     Canvas(modifier = modifier) {
         val cell = size.minDimension / gridSize
-        // Random data modules
         for (r in 0 until gridSize) {
             for (c in 0 until gridSize) {
                 if (cells[r][c]) {
-                    drawRect(
-                        color = Color.Black,
-                        topLeft = Offset(c * cell, r * cell),
-                        size = Size(cell, cell)
-                    )
+                    drawRect(color = Color.Black, topLeft = Offset(c * cell, r * cell), size = Size(cell, cell))
                 }
             }
         }
-        // Three finder-pattern squares (top-left, top-right, bottom-left)
-        val finderPositions = listOf(
-            Offset(0f, 0f),
-            Offset((gridSize - 7) * cell, 0f),
-            Offset(0f, (gridSize - 7) * cell)
-        )
+        val finderPositions = listOf(Offset(0f, 0f), Offset((gridSize - 7) * cell, 0f), Offset(0f, (gridSize - 7) * cell))
         finderPositions.forEach { origin ->
             drawRect(color = Color.Black, topLeft = origin, size = Size(cell * 7, cell * 7))
             drawRect(color = Color.White, topLeft = origin + Offset(cell, cell), size = Size(cell * 5, cell * 5))

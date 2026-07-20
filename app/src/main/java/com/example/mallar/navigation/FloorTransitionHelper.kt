@@ -9,8 +9,6 @@ import kotlin.math.sqrt
  */
 object FloorTransitionHelper {
 
-    const val ARRIVAL_THRESHOLD_PX = 18.0
-
     data class PathFloorTransition(
         val departNodeIndex: Int,
         val arriveNodeIndex: Int,
@@ -59,7 +57,7 @@ object FloorTransitionHelper {
         val next = transitions.getOrNull(completedCount) ?: return null
         if (segmentIdx < next.departNodeIndex) return null
         val depart = path.getOrNull(next.departNodeIndex) ?: return null
-        if (distanceToNodePx(userX, userY, depart) > ARRIVAL_THRESHOLD_PX) return null
+        if (distanceToNodePx(userX, userY, depart) > NavConfig.TRANSITION_ARRIVAL_THRESHOLD_PX) return null
         return next
     }
 }

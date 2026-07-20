@@ -86,6 +86,7 @@ internal val MutedTextSubLight = Color(0xFF888EA8)
 // offers/coupons backend yet. Replace `sampleOffers` with a real data source
 // (e.g. an OffersRepository) before shipping.
 private data class OfferItem(
+    val id: String,
     val logoAssetPath: String,
     val brandName: String,
     val tint: Color,
@@ -95,9 +96,9 @@ private data class OfferItem(
 )
 
 private val sampleOffers = listOf(
-    OfferItem("logos/adidas.png",   "Adidas",    Color(0xFF1E3A6E), "20% OFF",     "On all items",      "1st Floor"),
-    OfferItem("logos/Starbucks.png","Starbucks", Color(0xFF1E6E4A), "Free Upsize", "On any beverage",   "2nd Floor"),
-    OfferItem("logos/H&M.png",      "H&M",       Color(0xFF6E1E2E), "15% OFF",     "On selected items", "Ground Floor")
+    OfferItem("v_starbucks_upsize", "logos/Starbucks.png","Starbucks", Color(0xFF1E6E4A), "Free Upsize", "On any beverage",   "2nd Floor"),
+    OfferItem("v_zara_15off",       "logos/ZARA.png",      "Zara",       Color(0xFF6E1E2E), "15% OFF",     "On selected items", "Ground Floor"),
+    OfferItem("v_mango_20off",      "logos/Mango.png",     "Mango",      Color(0xFF8B4513), "20% OFF",     "On all items",      "Ground Floor")
 )
 
 // ── Category data ─────────────────────────────────────────────────────────────
@@ -132,6 +133,7 @@ fun HomeScreen(
     onNavigateToNavigation: () -> Unit = {},
     onCategoryClick: (categoryKey: String, categoryLabel: String) -> Unit = { _, _ -> },
     onOffersClick: () -> Unit = {},
+    onVoucherClick: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
     val isDarkMode by com.example.mallar.data.AppPreferences.isDarkMode.collectAsState()
@@ -642,8 +644,14 @@ fun HomeScreen(
                                 contentPadding = PaddingValues(horizontal = 20.dp),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                items(sampleOffers, key = { it.brandName }) { offer ->
-                                    OfferCard(offer = offer, isDarkMode = isDarkMode, currentTextMain = currentTextMain, currentTextSub = currentTextSub)
+                                items(sampleOffers, key = { it.id }) { offer ->
+                                    OfferCard(
+                                        offer = offer,
+                                        isDarkMode = isDarkMode,
+                                        currentTextMain = currentTextMain,
+                                        currentTextSub = currentTextSub,
+                                        onClick = { onVoucherClick(offer.id) }
+                                    )
                                 }
                             }
                         }
@@ -1573,7 +1581,8 @@ private fun OfferCard(
     offer: OfferItem,
     isDarkMode: Boolean,
     currentTextMain: Color,
-    currentTextSub: Color
+    currentTextSub: Color,
+    onClick: () -> Unit
 ) {
     val context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -1592,7 +1601,7 @@ private fun OfferCard(
                 )
             )
             .border(1.dp, Color.White.copy(alpha = if (isDarkMode) 0.06f else 0.5f), RoundedCornerShape(22.dp))
-            .clickable(interactionSource = interactionSource, indication = null) { /* No real offer destination yet — see NOTE above */ }
+            .clickable(interactionSource = interactionSource, indication = null) { onClick() }
             .padding(14.dp)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {

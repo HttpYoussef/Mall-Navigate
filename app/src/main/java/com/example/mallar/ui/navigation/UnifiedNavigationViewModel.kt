@@ -1,17 +1,13 @@
 package com.example.mallar.ui.navigation
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.os.SystemClock
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mallar.data.AStarPath
 import com.example.mallar.data.GraphNode
 import com.example.mallar.data.MallGraphRepository
-import com.example.mallar.navigation.NavMode
-import com.example.mallar.navigation.NavSessionState
-import com.example.mallar.navigation.NavigationFloorState
-import com.example.mallar.navigation.NavigationSessionManager
-import com.example.mallar.navigation.NavigationModeSelection
-import com.example.mallar.navigation.OrientationManager
-import com.example.mallar.navigation.OrientationUiState
+import com.example.mallar.navigation.*
 import com.example.mallar.voice.LocalIntentParser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,16 +18,21 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.example.mallar.ui.localization.NavigationState
 
-class UnifiedNavigationViewModel : ViewModel() {
+/**
+ * UnifiedNavigationViewModel
+ * ─────────────────────────────────────────────────────────────────────────────
+ * PRODUCTION READY - MOVEMENT TRACKING COMPLETED
+ * 
+ * Manages the lifecycle of a navigation session and its associated sensors.
+ */
+class UnifiedNavigationViewModel(application: Application) : AndroidViewModel(application) {
 
-    init {
-        // SINGLETON RESET FIX: fresh instance for every new navigation trip.
-        // Must happen BEFORE navState evaluates NavigationSessionManager.instance
-        NavigationSessionManager.reset()
-    }
+    private val context = application.applicationContext
 
-    private val sessionManager: NavigationSessionManager
-        get() = NavigationSessionManager.instance
+    val sessionManager: NavigationSessionManager = NavigationSessionManager(
+        mallGraph = MallGraphRepository.loadedGraph 
+            ?: throw IllegalStateException("MallGraph not loaded before starting navigation")
+    )
 
     val navState: StateFlow<NavSessionState> = sessionManager.sessionState
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NavSessionState())
@@ -39,27 +40,88 @@ class UnifiedNavigationViewModel : ViewModel() {
     private val _poseEnabled = MutableStateFlow(false)
     val poseEnabled: StateFlow<Boolean> = _poseEnabled.asStateFlow()
 
-    // Orientation phase: runs once, before normal navigation is shown.
-    // See OrientationManager for details; kept independent of NavigationSessionManager
-    // so the existing navigation pipeline requires no behavioural changes.
     private val orientationManager = OrientationManager()
     val orientationState: StateFlow<OrientationUiState> = orientationManager.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), OrientationUiState())
+
+    // ── Sensors (Owned by VM, gated by Screen Lifecycle) ──────────────────────
+    private val stepTracker = StepTracker(context)
+    private val barometerManager = BarometerManager(context)
+    private val sensorFusionManager = SensorFusionManager(context)
 
     companion object {
         private const val POSE_GRACE_MS = 1500L
     }
 
     init {
-        setupRerouteCallback()
+        setupCallbacks()
         startSession()
         enablePoseAfterGrace()
+        
         viewModelScope.launch {
+            var lastPauseState = false
             navState.collect { state ->
                 if (!state.isPausedForFloorTransition) {
                     NavigationState.currentFloor = state.currentFloor
                 }
+                
+                // One-shot barometer reset when transition triggers
+                if (state.isPausedForFloorTransition && !lastPauseState) {
+                    barometerManager.resetBaseline()
+                }
+                lastPauseState = state.isPausedForFloorTransition
             }
+        }
+    }
+
+    // ── Lifecycle Gating ─────────────────────────────────────────────────────
+
+    /** Call from UI DisposableEffect to start sensors only when visible. */
+    fun resumeSensors() {
+        // 1. Heading (Sensor Fusion)
+        sensorFusionManager.onHeadingChanged = { azimuth, _ ->
+            if (orientationManager.state.value.active) {
+                orientationManager.onHeadingUpdated(azimuth)
+            }
+            sessionManager.onHeadingUpdated(azimuth)
+        }
+        
+        // 2. Steps (PDR)
+        stepTracker.onStep = { total, stride, _ ->
+            sessionManager.onStep(total, stride)
+            
+            val state = navState.value
+            if (state.isPausedForFloorTransition && state.pendingFloorTransition != null) {
+                checkAutoFloorTransition(state.pendingFloorTransition)
+            }
+        }
+        
+        sensorFusionManager.start()
+        stepTracker.start()
+        barometerManager.start()
+    }
+
+    /** Call from UI DisposableEffect to stop sensors when hidden. */
+    fun pauseSensors() {
+        sensorFusionManager.stop()
+        stepTracker.stop()
+        barometerManager.stop()
+    }
+
+    private fun checkAutoFloorTransition(transition: FloorTransitionHelper.PathFloorTransition) {
+        if (!barometerManager.isAvailable) return
+        
+        val delta = barometerManager.relativeAltitudeDelta
+        val requiredDelta = if (transition.toFloor > transition.fromFloor) {
+            NavConfig.AUTO_FLOOR_CONFIRM_THRESHOLD_M
+        } else {
+            -NavConfig.AUTO_FLOOR_CONFIRM_THRESHOLD_M
+        }
+
+        val directionCorrect = if (requiredDelta > 0) delta > requiredDelta else delta < requiredDelta
+        
+        if (directionCorrect) {
+            confirmFloorTransition()
         }
     }
 
@@ -72,15 +134,9 @@ class UnifiedNavigationViewModel : ViewModel() {
 
         if (nodes.size >= 2) {
             sessionManager.initialize(nodes, destName)
-            NavigationState.currentFloor = NavigationFloorState.currentFloor
-
-            // Apply the user's AR/Map choice after initialising
             if (NavigationState.startWithAr) {
                 sessionManager.switchMode(NavMode.CAMERA)
             }
-
-            // Orientation phase: face the first leg of the route before the
-            // existing navigation UI (step tracking / AR / map) takes over.
             orientationManager.start(nodes)
         }
     }
@@ -92,12 +148,9 @@ class UnifiedNavigationViewModel : ViewModel() {
         }
     }
 
-    private fun setupRerouteCallback() {
+    private fun setupCallbacks() {
         sessionManager.onRerouteNeeded = {
             viewModelScope.launch { performReroute() }
-        }
-        sessionManager.onArrived = {
-            /* arrival state is set inside sessionManager — UI reads it */
         }
     }
 
@@ -146,22 +199,17 @@ class UnifiedNavigationViewModel : ViewModel() {
         sessionManager.setModeSelection(selection)
     }
 
-    fun onHeadingUpdated(azimuthDeg: Float) {
-        // Orientation phase consumes the same compass stream the existing
-        // navigation pipeline already uses — no new sensor listener needed.
+    fun onLogoDetected(node: GraphNode)   = sessionManager.onLogoDetected(node)
+    fun setScreenSize(w: Float, h: Float) = sessionManager.setScreenSize(w, h)
+
+    /** Entry point for heading updates from UI sensors. */
+    fun onHeadingUpdated(azimuth: Float) {
         if (orientationManager.state.value.active) {
-            orientationManager.onHeadingUpdated(azimuthDeg)
+            orientationManager.onHeadingUpdated(azimuth)
         }
-        sessionManager.onHeadingUpdated(azimuthDeg)
+        sessionManager.onHeadingUpdated(azimuth)
     }
 
-    fun onStep(totalSteps: Long)             = sessionManager.onStep(totalSteps)
-    fun onLogoDetected(node: GraphNode)      = sessionManager.onLogoDetected(node)
-    fun setScreenSize(w: Float, h: Float)    = sessionManager.setScreenSize(w, h)
-
-    /**
-     * Recompute A* from the user's current path segment to a new store (voice mid-trip).
-     */
     fun navigateToNewDestination(shopQuery: String): AStarPath? {
         val graph = MallGraphRepository.loadedGraph ?: return null
         val resolved = LocalIntentParser.fuzzyMatchShop(shopQuery, graph)
@@ -185,7 +233,6 @@ class UnifiedNavigationViewModel : ViewModel() {
         return newPath
     }
 
-    /** Voice: explicit start store → end store (e.g. from Zara to Bershka). */
     fun navigateFromShopToShop(originQuery: String, destQuery: String): AStarPath? {
         val graph = MallGraphRepository.loadedGraph ?: return null
         val oName = LocalIntentParser.fuzzyMatchShop(originQuery, graph) ?: originQuery.trim()
@@ -214,8 +261,7 @@ class UnifiedNavigationViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        // Destroy session when user leaves navigation screen.
-        // Next startSession() call will reset() and create a fresh instance.
+        pauseSensors()
         sessionManager.destroy()
     }
 }

@@ -20,6 +20,9 @@ enum class NavMode { MAP, CAMERA }
 
 enum class NavigationModeSelection { AUTO, AR, MAP }
 
+/**
+ * Snapshot of the current navigation state.
+ */
 data class NavSessionState(
     val pathNodes: List<GraphNode>    = emptyList(),
     val segmentIdx: Int               = 0,
@@ -45,9 +48,14 @@ data class NavSessionState(
     val relocReason: String?          = null
 )
 
+/**
+ * NavigationSessionManager
+ * 
+ * Orchestrates the navigation trip. Managed as an instance by a ViewModel.
+ */
 class NavigationSessionManager(
     private val mallGraph: MallGraph,
-    private val pxPerMetre: Float = 4.48f  // Calibrated: 208 px = 46.5 m (Bershka→OXXO)
+    private val pxPerMetre: Float = NavConfig.PIXELS_PER_METER
 ) {
 
     private val _sessionState = MutableStateFlow(NavSessionState())
@@ -55,7 +63,6 @@ class NavigationSessionManager(
 
     private var positionTracker: IndoorPositionTracker? = null
     private val projectionEngine = OverlayProjectionEngine()
-    private val pathSnapper      = PathSnapper()
     private val driftMonitor     = DriftMonitor()
     private val smoother         = PositionSmoother()
 
@@ -67,6 +74,9 @@ class NavigationSessionManager(
     var onRelocalizationNeeded: ((reason: String) -> Unit)? = null
     var onFloorTransitionReached: ((FloorTransitionHelper.PathFloorTransition) -> Unit)? = null
 
+    /**
+     * Prepares the session with a calculated path.
+     */
     fun initialize(pathNodes: List<GraphNode>, destinationName: String) {
         if (pathNodes.size < 2) {
             Log.w(TAG, "Path too short — cannot initialise")
@@ -74,9 +84,7 @@ class NavigationSessionManager(
         }
 
         val startNode = pathNodes.first()
-        positionTracker = IndoorPositionTracker(mallGraph, startNode).also { tracker ->
-            tracker.onPositionUpdated = { posX, posY -> onPositionUpdated(posX, posY) }
-        }
+        positionTracker = IndoorPositionTracker(mallGraph, startNode, pxPerMetre)
 
         driftMonitor.onRelocalizationNeeded = { reason ->
             _sessionState.update { it.copy(relocReason = reason) }
@@ -106,21 +114,19 @@ class NavigationSessionManager(
         NavigationFloorState.currentFloor = startFloor
 
         Log.d(TAG, "Initialised: ${pathNodes.size} nodes, dest=$destinationName")
-        recomputeAndEmit()
+        recomputeForCurrentMode()
     }
 
+    /**
+     * Cleanup resources when the trip ends.
+     */
     fun destroy() {
         positionTracker = null
         onRerouteNeeded = null
         onArrived       = null
         onRelocalizationNeeded = null
-        pathSnapper.reset()
-        smoother.reset()
-        driftMonitor.onRelocalizationNeeded = null
         pathTransitions = emptyList()
-        completedTransitionCount = 0
-        onFloorTransitionReached = null
-        Log.d(TAG, "Destroyed")
+        Log.d(TAG, "Session Destroyed")
     }
 
     fun confirmFloorTransition() {
@@ -131,7 +137,6 @@ class NavigationSessionManager(
 
         completedTransitionCount++
         positionTracker?.relocalize(arrive)
-        pathSnapper.reset()
         smoother.reset()
 
         _sessionState.update {
@@ -146,76 +151,158 @@ class NavigationSessionManager(
             )
         }
         NavigationFloorState.currentFloor = pending.toFloor
-        Log.d(TAG, "Floor transition confirmed → floor ${pending.toFloor}, node ${arrive.id}")
-        recomputeAndEmit()
+        recomputeForCurrentMode()
     }
 
     fun onHeadingUpdated(azimuthDeg: Float) {
         positionTracker?.currentHeadingDeg = azimuthDeg
         _sessionState.update { it.copy(headingDeg = azimuthDeg) }
-        recomputeProjectionOnly()
+        if (_sessionState.value.mode == NavMode.CAMERA) {
+            recomputeForCurrentMode()
+        }
     }
 
-    fun onStep(totalSteps: Long) {
-        if (_sessionState.value.isPausedForFloorTransition) {
+    fun onStep(totalSteps: Long, strideLengthM: Float) {
+        val tracker = positionTracker ?: return
+        val state = _sessionState.value
+        
+        if (state.isPausedForFloorTransition) {
             _sessionState.update { it.copy(totalSteps = totalSteps) }
             return
         }
-        // StepTracker already debounces at 400 ms (hardware) or STEP_DEBOUNCE_MS
-        // (software fallback). A second gate here only silently drops valid steps.
-        val stridePx = StepTracker.STRIDE_LENGTH_M * pxPerMetre
-        positionTracker?.onStep(stridePx.toDouble())
-        _sessionState.update { it.copy(totalSteps = totalSteps) }
-        // Force map dot + AR projection to update immediately on every step
+
+        // 1. Calculate next position state atomically
+        val snapResult = tracker.onStep(
+            strideM = strideLengthM,
+            path = state.pathNodes,
+            currentSegmentIdx = state.segmentIdx
+        )
+
+        // 2. Process updates
+        processNavigationUpdate(snapResult, totalSteps)
+    }
+
+    private fun processNavigationUpdate(
+        snapResult: IndoorPositionTracker.ConstraintResult,
+        totalSteps: Long
+    ) {
+        val state = _sessionState.value
+        val path  = state.pathNodes
+
+        driftMonitor.onStep(
+            posX        = snapResult.snappedX,
+            posY        = snapResult.snappedY,
+            isOnPath    = snapResult.isOnPath,
+            deviationPx = snapResult.deviationPx,
+            headingDeg  = state.headingDeg
+        )
+        val drift = driftMonitor.driftState
+
+        val transition = FloorTransitionHelper.pendingTransition(
+            path = path,
+            transitions = pathTransitions,
+            completedCount = completedTransitionCount,
+            segmentIdx = snapResult.bestSegmentIdx,
+            userX = snapResult.snappedX,
+            userY = snapResult.snappedY,
+        )
+        if (transition != null) {
+            _sessionState.update {
+                it.copy(
+                    isPausedForFloorTransition = true,
+                    pendingFloorTransition     = transition,
+                    userMapX                   = snapResult.snappedX.toFloat(),
+                    userMapY                   = snapResult.snappedY.toFloat(),
+                    segmentIdx                 = snapResult.bestSegmentIdx,
+                    totalSteps                 = totalSteps
+                )
+            }
+            onFloorTransitionReached?.invoke(transition)
+            return
+        }
+
+        val (smoothX, smoothY) = smoother.smoothPosition(snapResult.snappedX, snapResult.snappedY)
+        val headingForSmooth = positionTracker?.currentHeadingDeg ?: state.headingDeg
+        val smoothHeading = smoother.smoothHeading(headingForSmooth)
+
+        val finalNode = path.lastOrNull()
+        if (finalNode != null) {
+            val dx = finalNode.x - smoothX; val dy = finalNode.y - smoothY
+            if (sqrt(dx * dx + dy * dy) < NavConfig.ARRIVAL_THRESHOLD_PX) {
+                if (!state.isArrived) {
+                    _sessionState.update { it.copy(isArrived = true, totalSteps = totalSteps) }
+                    onArrived?.invoke()
+                }
+                return
+            }
+        }
+
+        if (!snapResult.isOnPath && snapResult.deviationPx > NavConfig.REROUTE_THRESHOLD_PX && !state.isRerouting) {
+            _sessionState.update { it.copy(isRerouting = true, isOnPath = false) }
+            onRerouteNeeded?.invoke()
+        }
+
+        val remainPx = computeRemainingDistancePx(path, snapResult.bestSegmentIdx, smoothX, smoothY)
+        val remainM  = (remainPx / pxPerMetre).roundToInt().coerceAtLeast(0)
+        val mins     = if (remainM > 0) (remainM / 80f).coerceAtLeast(1f).roundToInt() else 0
+        val activeFloor = path.getOrNull(snapResult.bestSegmentIdx)?.floor ?: state.currentFloor
+
+        _sessionState.update {
+            it.copy(
+                userMapX           = smoothX.toFloat(),
+                userMapY           = smoothY.toFloat(),
+                headingDeg         = smoothHeading,
+                segmentIdx         = snapResult.bestSegmentIdx,
+                remainingDistanceM = remainM,
+                walkMinutes        = mins,
+                isOnPath           = snapResult.isOnPath,
+                currentFloor       = activeFloor,
+                driftLevel         = drift.level,
+                relocReason        = if (drift.relocNeeded) drift.relocReason else it.relocReason,
+                totalSteps         = totalSteps
+            )
+        }
+        NavigationFloorState.currentFloor = activeFloor
         recomputeForCurrentMode()
     }
 
     fun onLogoDetected(node: GraphNode) {
-        val snapped = positionTracker?.relocalize(node) ?: false
-        if (snapped) {
-            Log.d(TAG, "Relocalized to '${node.shopName}'")
-            pathSnapper.reset()
-            smoother.reset()
-            driftMonitor.onRelocalized()
-            _sessionState.update { it.copy(relocReason = null, driftLevel = DriftMonitor.DriftLevel.OK) }
-            recomputeAndEmit()
-        }
+        positionTracker?.relocalize(node)
+        smoother.reset()
+        driftMonitor.onRelocalized()
+        _sessionState.update { it.copy(relocReason = null, driftLevel = DriftMonitor.DriftLevel.OK) }
+        recomputeForCurrentMode()
     }
 
     fun switchMode(newMode: NavMode) {
         if (_sessionState.value.mode == newMode) return
         _sessionState.update { it.copy(mode = newMode) }
-        Log.d(TAG, "Mode → $newMode")
-        if (newMode == NavMode.CAMERA) recomputeAndEmit()
+        if (newMode == NavMode.CAMERA) recomputeForCurrentMode()
     }
 
     fun setModeSelection(selection: NavigationModeSelection) {
         if (_sessionState.value.modeSelection == selection) return
         _sessionState.update { it.copy(modeSelection = selection) }
-        Log.d(TAG, "ModeSelection → $selection")
         when (selection) {
-            NavigationModeSelection.AUTO -> {
-                // Do not force mode; next orientation update will control it.
-            }
-            NavigationModeSelection.AR -> {
-                switchMode(NavMode.CAMERA)
-            }
-            NavigationModeSelection.MAP -> {
-                switchMode(NavMode.MAP)
-            }
+            NavigationModeSelection.AUTO -> { }
+            NavigationModeSelection.AR -> switchMode(NavMode.CAMERA)
+            NavigationModeSelection.MAP -> switchMode(NavMode.MAP)
         }
     }
 
     fun updatePath(newPath: List<GraphNode>) {
         if (newPath.size < 2) return
-        val tracker  = positionTracker
-        val nearNode = if (tracker != null) {
-            MallGraphRepository.findNearestNode(mallGraph, tracker.posX, tracker.posY)
-        } else null
-        if (nearNode != null) tracker?.relocalize(nearNode)
+        val tracker = positionTracker
+        if (tracker != null) {
+            val nearNode = MallGraphRepository.findNearestNode(mallGraph, tracker.posX, tracker.posY)
+            if (nearNode != null) {
+                tracker.relocalize(nearNode)
+                smoother.reset()
+            }
+        }
         pathTransitions = FloorTransitionHelper.scanPathTransitions(newPath)
         completedTransitionCount = 0
-        val floor = nearNode?.floor ?: newPath.first().floor
+        val floor = newPath.firstOrNull()?.floor ?: 2
         _sessionState.update {
             it.copy(
                 pathNodes = newPath,
@@ -227,8 +314,7 @@ class NavigationSessionManager(
             )
         }
         NavigationFloorState.currentFloor = floor
-        Log.d(TAG, "Path updated: ${newPath.size} nodes")
-        recomputeAndEmit()
+        recomputeForCurrentMode()
     }
 
     fun setRerouting(active: Boolean) {
@@ -239,106 +325,13 @@ class NavigationSessionManager(
         projectionEngine.screenW = w
         projectionEngine.screenH = h
         projectionEngine.fovDeg  = fovDeg
-        recomputeProjectionOnly()
+        recomputeForCurrentMode()
     }
 
     fun setWaypointMessage(msg: String?) {
         _sessionState.update { it.copy(waypointMessage = msg) }
     }
 
-    private fun onPositionUpdated(rawPosX: Double, rawPosY: Double) {
-        val state = _sessionState.value
-        if (state.isPausedForFloorTransition) return
-
-        val path  = state.pathNodes
-
-        val snapResult = pathSnapper.snap(rawPosX, rawPosY, path, state.segmentIdx)
-        val snappedX   = snapResult.snappedX
-        val snappedY   = snapResult.snappedY
-        val newSeg     = snapResult.bestSegmentIdx.coerceAtLeast(state.segmentIdx)
-
-        driftMonitor.onStep(
-            posX        = snappedX,
-            posY        = snappedY,
-            isOnPath    = snapResult.isOnPath,
-            deviationPx = snapResult.deviationPx,
-            headingDeg  = state.headingDeg
-        )
-        val drift = driftMonitor.driftState
-
-        val transition = FloorTransitionHelper.pendingTransition(
-            path = path,
-            transitions = pathTransitions,
-            completedCount = completedTransitionCount,
-            segmentIdx = newSeg,
-            userX = snappedX,
-            userY = snappedY,
-        )
-        if (transition != null && !state.isPausedForFloorTransition) {
-            _sessionState.update {
-                it.copy(
-                    isPausedForFloorTransition = true,
-                    pendingFloorTransition     = transition,
-                    userMapX                   = snappedX.toFloat(),
-                    userMapY                   = snappedY.toFloat(),
-                    segmentIdx                 = newSeg,
-                )
-            }
-            onFloorTransitionReached?.invoke(transition)
-            return
-        }
-
-        val (smoothX, smoothY) = smoother.smoothPosition(snappedX, snappedY)
-        // Use live tracker heading so each step uses the same heading as dead reckoning,
-        // not a possibly stale snapshot from the last StateFlow update.
-        val headingForSmooth =
-            positionTracker?.currentHeadingDeg ?: state.headingDeg
-        val smoothHeading = smoother.smoothHeading(headingForSmooth)
-
-        val finalNode = path.lastOrNull()
-        if (finalNode != null) {
-            val dx = finalNode.x - smoothX; val dy = finalNode.y - smoothY
-            if (sqrt(dx * dx + dy * dy) < ARRIVAL_THRESHOLD_PX) {
-                if (!state.isArrived) {
-                    _sessionState.update { it.copy(isArrived = true) }
-                    onArrived?.invoke()
-                }
-                return
-            }
-        }
-
-        val isOnPath = snapResult.isOnPath
-        if (!isOnPath && snapResult.deviationPx > REROUTE_THRESHOLD_PX && !state.isRerouting) {
-            _sessionState.update { it.copy(isRerouting = true, isOnPath = false) }
-            onRerouteNeeded?.invoke()
-        }
-
-        val remainPx = computeRemainingDistancePx(path, newSeg, smoothX, smoothY)
-        val remainM  = (remainPx / pxPerMetre).roundToInt().coerceAtLeast(0)
-        val mins     = if (remainM > 0) (remainM / 80f).coerceAtLeast(1f).roundToInt() else 0
-
-        val activeFloor = path.getOrNull(newSeg)?.floor ?: state.currentFloor
-
-        _sessionState.update {
-            it.copy(
-                userMapX           = smoothX.toFloat(),
-                userMapY           = smoothY.toFloat(),
-                headingDeg         = smoothHeading,
-                segmentIdx         = newSeg,
-                remainingDistanceM = remainM,
-                walkMinutes        = mins,
-                isOnPath           = isOnPath,
-                currentFloor       = activeFloor,
-                driftLevel         = drift.level,
-                relocReason        = if (drift.relocNeeded) drift.relocReason else it.relocReason
-            )
-        }
-        NavigationFloorState.currentFloor = activeFloor
-
-        recomputeAndEmit()
-    }
-
-    /** Recompute overlay projection (camera mode) and turn hints for both modes. */
     private fun recomputeForCurrentMode() {
         val state = _sessionState.value
         val path = state.pathNodes
@@ -372,15 +365,6 @@ class NavigationSessionManager(
         }
     }
 
-    // Keep old name as alias so all existing callers still compile
-    private fun recomputeAndEmit() = recomputeForCurrentMode()
-
-    private fun recomputeProjectionOnly() {
-        val state = _sessionState.value
-        if (state.mode != NavMode.CAMERA) return
-        recomputeForCurrentMode()
-    }
-
     private fun computeRemainingDistancePx(
         path: List<GraphNode>, fromIdx: Int, userX: Double, userY: Double
     ): Float {
@@ -401,32 +385,5 @@ class NavigationSessionManager(
             d += sqrt(dx * dx + dy * dy)
         }
         return d
-    }
-
-    companion object {
-        // Thresholds in map pixels, calibrated to pxPerMetre = 4.48
-        // ARRIVAL  ~2 m  → 2 × 4.48 = ~9 px
-        // REROUTE  ~4 m  → 4 × 4.48 = ~18 px
-        private const val ARRIVAL_THRESHOLD_PX = 9.0
-        private const val REROUTE_THRESHOLD_PX = 18.0
-
-        // SINGLETON RESET FIX: var instead of lazy — fully replaced each trip
-        @Volatile
-        private var _instance: NavigationSessionManager? = null
-
-        val instance: NavigationSessionManager
-            get() = _instance
-                ?: throw IllegalStateException(
-                    "NavigationSessionManager not initialised — call reset() first"
-                )
-
-        fun reset() {
-            _instance?.destroy()
-            _instance = NavigationSessionManager(
-                mallGraph  = MallGraphRepository.loadedGraph
-                    ?: throw IllegalStateException("Graph not loaded"),
-                pxPerMetre = 4.48f  // Calibrated: 208 px = 46.5 m (Bershka→OXXO)
-            )
-        }
     }
 }

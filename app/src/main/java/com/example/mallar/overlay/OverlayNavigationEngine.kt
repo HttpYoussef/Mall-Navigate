@@ -5,6 +5,7 @@ import com.example.mallar.data.GraphNode
 import com.example.mallar.data.MallGraph
 import com.example.mallar.data.MallGraphRepository
 import com.example.mallar.navigation.IndoorPositionTracker
+import com.example.mallar.navigation.NavConfig
 import com.example.mallar.navigation.StepTracker
 import kotlin.math.sqrt
 
@@ -19,7 +20,7 @@ private const val TAG = "OverlayNavigationEngine"
  * -------
  * The central brain of the pseudo-AR overlay navigation system.
  *
- * Replaces the ARCore-based ArrowSceneManager pipeline with a pure software
+ * Replaces the ARCore-based ArrowSceneManager pipeline with a software
  * pipeline that uses:
  *   • IndoorPositionTracker (dead-reckoning + map matching + logo relocalization)
  *   • SensorFusionManager heading (TYPE_ROTATION_VECTOR → Kalman filtered)
@@ -100,7 +101,7 @@ class OverlayNavigationEngine(
      */
     fun initialize() {
         val startNode = currentPath.firstOrNull() ?: return
-        positionTracker = IndoorPositionTracker(mallGraph, startNode).also { tracker ->
+        positionTracker = IndoorPositionTracker(mallGraph, startNode, pxPerMetre).also { tracker ->
             tracker.onPositionUpdated = { posX, posY -> onPositionUpdated(posX, posY) }
         }
         isInitialized = true
@@ -126,10 +127,9 @@ class OverlayNavigationEngine(
      * Feed a new step event from StepTracker (hardware or software).
      * Advances dead-reckoning position.
      */
-    fun onStep(totalSteps: Long) {
+    fun onStep(totalSteps: Long, strideM: Float = NavConfig.DEFAULT_STRIDE_LENGTH_M) {
         if (!isInitialized) return
-        val stridePx = StepTracker.STRIDE_LENGTH_M * pxPerMetre
-        positionTracker?.onStep(stridePx.toDouble())
+        positionTracker?.onStep(strideM, currentPath, currentSegmentIdx)
         // onPositionUpdated is triggered automatically via the tracker's callback
     }
 
@@ -139,11 +139,10 @@ class OverlayNavigationEngine(
      */
     fun onLogoDetected(recognizedNode: GraphNode) {
         if (!isInitialized) return
-        val snapped = positionTracker?.relocalize(recognizedNode) ?: false
-        if (snapped) {
-            Log.d(TAG, "Relocalized to '${recognizedNode.shopName}'")
-            recomputeAndNotify()
-        }
+        positionTracker?.relocalize(recognizedNode)
+        // onPositionUpdated is triggered automatically via tracker
+        Log.d(TAG, "Relocalized to '${recognizedNode.shopName}'")
+        recomputeAndNotify()
     }
 
     // ─────────────────────────────────────────────────────────────────────────

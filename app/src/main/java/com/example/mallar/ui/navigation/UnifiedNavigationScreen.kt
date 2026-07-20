@@ -107,9 +107,10 @@ fun UnifiedNavigationScreen(
     DisposableEffect(Unit) {
         voiceAssistant.initialize()
         voiceAssistant.graphProvider = { MallGraphRepository.loadedGraph }
-        voiceAssistant.navStateProvider = {
-            runCatching { NavigationSessionManager.instance.sessionState.value }.getOrNull()
-        }
+        
+        // FIX: Remove Singleton dependency, use ViewModel state
+        voiceAssistant.navStateProvider = { viewModel.navState.value }
+        
         voiceAssistant.onNavigateTo = { shopName, isArabic ->
             NavigationState.preferArabicVoice = isArabic
             viewModel.navigateToNewDestination(shopName)
@@ -132,6 +133,8 @@ fun UnifiedNavigationScreen(
     }
 
     // ── Sensors ───────────────────────────────────────────────────────────────
+    // Note: UnifiedNavigationViewModel now handles StepTracker and Barometer.
+    // SensorFusion is still handled here for now but Azimuth is piped to ViewModel.
     val modeSelection = state.modeSelection
     DisposableEffect(poseEnabled, modeSelection) {
         if (poseEnabled && modeSelection == NavigationModeSelection.AUTO) {
@@ -159,12 +162,6 @@ fun UnifiedNavigationScreen(
         f.start()
         onDispose { f.stop() }
     }
-    DisposableEffect(Unit) {
-        val s = StepTracker(context)
-        s.onStep = { total, _ -> viewModel.onStep(total) }
-        s.start()
-        onDispose { s.stop() }
-    }
 
     // ── Camera lifecycle ──────────────────────────────────────────────────────
     LaunchedEffect(isCameraMode, previewRef.value) {
@@ -175,6 +172,11 @@ fun UnifiedNavigationScreen(
         val pv = previewRef.value ?: return@LaunchedEffect
         yield()
         delay(48)
+        
+        // Wire CameraManager to ViewModel state to enable relocalization
+        cameraManager.navStateProvider = { viewModel.navState.value }
+        cameraManager.onLogoDetected = { node -> viewModel.onLogoDetected(node) }
+        
         cameraManager.startCamera(
             lifecycleOwner        = lifecycle,
             surfaceProvider       = pv.surfaceProvider,
@@ -256,21 +258,12 @@ fun UnifiedNavigationScreen(
             }
         }
 
-        // LAYER 5: Orientation phase — shown once, before normal navigation,
-        // so the user faces the correct direction before it begins.
         if (orientationState.active) {
             OrientationOverlay(orientationState = orientationState)
         }
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Orientation Phase Overlay
-// ─────────────────────────────────────────────────────────────────────────────
-// Text-only guidance today. It renders purely from OrientationUiState
-// (targetBearingDeg / headingDeg / direction), so a future AR arrow can be
-// swapped in here — reading the same state — without touching the navigation
-// flow that drives it (UnifiedNavigationViewModel / OrientationManager).
 @Composable
 private fun OrientationOverlay(orientationState: OrientationUiState) {
     Box(
@@ -395,10 +388,6 @@ private fun FloorTransitionSheet(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LAYER 3: Calibrated map layer
-// ─────────────────────────────────────────────────────────────────────────────
-
 @Composable
 private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = Modifier) {
     if (alpha <= 0f) {
@@ -436,7 +425,6 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
     }
 
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
-
     var mapScale  by remember { mutableFloatStateOf(1f) }
     var panOffset by remember { mutableStateOf(Offset.Zero) }
     var userPanning by remember { mutableStateOf(false) }
@@ -446,8 +434,6 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
         else state.pathNodes.size * 31 + state.pathNodes.first().id.hashCode() + state.pathNodes.last().id.hashCode()
     }
 
-    // FIX: replaced return@remember (invalid label on non-inline lambda) with
-    // plain if/else expressions.
     val fitScale = remember(canvasSize) {
         if (canvasSize.width == 0 || canvasSize.height == 0) 1f
         else minOf(canvasSize.width.toFloat() / MAP_SRC_W, canvasSize.height.toFloat() / MAP_SRC_H)
@@ -461,7 +447,6 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
         )
     }
 
-    // Route-focused initial zoom + pan
     LaunchedEffect(fitScale, fitOffset, canvasSize, pathSignature) {
         if (userPanning || canvasSize.width == 0 || canvasSize.height == 0) return@LaunchedEffect
         val nodes = state.pathNodes
@@ -526,7 +511,6 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
                 }
             }
     ) {
-        // 1. Map image
         withTransform({
             translate(panOffset.x, panOffset.y)
             scale(mapScale, mapScale, Offset.Zero)
@@ -534,7 +518,6 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
             mapBitmap?.let { drawImage(it) }
         }
 
-        // 2. A* route path (current floor segment only)
         val nodes = floorPathNodes
         if (nodes.size >= 2) {
             val fullNodes = state.pathNodes
@@ -572,7 +555,6 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
             }
 
             val r = (9f * mapScale).coerceIn(5f, 20f)
-
             val sp = toCv(nodes.first().x, nodes.first().y)
             drawCircle(Color.White,  r * 1.6f, sp)
             drawCircle(StartGreen,   r, sp)
@@ -590,15 +572,12 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
             }
         }
 
-        // 3. User dot
         val up = toCv(state.userMapX.toDouble(), state.userMapY.toDouble())
         val dr = (9f * mapScale).coerceIn(5f, 18f)
-
         drawCircle(UserBlue.copy(0.12f), dr * 3.2f, up)
         drawCircle(Color.White,          dr * 1.55f, up)
         drawCircle(UserBlue,             dr, up)
 
-        // Heading arrow
         val hr = Math.toRadians(state.headingDeg.toDouble())
         val al = dr * 2.8f
         drawLine(
@@ -611,10 +590,6 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LAYER 4: HUD
-// ─────────────────────────────────────────────────────────────────────────────
-
 @Composable
 private fun NavigationHud(
     state: NavSessionState,
@@ -622,7 +597,6 @@ private fun NavigationHud(
     onBackClick: () -> Unit,
     onModeSelected: (NavigationModeSelection) -> Unit
 ) {
-    // Top bar
     Column(Modifier.fillMaxWidth().statusBarsPadding()) {
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
@@ -651,7 +625,6 @@ private fun NavigationHud(
             } else Spacer(Modifier.weight(1f))
         }
 
-        // Mode badge (only visible in Auto selection mode to indicate active orientation mode)
         if (state.modeSelection == NavigationModeSelection.AUTO) {
             Row(
                 modifier = Modifier
@@ -668,7 +641,6 @@ private fun NavigationHud(
         }
     }
 
-    // Centre banners
     Box(Modifier.fillMaxSize(), Alignment.Center) {
         AnimatedVisibility(state.isRerouting, enter = fadeIn() + scaleIn(spring(Spring.DampingRatioMediumBouncy)), exit = fadeOut() + scaleOut()) {
             Row(
@@ -707,13 +679,11 @@ private fun NavigationHud(
         }
     }
 
-    // Bottom bar
     Box(Modifier.fillMaxSize(), Alignment.BottomCenter) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(bottom = 14.dp).navigationBarsPadding()
         ) {
-            // Segmented mode selector
             AnimatedVisibility(
                 visible = !state.isArrived,
                 enter = slideInVertically { it } + fadeIn(),
@@ -863,15 +833,9 @@ private fun HudButton(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LAYER 2: AR Directional Arrow Overlay
-// ─────────────────────────────────────────────────────────────────────────────
-
 @Composable
 private fun ArDirectionOverlay(state: NavSessionState, alpha: Float) {
-
     val turnInfo = state.turnInfo
-
     if (alpha > 0f) {
         Box(
             modifier = Modifier
@@ -880,9 +844,7 @@ private fun ArDirectionOverlay(state: NavSessionState, alpha: Float) {
             contentAlignment = Alignment.Center
         ) {
             if (!state.isArrived && turnInfo != null) {
-
                 val targetAngle = turnInfo.angleDeg
-
                 val smoothTarget = remember { mutableFloatStateOf(targetAngle) }
 
                 LaunchedEffect(targetAngle) {
@@ -916,7 +878,6 @@ private fun ArDirectionOverlay(state: NavSessionState, alpha: Float) {
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.offset(y = (-40).dp)
                 ) {
-                    // Guidance card
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
@@ -935,10 +896,7 @@ private fun ArDirectionOverlay(state: NavSessionState, alpha: Float) {
                             Text(text = "in ${state.remainingDistanceM} m", color = Color.White.copy(0.7f), fontWeight = FontWeight.Normal, fontSize = 13.sp)
                         }
                     }
-
                     Spacer(modifier = Modifier.height(60.dp))
-
-                    // Large animated arrow
                     Box(
                         modifier = Modifier
                             .size(160.dp)
@@ -951,7 +909,6 @@ private fun ArDirectionOverlay(state: NavSessionState, alpha: Float) {
                         Canvas(modifier = Modifier.fillMaxSize()) {
                             val w = size.width
                             val h = size.height
-
                             val arrowPath = androidx.compose.ui.graphics.Path().apply {
                                 moveTo(w * 0.5f, h * 0.05f)
                                 lineTo(w * 0.9f, h * 0.45f)
@@ -962,20 +919,16 @@ private fun ArDirectionOverlay(state: NavSessionState, alpha: Float) {
                                 lineTo(w * 0.1f, h * 0.45f)
                                 close()
                             }
-
-                            // Shadow glow
                             drawPath(
                                 path = arrowPath,
                                 color = Color.Black.copy(alpha = 0.35f),
                                 style = Stroke(width = 20f, join = StrokeJoin.Round)
                             )
-                            // White outline
                             drawPath(
                                 path = arrowPath,
                                 color = Color.White,
                                 style = Stroke(width = 10f, join = StrokeJoin.Round)
                             )
-                            // Main fill
                             drawPath(path = arrowPath, color = NavBlue)
                         }
                     }
