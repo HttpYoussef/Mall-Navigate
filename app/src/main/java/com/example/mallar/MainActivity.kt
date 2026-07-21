@@ -414,5 +414,36 @@ fun MallARNavGraph(context: Context) {
                 }
             )
         }
+
+        // ── PARKING ───────────────────────────────────────────────────────────
+        composable("parking_home") {
+            ParkingHomeScreen(
+                onBackClick = { navController.popBackStack() },
+                onSaveLocationClick = { navController.navigate("parking_camera") },
+                onNavigateToCarClick = { navController.navigate("parking_map") },
+                onEditLocationClick = { navController.navigate("parking_map") }
+            )
+        }
+        composable("parking_camera") {
+            ParkingCameraScreen(
+                onBackClick = { navController.popBackStack() },
+                onPhotoCaptured = { navController.navigate("parking_scan_result") }
+            )
+        }
+        composable("parking_scan_result") {
+            ParkingScanResultScreen(
+                onBackClick = { navController.popBackStack() },
+                onSaveSuccess = {
+                    navController.navigate("parking_home") {
+                        popUpTo("parking_home") { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable("parking_map") {
+            ParkingMapScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
     }
 }
