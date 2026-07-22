@@ -403,7 +403,7 @@ fun HomeScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.QrCodeScanner,
+                                        imageVector = Icons.Default.PhotoCamera,
                                         contentDescription = "Scan Logo",
                                         tint = currentAccent,
                                         modifier = Modifier.size(17.dp)
