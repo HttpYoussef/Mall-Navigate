@@ -425,15 +425,25 @@ fun HomeScreen(
                         visible = contentVisible,
                         enter = fadeIn(tween(280, delayMillis = 90)) + slideInVertically(tween(280, delayMillis = 90)) { it / 6 }
                     ) {
+                        val infiniteTransition = rememberInfiniteTransition(label = "nav_glow_infinite")
+                        val idleGlowAlpha by infiniteTransition.animateFloat(
+                            initialValue = 0.25f,
+                            targetValue = 0.45f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(2000, easing = LinearEasing),
+                                repeatMode = RepeatMode.Reverse
+                            ),
+                            label = "nav_idle_glow"
+                        )
                         val navInteractionSource = remember { MutableInteractionSource() }
                         val navPressed by navInteractionSource.collectIsPressedAsState()
                         val navPressScale by animateFloatAsState(
-                            targetValue = if (navPressed) 0.97f else 1f,
-                            animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+                            targetValue = if (navPressed) 0.96f else 1f,
+                            animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
                             label = "start_nav_press_scale"
                         )
                         val navGlow by animateFloatAsState(
-                            targetValue = if (navPressed) 0.5f else 0.3f,
+                            targetValue = if (navPressed) 0.65f else idleGlowAlpha,
                             animationSpec = spring(stiffness = Spring.StiffnessMedium),
                             label = "start_nav_glow"
                         )
@@ -441,16 +451,17 @@ fun HomeScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 14.dp)
+                                .padding(horizontal = 20.dp, vertical = 20.dp)
+                                .heightIn(min = 140.dp)
                                 .scale(navPressScale)
                                 // Stronger, layered outer glow for a premium feel
                                 .shadow(
-                                    elevation = 22.dp,
-                                    shape = RoundedCornerShape(28.dp),
+                                    elevation = 30.dp,
+                                    shape = RoundedCornerShape(32.dp),
                                     ambientColor = currentAccent.copy(alpha = navGlow),
                                     spotColor = currentAccent.copy(alpha = navGlow)
                                 )
-                                .clip(RoundedCornerShape(28.dp))
+                                .clip(RoundedCornerShape(32.dp))
                                 .background(
                                     // Layered gradient: diagonal accent wash + radial glow pooled
                                     // behind the icon, over the base glass surface.
@@ -462,7 +473,7 @@ fun HomeScreen(
                                         }
                                     )
                                 )
-                                .border(BorderStroke(1.dp, currentAccent.copy(alpha = 0.4f)), RoundedCornerShape(28.dp))
+                                .border(BorderStroke(1.2.dp, currentAccent.copy(alpha = 0.5f)), RoundedCornerShape(32.dp))
                                 .clickable(interactionSource = navInteractionSource, indication = null) {
                                     searchFocusRequester.requestFocus()
                                 }
@@ -471,25 +482,25 @@ fun HomeScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(70.dp)
+                                    .height(80.dp)
                                     .align(Alignment.TopCenter)
                                     .background(
                                         Brush.verticalGradient(
                                             listOf(Color.White.copy(alpha = 0.08f), Color.Transparent)
                                         ),
-                                        RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+                                        RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                                     )
                             )
 
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(22.dp),
+                                    .padding(horizontal = 24.dp, vertical = 26.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 // Larger icon, double-layered glow ring
                                 Box(
-                                    modifier = Modifier.size(76.dp),
+                                    modifier = Modifier.size(86.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Box(
@@ -502,7 +513,7 @@ fun HomeScreen(
                                     )
                                     Box(
                                         modifier = Modifier
-                                            .size(56.dp)
+                                            .size(64.dp)
                                             .background(
                                                 Brush.radialGradient(listOf(currentAccent.copy(alpha = 0.22f), Color.Transparent)),
                                                 CircleShape
@@ -510,33 +521,33 @@ fun HomeScreen(
                                     )
                                     Box(
                                         modifier = Modifier
-                                            .size(52.dp)
+                                            .size(58.dp)
                                             .border(1.5.dp, currentAccent.copy(alpha = 0.6f), CircleShape)
                                     )
                                     Icon(
                                         imageVector = Icons.Default.Navigation,
                                         contentDescription = null,
                                         tint = currentAccent,
-                                        modifier = Modifier.size(28.dp)
+                                        modifier = Modifier.size(32.dp)
                                     )
                                 }
 
-                                Spacer(Modifier.width(18.dp))
+                                Spacer(Modifier.width(20.dp))
 
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = "Start navigation",
                                         color = currentTextMain,
-                                        fontSize = 20.sp,
+                                        fontSize = 22.sp,
                                         fontWeight = FontWeight.Bold,
-                                        letterSpacing = (-0.2).sp
+                                        letterSpacing = (-0.4).sp
                                     )
-                                    Spacer(Modifier.height(5.dp))
+                                    Spacer(Modifier.height(6.dp))
                                     Text(
                                         text = "Get walking directions to any store or place",
                                         color = currentTextSub,
-                                        fontSize = 13.sp,
-                                        lineHeight = 17.sp
+                                        fontSize = 14.sp,
+                                        lineHeight = 18.sp
                                     )
                                 }
 
@@ -1444,10 +1455,10 @@ private fun ParkingHeroCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
-            .height(280.dp)
+            .height(200.dp)
             .scale(pressScale)
             .shadow(
-                elevation = 20.dp,
+                elevation = 16.dp,
                 shape = RoundedCornerShape(28.dp),
                 ambientColor = ParkingPurple.copy(alpha = glowAlpha),
                 spotColor = ParkingPurple.copy(alpha = glowAlpha)
@@ -1472,7 +1483,7 @@ private fun ParkingHeroCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(90.dp)
+                .height(70.dp)
                 .align(Alignment.TopCenter)
                 .background(
                     Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.07f), Color.Transparent)),
@@ -1483,36 +1494,36 @@ private fun ParkingHeroCard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(20.dp)
         ) {
             Text(
                 text = "PARK SMART",
                 color = ParkingPurple,
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 1.4.sp
+                letterSpacing = 1.2.sp
             )
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(6.dp))
             Text(
                 text = "Find parking\nin seconds.",
                 color = currentTextMain,
-                fontSize = 26.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                lineHeight = 30.sp
+                lineHeight = 26.sp
             )
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(8.dp))
 
             val subtitleText = if (parkingLocation != null) {
-                "Spot saved: ${parkingLocation!!.zone}-${parkingLocation!!.slot} · Floor ${parkingLocation!!.floor}. Tap to get directions back to your car."
+                "Spot saved: ${parkingLocation!!.zone}-${parkingLocation!!.slot}"
             } else {
-                "Real-time availability and directions to your spot."
+                "Real-time availability and directions."
             }
             Text(
                 text = subtitleText,
                 color = currentTextSub,
-                fontSize = 13.sp,
-                lineHeight = 18.sp,
-                maxLines = 2,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -1523,21 +1534,21 @@ private fun ParkingHeroCard(
                     .clip(RoundedCornerShape(50))
                     .background(Color.White.copy(alpha = if (isDarkMode) 0.10f else 0.7f))
                     .border(1.dp, Color.White.copy(alpha = if (isDarkMode) 0.16f else 0.9f), RoundedCornerShape(50))
-                    .padding(horizontal = 18.dp, vertical = 11.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = if (parkingLocation != null) "Find my car" else "Find parking",
                     color = ParkingPurple,
-                    fontSize = 14.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 Icon(
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = null,
                     tint = ParkingPurple,
-                    modifier = Modifier.size(15.dp)
+                    modifier = Modifier.size(14.dp)
                 )
             }
         }
@@ -1547,8 +1558,8 @@ private fun ParkingHeroCard(
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .fillMaxWidth(0.62f)
-                .fillMaxHeight(0.78f)
+                .fillMaxWidth(0.55f)
+                .fillMaxHeight(0.7f)
         ) {
             ParkingCarIllustration(isDarkMode = isDarkMode, currentAccent = ParkingPurple)
         }
@@ -1557,16 +1568,17 @@ private fun ParkingHeroCard(
         Column(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 24.dp, end = 24.dp)
+                .padding(top = 18.dp, end = 18.dp)
+                .scale(0.85f)
                 .clip(RoundedCornerShape(14.dp))
                 .background(if (isDarkMode) Color(0xFF121B2E).copy(alpha = 0.85f) else Color.White.copy(alpha = 0.9f))
                 .border(1.dp, Color.White.copy(alpha = if (isDarkMode) 0.08f else 0.6f), RoundedCornerShape(14.dp))
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("SPACES", color = currentTextSub, fontSize = 9.sp, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
-            Text("128", color = ParkingPurple, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Text("Available", color = currentTextSub, fontSize = 9.sp)
+            Text("SPACES", color = currentTextSub, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
+            Text("128", color = ParkingPurple, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text("Available", color = currentTextSub, fontSize = 8.sp)
         }
     }
 }

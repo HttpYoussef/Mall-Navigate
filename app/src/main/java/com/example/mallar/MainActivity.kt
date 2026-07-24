@@ -15,9 +15,6 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.core.tween
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import com.example.mallar.data.MallGraphRepository
 import com.example.mallar.data.PlaceRepository
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,8 +25,9 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.mallar.data.AppPreferences
-import com.example.mallar.data.FavoritesManager
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.mallar.data.StartupCoordinator
+import com.example.mallar.data.StartupState
 import com.example.mallar.ui.navigation.*
 import com.example.mallar.ui.splash.SplashScreen
 import com.example.mallar.ui.auth.*
@@ -58,22 +56,18 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 1. Install System Splash (Dismisses immediately into Compose Splash)
+        installSplashScreen()
+        
         super.onCreate(savedInstanceState)
 
-        // Initialize preference managers
-        AppPreferences.init(this)
-        FavoritesManager.init(this)
-        com.example.mallar.data.ParkingManager.init(this)
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            PlaceRepository.load(applicationContext)
-            MallGraphRepository.load(applicationContext)
-        }
-
         setContent {
+            val startupState by StartupCoordinator.state.collectAsState()
+            val intentData = remember { intent?.data }
+            
             MallARTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    MallARNavGraph(this)
+                    MallARNavGraph(this, startupState, intentData)
                 }
             }
         }
@@ -81,7 +75,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MallARNavGraph(context: Context) {
+fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentData: Uri?) {
 
     val navController = rememberNavController()
 
@@ -106,19 +100,35 @@ fun MallARNavGraph(context: Context) {
         prefs.edit().putBoolean("is_first_launch", false).apply()
     }
 
+    // Handle initial intent for deep linking after splash
+    val navigateAfterSplash: () -> Unit = {
+        val destination = if (isFirstLaunch.value) "welcome" else "home"
+        
+        // If we have deep link data, we ensure the standard transition occurs correctly.
+        // Deep links are typically handled by the NavHost automatically if configured,
+        // or we could explicitly route based on initialIntentData here.
+        navController.navigate(destination) {
+            popUpTo("splash") { inclusive = true }
+        }
+    }
+
     NavHost(
         navController    = navController,
         startDestination = "splash"
     ) {
 
         // ── Splash ────────────────────────────────────────────────────────────
-        composable("splash") {
+        composable(
+            route = "splash",
+            exitTransition = {
+                fadeOut(tween(300))
+            }
+        ) {
             SplashScreen(
-                isFirstLaunch = isFirstLaunch.value,
-                onStartClick = {
-                    navController.navigate("home") {
-                        popUpTo("splash") { inclusive = true }
-                    }
+                startupState = startupState,
+                onTimeout = navigateAfterSplash,
+                onRetry = {
+                    StartupCoordinator.retry(context)
                 }
             )
         }
@@ -224,8 +234,6 @@ fun MallARNavGraph(context: Context) {
         }
 
         // ── HOME ──────────────────────────────────────────────────────────────
-        // NEW: First screen after auth. User picks a destination here.
-        // After selection → check permissions → logo_scan (to localize) → navigation
         composable("home") {
             HomeScreen(
                 onMapClick = {
@@ -235,11 +243,7 @@ fun MallARNavGraph(context: Context) {
                     navController.navigate("saved_places")
                 },
                 onDestinationSelected = { place ->
-                    // Save the chosen destination globally
                     NavigationState.selectedPlace = place
-
-                    // Now send user to logo scan to set their start location,
-                    // with the destination already known.
                     if (checkPermissionsGranted()) {
                         navController.navigate("logo_scan_with_dest")
                     } else {
@@ -266,8 +270,6 @@ fun MallARNavGraph(context: Context) {
                 },
                 onCategoryClick = { categoryKey, categoryLabel ->
                     navController.navigate("category/${Uri.encode(categoryKey)}/${Uri.encode(categoryLabel)}")
-
-
                 },
                 onOffersClick = {
                     navController.navigate("offers")
@@ -277,6 +279,7 @@ fun MallARNavGraph(context: Context) {
                 }
             )
         }
+
         composable(
             route = "offers",
             enterTransition = { slideInHorizontally(tween(320)) { it / 3 } + fadeIn(tween(320)) },
@@ -340,53 +343,41 @@ fun MallARNavGraph(context: Context) {
             )
         }
 
-
-        // ── Logo Scan (destination pre-selected from HomeScreen) ──────────────
-        // User has already chosen where they want to go.
-        // This screen is now only for LOCALIZATION (setting start position).
-        // Once localized it auto-navigates.
         composable("logo_scan_with_dest") {
             LogoScanScreen(
                 preselectedDestination = true,
                 onBackFromLogo = { navController.popBackStack() },
-
                 onStoreSelected  = { isCameraMode ->
                     NavigationState.startWithAr = isCameraMode
                     navController.navigate("navigation") {
-                        // Keep home in the back stack so back from navigation → home
                         popUpTo("home") { inclusive = false }
                     }
                 }
             )
         }
 
-        // ── Logo Scan (standalone — no destination pre-selected) ──────────────
-        // Kept for backwards compatibility / direct deep links
         composable("logo_scan") {
             LogoScanScreen(
                 onBackFromLogo = { navController.popBackStack() },
-
                 onStoreSelected = { isCameraMode ->
                     NavigationState.startWithAr = isCameraMode
                     navController.navigate("navigation")
                 }
             )
         }
-        // ── Unified Navigation (Map + AR) ────────────────────────────────────
+        
         composable("navigation") {
             UnifiedNavigationScreen(
                 onBackClick = { navController.popBackStack() }
             )
         }
 
-        // ── Static mall map (from Home bottom nav) ────────────────────────────
         composable("static_map") {
             StaticMapScreen(
                 onBackClick = { navController.popBackStack() }
             )
         }
 
-        // ── Saved / favorite places (from Home bottom nav) ────────────────────
         composable("saved_places") {
             SavedPlacesScreen(
                 onBackClick = { navController.popBackStack() },
@@ -401,13 +392,13 @@ fun MallARNavGraph(context: Context) {
             )
         }
 
-        // ── Profile (replaces Settings) ──────────────────────────────────────
         composable("profile") {
             ProfileScreen(
                 onBackClick   = { navController.popBackStack() },
                 onLogoutClick = {
                     isFirstLaunch.value = true
                     prefs.edit().putBoolean("is_first_launch", true).apply()
+                    StartupCoordinator.reset()
                     navController.navigate("welcome") {
                         popUpTo(0) { inclusive = true }
                     }
@@ -415,7 +406,6 @@ fun MallARNavGraph(context: Context) {
             )
         }
 
-        // ── PARKING ───────────────────────────────────────────────────────────
         composable("parking_home") {
             ParkingHomeScreen(
                 onBackClick = { navController.popBackStack() },
@@ -424,12 +414,14 @@ fun MallARNavGraph(context: Context) {
                 onEditLocationClick = { navController.navigate("parking_map") }
             )
         }
+        
         composable("parking_camera") {
             ParkingCameraScreen(
                 onBackClick = { navController.popBackStack() },
                 onPhotoCaptured = { navController.navigate("parking_scan_result") }
             )
         }
+        
         composable("parking_scan_result") {
             ParkingScanResultScreen(
                 onBackClick = { navController.popBackStack() },
@@ -440,6 +432,7 @@ fun MallARNavGraph(context: Context) {
                 }
             )
         }
+        
         composable("parking_map") {
             ParkingMapScreen(
                 onBackClick = { navController.popBackStack() }
