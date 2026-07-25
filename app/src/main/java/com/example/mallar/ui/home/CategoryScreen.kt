@@ -88,12 +88,13 @@ fun CategoryScreen(
     val effectiveCategoryKey = remember(categoryKey) { if (categoryKey.equals("all", ignoreCase = true)) "" else categoryKey }
 
     // Same dynamic color mapping HomeScreen uses — same tokens, same rules.
-    val currentBg       = if (isDarkMode) DeepNavyBg else LightBg
-    val currentCardBg   = if (isDarkMode) GlassCardBg.copy(alpha = 0.5f) else LightCardBg
-    val currentTextMain = if (isDarkMode) Color.White else Color(0xFF1A1A2E)
-    val currentTextSub  = if (isDarkMode) MutedTextSubDark else MutedTextSubLight
-    val currentAccent   = if (isDarkMode) CyanGlow else LightTealAccent
-    val currentBorder   = if (isDarkMode) Color.White.copy(0.08f) else Color.Black.copy(0.06f)
+    val colorScheme = rememberHomeColorScheme(isDarkMode)
+    val currentBg       = colorScheme.bg
+    val currentCardBg   = colorScheme.cardBg
+    val currentTextMain = colorScheme.textMain
+    val currentTextSub  = colorScheme.textSub
+    val currentAccent   = colorScheme.accent
+    val currentBorder   = colorScheme.border
 
     var allPlaces     by remember { mutableStateOf<List<Place>>(emptyList()) }
     var searchQuery   by remember { mutableStateOf("") }

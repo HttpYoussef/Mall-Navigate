@@ -34,6 +34,7 @@ import com.example.mallar.ui.auth.*
 import com.example.mallar.ui.profile.*
 import com.example.mallar.ui.parking.*
 import com.example.mallar.ui.home.*
+import com.example.mallar.ui.destination.DestinationSelectionScreen
 import com.example.mallar.ui.localization.*
 import com.example.mallar.ui.theme.MallARTheme
 import java.util.Locale
@@ -276,6 +277,23 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
                 },
                 onVoucherClick = { voucherId ->
                     navController.navigate("voucher/$voucherId")
+                },
+                onNavigateToDestinationSelection = {
+                    navController.navigate("destination_selection")
+                }
+            )
+        }
+
+        composable("destination_selection") {
+            DestinationSelectionScreen(
+                onBackClick = { navController.popBackStack() },
+                onDestinationSelected = { place ->
+                    NavigationState.selectedPlace = place
+                    if (checkPermissionsGranted()) {
+                        navController.navigate("logo_scan_with_dest")
+                    } else {
+                        navController.navigate("permissions")
+                    }
                 }
             )
         }

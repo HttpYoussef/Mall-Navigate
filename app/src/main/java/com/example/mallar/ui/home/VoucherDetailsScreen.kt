@@ -65,12 +65,13 @@ fun VoucherDetailsScreen(
     val scope = rememberCoroutineScope()
     val isDarkMode by AppPreferences.isDarkMode.collectAsState()
 
-    val currentBg       = if (isDarkMode) DeepNavyBg else LightBg
-    val currentCardBg   = if (isDarkMode) GlassCardBg.copy(alpha = 0.5f) else LightCardBg
-    val currentTextMain = if (isDarkMode) Color.White else Color(0xFF1A1A2E)
-    val currentTextSub  = if (isDarkMode) MutedTextSubDark else MutedTextSubLight
-    val currentAccent   = if (isDarkMode) CyanGlow else LightTealAccent
-    val currentBorder   = if (isDarkMode) Color.White.copy(0.08f) else Color.Black.copy(0.06f)
+    val colorScheme = rememberHomeColorScheme(isDarkMode)
+    val currentBg       = colorScheme.bg
+    val currentCardBg   = colorScheme.cardBg
+    val currentTextMain = colorScheme.textMain
+    val currentTextSub  = colorScheme.textSub
+    val currentAccent   = colorScheme.accent
+    val currentBorder   = colorScheme.border
 
     val voucher = remember(voucherId) {
         VoucherRepository.loadPlaceholderVouchers().firstOrNull { it.id == voucherId }
