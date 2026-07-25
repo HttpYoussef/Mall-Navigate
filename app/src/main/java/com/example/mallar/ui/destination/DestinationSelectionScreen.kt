@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -16,15 +15,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -40,28 +37,25 @@ import com.example.mallar.ui.home.*
 fun DestinationSelectionScreen(
     viewModel: DestinationViewModel = viewModel(),
     onBackClick: () -> Unit,
-    onDestinationSelected: (Place) -> Unit
+    onSearchClick: () -> Unit,
+    onCategoryClick: (key: String, label: String) -> Unit,
+    onDestinationSelected: (Place) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isDarkMode by AppPreferences.isDarkMode.collectAsState()
-    val favoriteIds by FavoritesManager.favorites.collectAsState()
 
-    val colorScheme = rememberHomeColorScheme(isDarkMode)
+    val colorScheme = rememberHomeColorScheme(isDarkMode = isDarkMode)
     val currentBg       = colorScheme.bg
     val currentCardBg   = colorScheme.cardBg
     val currentTextMain = colorScheme.textMain
     val currentTextSub  = colorScheme.textSub
     val currentAccent   = colorScheme.accent
-    val currentBorder   = colorScheme.border
 
-    var searchFocused by remember { mutableStateOf(false) }
     var pendingPlace by remember { mutableStateOf<Place?>(null) }
-    var contentVisible by remember { mutableStateOf(false) }
-    val searchFocusRequester = remember { FocusRequester() }
+    var contentVisible by remember { mutableStateOf(value = false) }
     
     LaunchedEffect(Unit) { 
         contentVisible = true
-        searchFocusRequester.requestFocus()
     }
 
     val clothesPainter = painterResource(R.drawable.clothes)
@@ -71,11 +65,11 @@ fun DestinationSelectionScreen(
 
     val categories = remember(clothesPainter, foodPainter, perfumePainter, beauPainter) {
         listOf(
-            Category("All",         Icons.Default.GridView,   categoryKey = ""),
-            Category("Clothes",     clothesPainter,           categoryKey = "fashion"),
-            Category("Food",        foodPainter,              categoryKey = "dining"),
-            Category("Perfumes",    perfumePainter,           categoryKey = "perfumes& Cosmetics"),
-            Category("Beauty",      beauPainter,              categoryKey = "beauty"),
+            Category("Food & Dining", Icons.Default.Restaurant, categoryKey = "dining"),
+            Category("Fashion",       clothesPainter,           categoryKey = "fashion"),
+            Category("Cafés",         foodPainter,              categoryKey = "cafes"),
+            Category("Entertainment", Icons.Default.VideogameAsset, categoryKey = "entertainment"),
+            Category("Services",      Icons.Default.MoreHoriz,   categoryKey = "services"),
         )
     }
 
@@ -84,145 +78,198 @@ fun DestinationSelectionScreen(
             .fillMaxSize()
             .background(currentBg)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // ── Header ────────────────────────────────────────────────────────
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBackClick) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = currentTextMain)
-                }
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "Select Destination",
-                    color = currentTextMain,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-            }
-
-            // ── Search Bar ────────────────────────────────────────────────────
-            Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .shadow(8.dp, RoundedCornerShape(28.dp), clip = false)
-                        .background(
-                            if (isDarkMode) GlassCardBg else Color.White,
-                            RoundedCornerShape(28.dp)
+        // --- Premium Atmospheric Glow ---
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(450.dp)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            currentAccent.copy(alpha = 0.15f),
+                            currentAccent.copy(alpha = 0.05f),
+                            Color.Transparent
                         )
-                        .border(
-                            BorderStroke(
-                                if (searchFocused) 2.dp else 1.dp,
-                                if (searchFocused) currentAccent else currentBorder
-                            ),
-                            RoundedCornerShape(28.dp)
-                        )
-                        .padding(horizontal = 18.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        tint = if (searchFocused) currentAccent else currentTextSub,
-                        modifier = Modifier.size(22.dp)
                     )
-                    Spacer(Modifier.width(12.dp))
-                    BasicTextField(
-                        value = uiState.searchQuery,
-                        onValueChange = { viewModel.onSearchQueryChanged(it) },
-                        singleLine = true,
-                        textStyle = androidx.compose.ui.text.TextStyle(
-                            fontSize = 16.sp,
-                            color = currentTextMain,
-                            fontWeight = FontWeight.Normal
-                        ),
-                        modifier = Modifier
-                            .weight(1f)
-                            .focusRequester(searchFocusRequester)
-                            .onFocusChanged { searchFocused = it.isFocused },
-                        decorationBox = { inner ->
-                            if (uiState.searchQuery.isEmpty()) {
+                )
+        )
+
+        Column(modifier = Modifier.fillMaxSize()) {
+            // ── Unified Vertical Scroll per UX requirement ──────────
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 40.dp)
+            ) {
+                // ── Editorial Header ──────────────────────────────────────────
+                item(key = "header") {
+                    AnimatedVisibility(
+                        visible = contentVisible,
+                        enter = fadeIn(tween(600)) + slideInVertically(tween(600)) { -it / 3 }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .statusBarsPadding()
+                                .padding(start = 24.dp, end = 24.dp, top = 32.dp, bottom = 28.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Search stores or landmarks",
+                                    text = "Where would\nyou like to go?",
+                                    color = currentTextMain,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 34.sp,
+                                    lineHeight = 40.sp,
+                                    letterSpacing = (-1.2).sp
+                                )
+                                Spacer(Modifier.height(12.dp))
+                                Text(
+                                    text = "Find stores, restaurants and more\ninside the mall.",
                                     color = currentTextSub,
-                                    fontSize = 15.sp
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    lineHeight = 22.sp
                                 )
                             }
-                            inner()
-                        }
-                    )
-                    if (uiState.searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { viewModel.onSearchQueryChanged("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear", tint = currentTextSub)
+                            IconButton(
+                                onClick = { /* Notifications */ },
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .background(if (isDarkMode) Color.White.copy(0.05f) else Color.Black.copy(0.05f), androidx.compose.foundation.shape.CircleShape)
+                            ) {
+                                Icon(Icons.Default.Notifications, null, tint = currentTextMain)
+                            }
                         }
                     }
                 }
-            }
 
-            // ── Categories ────────────────────────────────────────────────────
-            Spacer(Modifier.height(16.dp))
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                itemsIndexed(categories, key = { _, cat -> cat.label }) { _, cat ->
-                    CategoryChip(
-                        category = cat,
-                        selected = uiState.selectedCategoryKey == cat.categoryKey,
-                        isDarkMode = isDarkMode,
-                        currentAccent = currentAccent,
-                        currentTextSub = currentTextSub,
-                        currentBorder = currentBorder,
-                        onClick = { viewModel.onCategorySelected(cat.categoryKey) }
-                    )
+                // ── Glowing Search Bar Entry ──────────────────────────────────
+                item(key = "search_entry") {
+                    AnimatedVisibility(
+                        visible = contentVisible,
+                        enter = fadeIn(tween(600, delayMillis = 150)) + slideInVertically(tween(600, delayMillis = 150)) { it / 4 }
+                    ) {
+                        GlowingSearchBar(
+                            query = "",
+                            onQueryChange = {},
+                            isFocused = false,
+                            onFocusChange = {},
+                            focusRequester = remember { FocusRequester() },
+                            currentAccent = currentAccent,
+                            isDarkMode = isDarkMode,
+                            currentTextMain = currentTextMain,
+                            currentTextSub = currentTextSub,
+                            onClick = onSearchClick,
+                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
+                        )
+                    }
                 }
-            }
 
-            // ── Store List ────────────────────────────────────────────────────
-            Spacer(Modifier.height(20.dp))
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(bottom = 32.dp)
-            ) {
-                if (uiState.displayedPlaces.isEmpty() && !uiState.isLoading) {
-                    item { EmptyState(currentTextSub) }
-                } else {
-                    val results = uiState.displayedPlaces
-                    itemsIndexed(results, key = { _, place -> place.id }) { index, place ->
-                        AnimatedVisibility(
-                            visible = contentVisible,
-                            enter = fadeIn(tween(200, delayMillis = (index * 20).coerceAtMost(200))) +
-                                    slideInVertically(tween(200, delayMillis = (index * 20).coerceAtMost(200))) { it / 10 }
-                        ) {
-                            Column {
-                                StoreRow(
-                                    place = place,
-                                    isSaved = favoriteIds.contains(place.id),
-                                    isDarkMode = isDarkMode,
-                                    currentCardBg = currentCardBg,
-                                    currentTextMain = currentTextMain,
-                                    currentTextSub = currentTextSub,
-                                    currentAccent = currentAccent,
-                                    currentBorder = currentBorder,
-                                    onClick = { pendingPlace = place },
-                                    onToggleSaved = { FavoritesManager.toggleFavorite(place.id) },
-                                    modifier = Modifier.padding(horizontal = 20.dp)
-                                )
-                                Spacer(Modifier.height(12.dp))
+                // ── Browse Categories ─────────────────────────────────────────
+                item(key = "categories_section") {
+                    AnimatedVisibility(
+                        visible = contentVisible,
+                        enter = fadeIn(tween(600, delayMillis = 300)) + slideInVertically(tween(600, delayMillis = 300)) { it / 6 }
+                    ) {
+                        Column(modifier = Modifier.padding(top = 42.dp)) {
+                            SectionHeader(
+                                title = "Browse Categories",
+                                onSeeAll = { /* View all categories */ },
+                                currentTextMain = currentTextMain,
+                                currentAccent = currentAccent
+                            )
+                            Spacer(Modifier.height(20.dp))
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 24.dp),
+                                horizontalArrangement = Arrangement.spacedBy(20.dp)
+                            ) {
+                                itemsIndexed(categories, key = { _, cat -> cat.label }) { _, cat ->
+                                    DestinationCategoryCard(
+                                        category = cat,
+                                        isDarkMode = isDarkMode,
+                                        currentAccent = currentAccent,
+                                        currentTextMain = currentTextMain,
+                                        onClick = { onCategoryClick(cat.categoryKey, cat.label) }
+                                    )
+                                }
                             }
                         }
+                    }
+                }
+
+                // ── Popular Destinations ──────────────────────────────────────
+                item(key = "popular_section") {
+                    AnimatedVisibility(
+                        visible = contentVisible,
+                        enter = fadeIn(tween(600, delayMillis = 450)) + slideInVertically(tween(600, delayMillis = 450)) { it / 8 }
+                    ) {
+                        Column(modifier = Modifier.padding(top = 48.dp)) {
+                            SectionHeader(
+                                title = "Popular Destinations",
+                                onSeeAll = { /* View all popular */ },
+                                currentTextMain = currentTextMain,
+                                currentAccent = currentAccent
+                            )
+                            Spacer(Modifier.height(20.dp))
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 24.dp),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                itemsIndexed(uiState.allPlaces.take(8), key = { _, place -> "pop_${place.id}" }) { _, place ->
+                                    PopularStoreCard(
+                                        place = place,
+                                        isDarkMode = isDarkMode,
+                                        currentAccent = currentAccent,
+                                        currentTextMain = currentTextMain,
+                                        currentTextSub = currentTextSub,
+                                        onClick = { pendingPlace = place }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── Recently Visited ──────────────────────────────────────────
+                item(key = "recent_header") {
+                    AnimatedVisibility(
+                        visible = contentVisible,
+                        enter = fadeIn(tween(600, delayMillis = 600))
+                    ) {
+                        Column(modifier = Modifier.padding(top = 48.dp)) {
+                            SectionHeader(
+                                title = "Recently Visited",
+                                onSeeAll = { /* View all recent */ },
+                                currentTextMain = currentTextMain,
+                                currentAccent = currentAccent
+                            )
+                            Spacer(Modifier.height(12.dp))
+                        }
+                    }
+                }
+
+                val recentPlaces = uiState.allPlaces.filter { it.brand in listOf("Nike", "Sephora", "ZARA") }
+                itemsIndexed(recentPlaces, key = { _, place -> "recent_${place.id}" }) { index, place ->
+                    AnimatedVisibility(
+                        visible = contentVisible,
+                        enter = fadeIn(tween(500, delayMillis = 650 + (index * 50))) +
+                                slideInVertically(tween(500, delayMillis = 650 + (index * 50))) { it / 10 }
+                    ) {
+                        RefinedStoreRow(
+                            place = place,
+                            currentTextMain = currentTextMain,
+                            currentTextSub = currentTextSub,
+                            currentAccent = currentAccent,
+                            onClick = { pendingPlace = place },
+                            modifier = Modifier.padding(horizontal = 24.dp)
+                        )
                     }
                 }
             }
         }
 
-        // ── Confirmation Dialog ───────────────────────────────────────────────
+        // ── Destination confirmation sheet logic remains intact ───────────────
         val confirmPlace = pendingPlace
         if (confirmPlace != null) {
             Dialog(
@@ -233,7 +280,7 @@ fun DestinationSelectionScreen(
                     Box(
                         Modifier
                             .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.45f))
+                            .background(Color.Black.copy(alpha = 0.5f))
                             .clickable { pendingPlace = null }
                     )
                     Box(Modifier.align(Alignment.BottomCenter)) {

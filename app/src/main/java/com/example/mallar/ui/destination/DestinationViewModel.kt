@@ -39,7 +39,8 @@ class DestinationViewModel(application: Application) : AndroidViewModel(applicat
         applyFilter()
     }
 
-    fun onCategorySelected(categoryKey: String) {
+    /** Used specifically for the Category screen where the category is fixed but search is local. */
+    fun initCategory(categoryKey: String) {
         _uiState.update { it.copy(selectedCategoryKey = categoryKey) }
         applyFilter()
     }
@@ -48,16 +49,18 @@ class DestinationViewModel(application: Application) : AndroidViewModel(applicat
         val state = _uiState.value
         val trimmedQuery = state.searchQuery.trim()
         
-        var filtered = if (trimmedQuery.isBlank()) {
-            state.allPlaces
+        // 1. Filter by category first if one is selected
+        var filtered = if (state.selectedCategoryKey.isNotBlank()) {
+            state.allPlaces.filter { PlaceRepository.matchesCategory(it, state.selectedCategoryKey) }
         } else {
-            state.allPlaces.filter { place ->
-                place.brand.orEmpty().contains(trimmedQuery, ignoreCase = true)
-            }
+            state.allPlaces
         }
 
-        if (state.selectedCategoryKey.isNotBlank()) {
-            filtered = filtered.filter { PlaceRepository.matchesCategory(it, state.selectedCategoryKey) }
+        // 2. Then apply search query filter
+        if (trimmedQuery.isNotBlank()) {
+            filtered = filtered.filter { place ->
+                place.brand.contains(trimmedQuery, ignoreCase = true)
+            }
         }
 
         _uiState.update { it.copy(displayedPlaces = filtered) }

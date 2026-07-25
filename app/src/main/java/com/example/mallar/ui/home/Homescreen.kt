@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -57,13 +58,13 @@ private data class OfferItem(
     val tint: Color,
     val discount: String,
     val subtitle: String,
-    val floor: String
+    val floor: String,
 )
 
 private val sampleOffers = listOf(
     OfferItem("v_starbucks_upsize", "logos/Starbucks.png","Starbucks", Color(0xFF1E6E4A), "Free Upsize", "On any beverage",   "2nd Floor"),
     OfferItem("v_zara_15off",       "logos/ZARA.png",      "Zara",       Color(0xFF6E1E2E), "15% OFF",     "On selected items", "Ground Floor"),
-    OfferItem("v_mango_20off",      "logos/Mango.png",     "Mango",      Color(0xFF8B4513), "20% OFF",     "On all items",      "Ground Floor")
+    OfferItem("v_mango_20off",      "logos/Mango.png",     "Mango",      Color(0xFF8B4513), "20% OFF",     "On all items",      "Ground Floor"),
 )
 
 // ── Bottom nav items ──────────────────────────────────────────────────────────
@@ -84,12 +85,10 @@ private val navItems = listOf(
 fun HomeScreen(
     onDestinationSelected: (Place) -> Unit,
     onSettingsClick: () -> Unit,
-    onScanClick: () -> Unit,
     onMapClick: () -> Unit = {},
     onSavedClick: () -> Unit = {},
     onParkingClick: () -> Unit = {},
     onNavigateToNavigation: () -> Unit = {},
-    onCategoryClick: (categoryKey: String, categoryLabel: String) -> Unit = { _, _ -> },
     onOffersClick: () -> Unit = {},
     onVoucherClick: (String) -> Unit = {},
     onNavigateToDestinationSelection: () -> Unit = {},
@@ -108,10 +107,10 @@ fun HomeScreen(
 
     // ── state ────────────────────────────────────────────────────────────────
     var allPlaces      by remember { mutableStateOf<List<Place>>(emptyList()) }
-    var showChatBot    by remember { mutableStateOf(false) }
+    var showChatBot    by remember { mutableStateOf(value = false) }
     var mallGraph      by remember { mutableStateOf<MallGraph?>(null) }
     var pendingPlace   by remember { mutableStateOf<Place?>(null) }
-    var contentVisible by remember { mutableStateOf(false) }
+    var contentVisible by remember { mutableStateOf(value = false) }
     
     LaunchedEffect(Unit) { contentVisible = true }
 
@@ -137,7 +136,7 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(currentBg)
+            .background(currentBg),
     ) {
         // --- Top Glow Gradient Overlay ---
         Box(
@@ -173,7 +172,7 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .statusBarsPadding()
-                                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                                    .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -364,7 +363,7 @@ fun HomeScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.ArrowForward,
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                         contentDescription = "Start navigation",
                                         tint = if (isDarkMode) DeepNavyBg else Color.White,
                                         modifier = Modifier.size(20.dp)
@@ -399,7 +398,7 @@ fun HomeScreen(
                         visible = contentVisible,
                         enter = fadeIn(tween(280, delayMillis = 220)) + slideInVertically(tween(280, delayMillis = 220)) { it / 6 }
                     ) {
-                        SectionHeader(title = "Offers & vouchers", onSeeAll = onOffersClick, currentTextMain = currentTextMain)
+                        SectionHeader(title = "Offers & vouchers", onSeeAll = onOffersClick, currentTextMain = currentTextMain, currentAccent = currentAccent)
                     }
                 }
                 item(key = "offers_spacer2") { Spacer(Modifier.height(14.dp)) }
@@ -431,7 +430,8 @@ fun HomeScreen(
                     SectionHeader(
                         title = "Your favorites",
                         onSeeAll = onSavedClick,
-                        currentTextMain = currentTextMain
+                        currentTextMain = currentTextMain,
+                        currentAccent = currentAccent
                     )
                 }
                 item(key = "favorites_spacer2") { Spacer(Modifier.height(14.dp)) }
@@ -548,9 +548,8 @@ fun HomeScreen(
                                 currentTextSub = currentTextSub,
                                 currentAccent = currentAccent,
                                 onStartNavigation = {
-                                    val place = confirmPlace
                                     pendingPlace = null
-                                    onDestinationSelected(place)
+                                    onDestinationSelected(confirmPlace)
                                 },
                                 onCancel = { pendingPlace = null }
                             )
@@ -802,7 +801,7 @@ private fun ParkingHeroCard(
                 )
                 Spacer(Modifier.width(6.dp))
                 Icon(
-                    imageVector = Icons.Default.ArrowForward,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = null,
                     tint = ParkingPurple,
                     modifier = Modifier.size(14.dp)
@@ -879,8 +878,8 @@ private fun OfferCard(
                 val request = remember(offer.logoAssetPath) {
                     ImageRequest.Builder(context)
                         .data("file:///android_asset/${offer.logoAssetPath}")
-                        .crossfade(false)
-                        .allowHardware(false)
+                        .crossfade(enable = false)
+                        .allowHardware(enable = false)
                         .size(CoilSize(128, 128))
                         .memoryCacheKey(offer.logoAssetPath)
                         .build()
@@ -926,8 +925,8 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
         val h = size.height
 
         for (i in 1..3) {
-            val yLine = h * (0.6f + i * 0.1f)
-            val wLine = w * (0.4f + i * 0.15f)
+                val yLine = h * (0.6f + (i * 0.1f))
+                val wLine = w * (0.4f + (i * 0.15f))
             drawLine(
                 color = currentAccent.copy(alpha = 0.08f / i),
                 start = Offset((w - wLine) / 2f, yLine),
@@ -974,7 +973,7 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
         val carY = h * 0.44f
 
         val roofPath = androidx.compose.ui.graphics.Path().apply {
-            moveTo(carX + carW * 0.26f, carY)
+            moveTo(carX + (carW * 0.26f), carY)
             lineTo(carX + carW * 0.74f, carY)
             lineTo(carX + carW * 0.84f, carY + carH * 0.4f)
             lineTo(carX + carW * 0.16f, carY + carH * 0.4f)

@@ -15,7 +15,6 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.core.tween
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.mallar.data.MallGraphRepository
 import com.example.mallar.data.PlaceRepository
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -35,17 +34,19 @@ import com.example.mallar.ui.profile.*
 import com.example.mallar.ui.parking.*
 import com.example.mallar.ui.home.*
 import com.example.mallar.ui.destination.DestinationSelectionScreen
+import com.example.mallar.ui.destination.DestinationSearchScreen
+import com.example.mallar.ui.destination.DestinationCategoryScreen
 import com.example.mallar.ui.localization.*
 import com.example.mallar.ui.theme.MallARTheme
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
-    override fun attachBaseContext(newBase: Context) {
+    override fun attachBaseContext(newBase: android.content.Context) {
         // Apply saved language preference before inflation
-        val prefs = newBase.getSharedPreferences("mallar_app_prefs", Context.MODE_PRIVATE)
+        val prefs = newBase.getSharedPreferences("mallar_app_prefs", android.content.Context.MODE_PRIVATE)
         val lang = prefs.getString("language", "en") ?: "en"
-        val locale = Locale(lang)
+        val locale = java.util.Locale(lang)
         Locale.setDefault(locale)
         val config = Configuration(newBase.resources.configuration).apply {
             setLocale(locale)
@@ -92,7 +93,8 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
 
     fun checkPermissionsGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
-            context, android.Manifest.permission.CAMERA
+            context,
+            android.Manifest.permission.CAMERA,
         ) == PackageManager.PERMISSION_GRANTED
     }
 
@@ -129,7 +131,7 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
                 startupState = startupState,
                 onTimeout = navigateAfterSplash,
                 onRetry = {
-                    StartupCoordinator.retry(context)
+                    StartupCoordinator.retry(context = context)
                 }
             )
         }
@@ -257,20 +259,10 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
                 onParkingClick = {
                     navController.navigate("parking_home")
                 },
-                onScanClick = {
-                    if (checkPermissionsGranted()) {
-                        navController.navigate("logo_scan")
-                    } else {
-                        navController.navigate("permissions")
-                    }
-                },
                 onNavigateToNavigation = {
                     navController.navigate("navigation") {
                         popUpTo("home") { inclusive = false }
                     }
-                },
-                onCategoryClick = { categoryKey, categoryLabel ->
-                    navController.navigate("category/${Uri.encode(categoryKey)}/${Uri.encode(categoryLabel)}")
                 },
                 onOffersClick = {
                     navController.navigate("offers")
@@ -286,6 +278,51 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
 
         composable("destination_selection") {
             DestinationSelectionScreen(
+                onBackClick = { navController.popBackStack() },
+                onSearchClick = { navController.navigate("destination_search") },
+                onCategoryClick = { key, label -> 
+                    val encodedKey = if (key.isBlank()) "all" else Uri.encode(key)
+                    navController.navigate("destination_category/$encodedKey/${Uri.encode(label)}") 
+                },
+                onDestinationSelected = { place ->
+                    NavigationState.selectedPlace = place
+                    if (checkPermissionsGranted()) {
+                        navController.navigate("logo_scan_with_dest")
+                    } else {
+                        navController.navigate("permissions")
+                    }
+                }
+            )
+        }
+
+        composable("destination_search") {
+            DestinationSearchScreen(
+                onBackClick = { navController.popBackStack() },
+                onDestinationSelected = { place ->
+                    NavigationState.selectedPlace = place
+                    if (checkPermissionsGranted()) {
+                        navController.navigate("logo_scan_with_dest")
+                    } else {
+                        navController.navigate("permissions")
+                    }
+                }
+            )
+        }
+
+        composable(
+            route = "destination_category/{categoryKey}/{categoryLabel}",
+            arguments = listOf(
+                navArgument("categoryKey") { type = NavType.StringType },
+                navArgument("categoryLabel") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val categoryKey = backStackEntry.arguments?.getString("categoryKey").orEmpty()
+            val categoryLabel = backStackEntry.arguments?.getString("categoryLabel").orEmpty()
+            val effectiveKey = if (categoryKey == "all") "" else categoryKey
+            
+            DestinationCategoryScreen(
+                categoryKey = effectiveKey,
+                categoryLabel = categoryLabel,
                 onBackClick = { navController.popBackStack() },
                 onDestinationSelected = { place ->
                     NavigationState.selectedPlace = place
@@ -322,33 +359,6 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
             val voucherId = backStackEntry.arguments?.getString("voucherId").orEmpty()
             VoucherDetailsScreen(
                 voucherId = voucherId,
-                onBackClick = { navController.popBackStack() },
-                onDestinationSelected = { place ->
-                    NavigationState.selectedPlace = place
-                    if (checkPermissionsGranted()) {
-                        navController.navigate("logo_scan_with_dest")
-                    } else {
-                        navController.navigate("permissions")
-                    }
-                }
-            )
-        }
-        composable(
-            route = "category/{categoryKey}/{categoryLabel}",
-            arguments = listOf(
-                navArgument("categoryKey") { type = NavType.StringType },
-                navArgument("categoryLabel") { type = NavType.StringType }
-            ),
-            enterTransition = { slideInHorizontally(tween(320)) { it / 3 } + fadeIn(tween(320)) },
-            exitTransition = { fadeOut(tween(180)) },
-            popEnterTransition = { fadeIn(tween(180)) },
-            popExitTransition = { slideOutHorizontally(tween(320)) { it / 3 } + fadeOut(tween(320)) }
-        ) { backStackEntry ->
-            val categoryKey = backStackEntry.arguments?.getString("categoryKey").orEmpty()
-            val categoryLabel = backStackEntry.arguments?.getString("categoryLabel").orEmpty()
-            CategoryScreen(
-                categoryKey = categoryKey,
-                categoryLabel = categoryLabel,
                 onBackClick = { navController.popBackStack() },
                 onDestinationSelected = { place ->
                     NavigationState.selectedPlace = place
