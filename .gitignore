@@ -17,3 +17,10 @@ local.properties
 # Log files
 *.log
 replay_pid*.log
+# Android Studio user-specific files
+/.idea/deploymentTargetSelector.xml
+/.idea/planningMode.xml
+/.idea/markdown.xml
+
+# JVM heap dumps
+*.hprof
