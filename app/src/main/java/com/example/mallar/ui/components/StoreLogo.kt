@@ -48,7 +48,7 @@ fun StoreLogo(
                 ImageRequest.Builder(context)
                     .data("file:///android_asset/$logoPath")
                     .crossfade(false)
-                    .allowHardware(false)
+                    .allowHardware(true)
                     .size(Size(maxDecodeSizePx, maxDecodeSizePx))
                     .memoryCacheKey(logoPath)
                     .build()

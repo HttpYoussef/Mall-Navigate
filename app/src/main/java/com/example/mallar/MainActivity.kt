@@ -8,10 +8,17 @@ import android.os.Bundle
 import android.net.Uri
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -76,6 +83,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentData: Uri?) {
 
@@ -115,10 +123,11 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
         }
     }
 
-    NavHost(
-        navController    = navController,
-        startDestination = "splash"
-    ) {
+    SharedTransitionLayout {
+        NavHost(
+            navController    = navController,
+            startDestination = "splash"
+        ) {
 
         // ── Splash ────────────────────────────────────────────────────────────
         composable(
@@ -237,8 +246,16 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
         }
 
         // ── HOME ──────────────────────────────────────────────────────────────
-        composable("home") {
+        composable(
+            route = "home",
+            exitTransition = {
+                scaleOut(targetScale = 0.975f, animationSpec = tween(170)) + fadeOut(tween(170))
+            },
+            popEnterTransition = { fadeIn(tween(170)) }
+        ) {
             HomeScreen(
+                sharedTransitionScope = this@SharedTransitionLayout,
+                animatedVisibilityScope = this@composable,
                 onMapClick = {
                     navController.navigate("static_map")
                 },
@@ -276,8 +293,30 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
             )
         }
 
-        composable("destination_selection") {
+        composable(
+            route = "destination_selection",
+            enterTransition = {
+                slideInVertically(
+                    animationSpec = spring(dampingRatio = 0.95f, stiffness = 420f),
+                    initialOffsetY = { it / 5 }
+                ) + fadeIn(tween(160)) +
+                    scaleIn(
+                        initialScale = 0.96f,
+                        animationSpec = spring(dampingRatio = 0.95f, stiffness = 400f)
+                    )
+            },
+            exitTransition = { fadeOut(tween(150)) },
+            popEnterTransition = { fadeIn(tween(170)) },
+            popExitTransition = {
+                slideOutVertically(
+                    animationSpec = spring(dampingRatio = 0.95f, stiffness = 420f),
+                    targetOffsetY = { it / 6 }
+                ) + fadeOut(tween(150))
+            }
+        ) {
             DestinationSelectionScreen(
+                sharedTransitionScope = this@SharedTransitionLayout,
+                animatedVisibilityScope = this@composable,
                 onBackClick = { navController.popBackStack() },
                 onSearchClick = { navController.navigate("destination_search") },
                 onCategoryClick = { key, label -> 
@@ -465,6 +504,7 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
             ParkingMapScreen(
                 onBackClick = { navController.popBackStack() }
             )
+        }
         }
     }
 }

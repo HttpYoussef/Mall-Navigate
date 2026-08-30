@@ -2,14 +2,12 @@ package com.example.mallar.ui.navigation
 
 import android.graphics.BitmapFactory
 import android.view.ViewGroup
-import androidx.camera.view.PreviewView
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -25,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.input.pointer.pointerInput
@@ -41,16 +38,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mallar.data.MallGraphRepository
 import com.example.mallar.navigation.*
 import com.example.mallar.utils.FloorMapAssets
-import com.example.mallar.overlay.*
 import com.example.mallar.voice.NavigationSessionVoiceCoordinator
-import com.example.mallar.voice.NavigationVoiceFab
 import com.example.mallar.voice.VoiceAssistantManager
-import com.example.mallar.voice.VoiceAssistantOverlay
-import com.example.mallar.voice.VoiceAssistantStatus
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.yield
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.*
+import com.example.mallar.ar.ui.ArSceneViewWrapper
 import com.example.mallar.ui.localization.NavigationState
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
@@ -83,8 +75,6 @@ fun UnifiedNavigationScreen(
     val context     = LocalContext.current
     val lifecycle   = LocalLifecycleOwner.current
 
-    val cameraManager = remember { CameraOverlayManager(context) }
-    val previewRef    = remember { mutableStateOf<PreviewView?>(null) }
     val isCameraMode  = state.mode == NavMode.CAMERA
 
     val suppressPoseFlatUntilMs = remember { AtomicLong(0L) }
@@ -95,7 +85,6 @@ fun UnifiedNavigationScreen(
     }
 
     val voiceAssistant = remember { VoiceAssistantManager(context) }
-    val voiceUiState by voiceAssistant.uiState.collectAsState()
     val sessionVoice = remember { NavigationSessionVoiceCoordinator(voiceAssistant.ttsManager) }
 
     var voiceMuted by remember { mutableStateOf(false) }
@@ -107,10 +96,7 @@ fun UnifiedNavigationScreen(
     DisposableEffect(Unit) {
         voiceAssistant.initialize()
         voiceAssistant.graphProvider = { MallGraphRepository.loadedGraph }
-        
-        // FIX: Remove Singleton dependency, use ViewModel state
         voiceAssistant.navStateProvider = { viewModel.navState.value }
-        
         voiceAssistant.onNavigateTo = { shopName, isArabic ->
             NavigationState.preferArabicVoice = isArabic
             viewModel.navigateToNewDestination(shopName)
@@ -133,8 +119,6 @@ fun UnifiedNavigationScreen(
     }
 
     // ── Sensors ───────────────────────────────────────────────────────────────
-    // Note: UnifiedNavigationViewModel now handles StepTracker and Barometer.
-    // SensorFusion is still handled here for now but Azimuth is piped to ViewModel.
     val modeSelection = state.modeSelection
     DisposableEffect(poseEnabled, modeSelection) {
         if (poseEnabled && modeSelection == NavigationModeSelection.AUTO) {
@@ -163,30 +147,14 @@ fun UnifiedNavigationScreen(
         onDispose { f.stop() }
     }
 
-    // ── Camera lifecycle ──────────────────────────────────────────────────────
-    LaunchedEffect(isCameraMode, previewRef.value) {
-        if (!isCameraMode) {
-            cameraManager.stopCamera()
-            return@LaunchedEffect
+    // Phase 4: ARCore lifecycle is handled by ArSceneViewWrapper via UnifiedNavigationViewModel
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.arCoreSessionManager.destroy()
         }
-        val pv = previewRef.value ?: return@LaunchedEffect
-        yield()
-        delay(48)
-        
-        // Wire CameraManager to ViewModel state to enable relocalization
-        cameraManager.navStateProvider = { viewModel.navState.value }
-        cameraManager.onLogoDetected = { node -> viewModel.onLogoDetected(node) }
-        
-        cameraManager.startCamera(
-            lifecycleOwner        = lifecycle,
-            surfaceProvider       = pv.surfaceProvider,
-            relocalizationEnabled = true
-        )
     }
-    DisposableEffect(Unit) { onDispose { cameraManager.release() } }
 
     // ── Mode alpha ────────────────────────────────────────────────────────────
-    val camAlpha by animateFloatAsState(if (isCameraMode) 1f else 0f, tween(350), label = "cam")
     val mapAlpha by animateFloatAsState(if (!isCameraMode) 1f else 0f, tween(350), label = "map")
 
     Box(
@@ -199,25 +167,22 @@ fun UnifiedNavigationScreen(
                 }
             }
     ) {
-        // LAYER 1: Camera preview
-        AndroidView(
-            factory = { ctx ->
-                PreviewView(ctx).apply {
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-                    implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-                    scaleType = PreviewView.ScaleType.FILL_CENTER
-                    previewRef.value = this
-                }
-            },
-            update  = { pv -> pv.alpha = if (isCameraMode) 1f else 0.02f },
-            modifier = Modifier.fillMaxSize()
+        // LAYER 1: AR/Camera Layer (Module 2 + 7 host). Keep the native
+        // SceneView mounted across Map↔Camera so the manager-owned Session is
+        // never rebound to a fresh SceneView after native teardown.
+        ArSceneViewWrapper(
+            modifier = Modifier.fillMaxSize(),
+            sessionManager = viewModel.arCoreSessionManager,
+            localizationLayer = viewModel.localizationLayer,
+            routePathLayer = viewModel.routePathLayer,
+            initialStartNode = viewModel.initialLocalizationStartNode,
+            initialHeadingDeg = viewModel.initialLocalizationHeading,
+            active = isCameraMode,
+            supervisor = viewModel.driftRecoverySupervisor,
+            driftState = viewModel.sessionManager.driftState
         )
 
-        // LAYER 2: AR overlay
-        ArDirectionOverlay(state = state, alpha = camAlpha)
-
-        // LAYER 3: Calibrated map
+        // LAYER 2: Calibrated map
         MapLayer(state = state, alpha = mapAlpha, modifier = Modifier.fillMaxSize())
 
         // LAYER 4: HUD
@@ -300,53 +265,33 @@ private fun OrientationOverlay(orientationState: OrientationUiState) {
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = orientationState.instruction.ifBlank { "Hold still..." },
-                    color = Color.White,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 26.sp
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = "Navigation starts once you're facing the right way",
-                    color = Color.White.copy(0.6f),
-                    fontSize = 13.sp
-                )
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FloorTransitionSheet(
-    transition: com.example.mallar.navigation.FloorTransitionHelper.PathFloorTransition,
-    onContinue: () -> Unit,
+    transition: FloorTransitionHelper.PathFloorTransition,
+    onContinue: () -> Unit
 ) {
-    val typeLabel = when (transition.transitionType.lowercase()) {
-        "elevator" -> androidx.compose.ui.res.stringResource(com.example.mallar.R.string.transition_elevator)
-        else -> androidx.compose.ui.res.stringResource(com.example.mallar.R.string.transition_escalator)
+    val message = if (transition.toFloor > transition.fromFloor) {
+        "Take the escalator or elevator to Floor ${transition.toFloor}"
+    } else {
+        "Go down to Floor ${transition.toFloor}"
     }
-    val message = androidx.compose.ui.res.stringResource(
-        com.example.mallar.R.string.floor_transition_message,
-        typeLabel,
-        transition.toFloor
-    )
 
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-        confirmValueChange = { false },
-    )
-    ModalBottomSheet(
-        onDismissRequest = { },
-        sheetState = sheetState,
-        containerColor = NavCard,
-        dragHandle = { BottomSheetDefaults.DragHandle() }
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(0.6f)),
+        contentAlignment = Alignment.BottomCenter
     ) {
         Column(
-            modifier = Modifier
+            Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+                .background(NavCard)
                 .padding(horizontal = 24.dp, vertical = 8.dp)
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -359,7 +304,7 @@ private fun FloorTransitionSheet(
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.floor_transition_title),
+                text = "Floor Change",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
@@ -379,7 +324,7 @@ private fun FloorTransitionSheet(
                 colors = ButtonDefaults.buttonColors(containerColor = NavBlue)
             ) {
                 Text(
-                    androidx.compose.ui.res.stringResource(com.example.mallar.R.string.floor_transition_continue),
+                    "Continue on Floor ${transition.toFloor}",
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -408,7 +353,7 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
     val mapBitmap = remember(displayFloor) {
         runCatching {
             context.assets.open(FloorMapAssets.mapAssetForFloor(displayFloor)).use {
-                BitmapFactory.decodeStream(it).asImageBitmap()
+                android.graphics.BitmapFactory.decodeStream(it).asImageBitmap()
             }
         }.getOrNull()
     }
@@ -418,7 +363,7 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
     }
 
     if (mapBitmap == null) {
-        Box(modifier.graphicsLayer(alpha = alpha).background(NavSurface), Alignment.Center) {
+        Box(modifier.graphicsLayer { this.alpha = alpha }.background(NavSurface), Alignment.Center) {
             Text("Map unavailable", color = Color.White.copy(0.4f), fontSize = 13.sp)
         }
         return
@@ -427,7 +372,6 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var mapScale  by remember { mutableFloatStateOf(1f) }
     var panOffset by remember { mutableStateOf(Offset.Zero) }
-    var userPanning by remember { mutableStateOf(false) }
 
     val pathSignature = remember(state.pathNodes) {
         if (state.pathNodes.isEmpty()) 0
@@ -447,146 +391,44 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
         )
     }
 
-    LaunchedEffect(fitScale, fitOffset, canvasSize, pathSignature) {
-        if (userPanning || canvasSize.width == 0 || canvasSize.height == 0) return@LaunchedEffect
-        val nodes = state.pathNodes
-        if (nodes.size < 2) {
-            mapScale = fitScale
-            panOffset = fitOffset
-            return@LaunchedEffect
-        }
-        val pad = 120f
-        val minX = nodes.minOf { it.x }.toFloat()
-        val maxX = nodes.maxOf { it.x }.toFloat()
-        val minY = nodes.minOf { it.y }.toFloat()
-        val maxY = nodes.maxOf { it.y }.toFloat()
-        val bw = (maxX - minX).coerceAtLeast(200f)
-        val bh = (maxY - minY).coerceAtLeast(200f)
-        val routeFit = minOf(
-            canvasSize.width.toFloat() / (bw + pad * 2f),
-            canvasSize.height.toFloat() / (bh + pad * 2f)
-        )
-        val smartScale = routeFit.coerceIn(fitScale * 1.38f, fitScale * 4.25f)
-        val cx = (minX + maxX) * 0.5f
-        val cy = (minY + maxY) * 0.5f
-        mapScale = smartScale
-        panOffset = Offset(
-            x = canvasSize.width / 2f - cx * smartScale,
-            y = canvasSize.height * 0.58f - cy * smartScale
-        )
-    }
-
-    fun toCv(x: Float, y: Float) = Offset(x * mapScale + panOffset.x, y * mapScale + panOffset.y)
-    fun toCv(x: Double, y: Double) = toCv(x.toFloat(), y.toFloat())
-
-    val targetPanX = canvasSize.width  / 2f - state.userMapX * mapScale
-    val targetPanY = canvasSize.height * 0.60f - state.userMapY * mapScale
-
-    val animPanX by animateFloatAsState(
-        targetValue = if (!userPanning) targetPanX else panOffset.x,
-        animationSpec = spring(stiffness = Spring.StiffnessMediumLow), label = "px"
-    )
-    val animPanY by animateFloatAsState(
-        targetValue = if (!userPanning) targetPanY else panOffset.y,
-        animationSpec = spring(stiffness = Spring.StiffnessMediumLow), label = "py"
-    )
-
-    LaunchedEffect(animPanX, animPanY) {
-        if (!userPanning) panOffset = Offset(animPanX, animPanY)
-    }
-
-    LaunchedEffect(userPanning) {
-        if (userPanning) { delay(3000); userPanning = false }
-    }
-
-    Canvas(
-        modifier = modifier
-            .graphicsLayer(alpha = alpha)
-            .onSizeChanged { canvasSize = it }
-            .pointerInput(Unit) {
-                detectTransformGestures { _, pan, zoom, _ ->
-                    userPanning = true
-                    mapScale  = (mapScale * zoom).coerceIn(fitScale * 0.8f, fitScale * 6f)
-                    panOffset = Offset(panOffset.x + pan.x, panOffset.y + pan.y)
-                }
-            }
-    ) {
-        withTransform({
-            translate(panOffset.x, panOffset.y)
-            scale(mapScale, mapScale, Offset.Zero)
-        }) {
-            mapBitmap?.let { drawImage(it) }
-        }
-
-        val nodes = floorPathNodes
-        if (nodes.size >= 2) {
-            val fullNodes = state.pathNodes
-            val seg = state.segmentIdx
-            val segNode = fullNodes.getOrNull(seg)
-            val floorSegIdx = if (segNode != null && segNode.floor == displayFloor) {
-                nodes.indexOf(segNode).coerceAtLeast(0)
-            } else {
-                nodes.indexOfLast { fullNodes.indexOf(it) <= seg }.coerceAtLeast(0)
-            }
-
-            val routePath = Path().apply {
-                val s = toCv(nodes[0].x, nodes[0].y)
-                moveTo(s.x, s.y)
-                for (i in 1 until nodes.size) {
-                    val p = toCv(nodes[i].x, nodes[i].y)
-                    lineTo(p.x, p.y)
-                }
-            }
-            val lineW = (5f * mapScale).coerceIn(3f, 14f)
-
-            drawPath(routePath, PathShadow, style = Stroke(lineW * 1.6f, cap = StrokeCap.Round, join = StrokeJoin.Round))
-            drawPath(routePath, PathColor, style = Stroke(lineW, cap = StrokeCap.Round, join = StrokeJoin.Round))
-
-            if (floorSegIdx > 0) {
-                val walked = Path().apply {
-                    val s = toCv(nodes[0].x, nodes[0].y)
-                    moveTo(s.x, s.y)
-                    for (i in 1..floorSegIdx.coerceAtMost(nodes.size - 1)) {
-                        val p = toCv(nodes[i].x, nodes[i].y)
-                        lineTo(p.x, p.y)
+    Box(modifier.graphicsLayer { this.alpha = alpha }.onSizeChanged { canvasSize = it }) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            withTransform({
+                translate(fitOffset.x + panOffset.x, fitOffset.y + panOffset.y)
+                scale(fitScale * mapScale, fitScale * mapScale, Offset.Zero)
+            }) {
+                drawImage(mapBitmap)
+                
+                // Draw Path
+                val nodes = floorPathNodes
+                if (nodes.size >= 2) {
+                    val routePath = androidx.compose.ui.graphics.Path()
+                    routePath.moveTo(nodes[0].x.toFloat(), nodes[0].y.toFloat())
+                    for (i in 1 until nodes.size) {
+                        routePath.lineTo(nodes[i].x.toFloat(), nodes[i].y.toFloat())
                     }
+                    val lineW = 3.5f / (fitScale * mapScale)
+                    drawPath(routePath, PathShadow, style = Stroke(lineW * 1.6f, cap = StrokeCap.Round, join = StrokeJoin.Round))
+                    drawPath(routePath, PathColor, style = Stroke(lineW, cap = StrokeCap.Round, join = StrokeJoin.Round))
                 }
-                drawPath(walked, WalkedColor, style = Stroke(lineW, cap = StrokeCap.Round, join = StrokeJoin.Round))
-            }
 
-            val r = (9f * mapScale).coerceIn(5f, 20f)
-            val sp = toCv(nodes.first().x, nodes.first().y)
-            drawCircle(Color.White,  r * 1.6f, sp)
-            drawCircle(StartGreen,   r, sp)
-            drawCircle(Color.White,  r * 0.38f, sp)
-
-            val ep = toCv(nodes.last().x, nodes.last().y)
-            drawCircle(Color.White,  r * 1.8f, ep)
-            drawCircle(EndRed,       r * 1.2f, ep)
-            drawCircle(Color.White,  r * 0.42f, ep)
-
-            nodes.getOrNull(floorSegIdx + 1)?.let { nxt ->
-                val np = toCv(nxt.x, nxt.y)
-                drawCircle(PathColor.copy(0.22f), r * 1.8f, np)
-                drawCircle(PathColor, r * 0.7f, np)
+                // Draw User
+                if (state.currentFloor == displayFloor) {
+                    val up = Offset(state.userMapX, state.userMapY)
+                    val dr = 6f / (fitScale * mapScale)
+                    drawCircle(UserBlue.copy(0.12f), dr * 3.2f, up)
+                    drawCircle(UserBlue, dr, up)
+                    
+                    val headLen = dr * 2.2f
+                    val rad = Math.toRadians(state.headingDeg.toDouble())
+                    val tip = Offset(
+                        up.x + headLen * sin(rad).toFloat(),
+                        up.y - headLen * cos(rad).toFloat()
+                    )
+                    drawLine(UserBlue, up, tip, strokeWidth = dr * 0.6f, cap = StrokeCap.Round)
+                }
             }
         }
-
-        val up = toCv(state.userMapX.toDouble(), state.userMapY.toDouble())
-        val dr = (9f * mapScale).coerceIn(5f, 18f)
-        drawCircle(UserBlue.copy(0.12f), dr * 3.2f, up)
-        drawCircle(Color.White,          dr * 1.55f, up)
-        drawCircle(UserBlue,             dr, up)
-
-        val hr = Math.toRadians(state.headingDeg.toDouble())
-        val al = dr * 2.8f
-        drawLine(
-            color       = UserBlue,
-            start       = up,
-            end         = Offset(up.x + (sin(hr) * al).toFloat(), up.y - (cos(hr) * al).toFloat()),
-            strokeWidth = (2.5f * mapScale).coerceIn(1.5f, 5f),
-            cap         = StrokeCap.Round
-        )
     }
 }
 
@@ -597,343 +439,72 @@ private fun NavigationHud(
     onBackClick: () -> Unit,
     onModeSelected: (NavigationModeSelection) -> Unit
 ) {
-    Column(Modifier.fillMaxWidth().statusBarsPadding()) {
+    Box(Modifier.fillMaxSize()) {
+        // TOP HUD
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            HudButton(Icons.AutoMirrored.Filled.ArrowBack, onClick = onBackClick)
-            Spacer(Modifier.width(10.dp))
-
-            if (state.destinationName.isNotBlank()) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f).height(40.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Brush.horizontalGradient(listOf(NavBlue.copy(0.88f), NavBlueDark.copy(0.88f)))),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        Modifier.padding(horizontal = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(Icons.Default.LocationOn, null, tint = Color.White, modifier = Modifier.size(14.dp))
-                        Spacer(Modifier.width(5.dp))
-                        Text(state.destinationName, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1)
-                    }
-                }
-            } else Spacer(Modifier.weight(1f))
-        }
-
-        if (state.modeSelection == NavigationModeSelection.AUTO) {
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .clip(RoundedCornerShape(50))
-                    .background(Color.Black.copy(0.5f))
-                    .padding(horizontal = 12.dp, vertical = 3.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Surface(
+                shape = CircleShape,
+                color = Color.Black.copy(0.45f),
+                modifier = Modifier.size(40.dp).clickable { onBackClick() }
             ) {
-                Box(Modifier.size(6.dp).clip(CircleShape).background(if (isCameraMode) NavBlue else NavGreen))
-                Spacer(Modifier.width(5.dp))
-                Text(if (isCameraMode) "AR Mode" else "Map Mode", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White, modifier = Modifier.padding(8.dp))
             }
-        }
-    }
-
-    Box(Modifier.fillMaxSize(), Alignment.Center) {
-        AnimatedVisibility(state.isRerouting, enter = fadeIn() + scaleIn(spring(Spring.DampingRatioMediumBouncy)), exit = fadeOut() + scaleOut()) {
-            Row(
-                Modifier.clip(RoundedCornerShape(20.dp)).background(NavBlue.copy(0.95f)).padding(horizontal = 22.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
+            
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = Color.Black.copy(0.45f)
             ) {
-                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-                Spacer(Modifier.width(10.dp))
-                Text("Recalculating…", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            }
-        }
-
-        val showDrift = state.relocReason != null || state.driftLevel == DriftMonitor.DriftLevel.CRITICAL
-        AnimatedVisibility(showDrift, enter = fadeIn() + slideInVertically { -40 }, exit = fadeOut() + slideOutVertically { -40 }) {
-            val sev = state.relocReason != null || state.driftLevel == DriftMonitor.DriftLevel.CRITICAL
-            Row(
-                Modifier.padding(top = 120.dp).clip(RoundedCornerShape(16.dp))
-                    .background(if (sev) EndRed.copy(0.95f) else NavAmber.copy(0.95f))
-                    .padding(horizontal = 18.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(if (sev) Icons.Default.Warning else Icons.Default.Info, null, tint = Color.White, modifier = Modifier.size(17.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(state.relocReason ?: if (sev) "Tracking lost — scan a store logo" else "Accuracy low", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-            }
-        }
-
-        AnimatedVisibility(state.isArrived, enter = fadeIn() + scaleIn(spring(Spring.DampingRatioMediumBouncy)), exit = fadeOut()) {
-            ArrivalCard(state.destinationName)
-        }
-
-        AnimatedVisibility(state.waypointMessage != null, enter = fadeIn() + slideInVertically { -30 }, exit = fadeOut() + slideOutVertically { -30 }) {
-            Box(Modifier.clip(RoundedCornerShape(12.dp)).background(NavGreen.copy(0.93f)).padding(horizontal = 18.dp, vertical = 9.dp)) {
-                Text(state.waypointMessage ?: "", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-            }
-        }
-    }
-
-    Box(Modifier.fillMaxSize(), Alignment.BottomCenter) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(bottom = 14.dp).navigationBarsPadding()
-        ) {
-            AnimatedVisibility(
-                visible = !state.isArrived,
-                enter = slideInVertically { it } + fadeIn(),
-                exit = slideOutVertically { it } + fadeOut()
-            ) {
-                NavigationModeSelector(
-                    selectedMode = state.modeSelection,
-                    onModeSelected = onModeSelected,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
-
-            AnimatedVisibility(
-                visible = !state.isArrived,
-                enter = slideInVertically { it } + fadeIn(),
-                exit = slideOutVertically { it } + fadeOut()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp).fillMaxWidth()
-                        .clip(RoundedCornerShape(20.dp)).background(NavCard)
-                        .padding(horizontal = 20.dp, vertical = 14.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text("Distance", color = Color.White.copy(0.55f), fontSize = 11.sp)
-                        Text(
-                            if (state.remainingDistanceM < 1000) "${state.remainingDistanceM} m"
-                            else "${"%.1f".format(state.remainingDistanceM / 1000f)} km",
-                            color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp
-                        )
-                    }
-                    Box(Modifier.width(1.dp).height(34.dp).background(Color.White.copy(0.12f)))
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text("ETA", color = Color.White.copy(0.55f), fontSize = 11.sp)
-                        Text("${state.walkMinutes.coerceAtLeast(1)} min", color = NavGreen, fontWeight = FontWeight.Bold, fontSize = 22.sp)
-                    }
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = if (isCameraMode) Icons.Default.Videocam else Icons.Default.Map,
-                            contentDescription = null,
-                            tint = Color(0xFF00BCD4).copy(alpha = 0.8f),
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Text(
-                            text = when (state.modeSelection) {
-                                NavigationModeSelection.AUTO -> "Auto"
-                                NavigationModeSelection.AR -> "AR"
-                                NavigationModeSelection.MAP -> "Map"
-                            },
-                            color = Color.White.copy(0.35f),
-                            fontSize = 9.sp
-                        )
-                    }
+                Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp)) {
+                    HudTab("Map", !isCameraMode) { onModeSelected(NavigationModeSelection.MAP) }
+                    HudTab("AR", isCameraMode) { onModeSelected(NavigationModeSelection.AR) }
                 }
             }
         }
-    }
-}
 
-@Composable
-private fun NavigationModeSelector(
-    selectedMode: NavigationModeSelection,
-    onModeSelected: (NavigationModeSelection) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val modes = NavigationModeSelection.values()
-    Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(24.dp))
-            .background(Color.Black.copy(0.6f))
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        modes.forEach { mode ->
-            val isSelected = selectedMode == mode
-            val backgroundColor by animateColorAsState(
-                targetValue = if (isSelected) Color(0xFF00BCD4).copy(alpha = 0.25f) else Color.Transparent,
-                animationSpec = tween(250),
-                label = "bg_color"
-            )
-            val contentColor by animateColorAsState(
-                targetValue = if (isSelected) Color(0xFF00BCD4) else Color.White.copy(alpha = 0.6f),
-                animationSpec = tween(250),
-                label = "content_color"
-            )
-            val borderModifier = if (isSelected) {
-                Modifier.border(1.dp, Color(0xFF00BCD4), RoundedCornerShape(20.dp))
-            } else {
-                Modifier
-            }
-
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .then(borderModifier)
-                    .background(backgroundColor)
-                    .clickable { onModeSelected(mode) }
-                    .padding(horizontal = 14.dp, vertical = 6.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = when (mode) {
-                        NavigationModeSelection.AUTO -> "Auto"
-                        NavigationModeSelection.AR -> "AR"
-                        NavigationModeSelection.MAP -> "Map"
-                    },
-                    color = contentColor,
-                    fontSize = 12.sp,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ArrivalCard(destName: String) {
-    Card(
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = NavCard),
-        elevation = CardDefaults.cardElevation(16.dp),
-        modifier = Modifier.padding(horizontal = 28.dp)
-    ) {
-        Column(Modifier.padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Default.CheckCircle, "Arrived", tint = NavGreen, modifier = Modifier.size(56.dp))
-            Spacer(Modifier.height(12.dp))
-            Text("You Arrived!", color = NavGreen, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp)
-            if (destName.isNotBlank()) { Spacer(Modifier.height(6.dp)); Text(destName, color = Color.White, fontSize = 16.sp) }
-        }
-    }
-}
-
-@Composable
-private fun HudButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    bgColor: Color = Color.Black.copy(0.52f),
-    onClick: () -> Unit
-) {
-    Box(
-        Modifier.size(42.dp).clip(CircleShape).background(bgColor).clickable(onClick = onClick),
-        Alignment.Center
-    ) {
-        Icon(icon, null, tint = Color.White, modifier = Modifier.size(20.dp))
-    }
-}
-
-@Composable
-private fun ArDirectionOverlay(state: NavSessionState, alpha: Float) {
-    val turnInfo = state.turnInfo
-    if (alpha > 0f) {
-        Box(
+        // BOTTOM CARD
+        Surface(
             modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer { this.alpha = alpha },
-            contentAlignment = Alignment.Center
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(16.dp),
+            shape = RoundedCornerShape(24.dp),
+            color = NavCard,
+            tonalElevation = 8.dp
         ) {
-            if (!state.isArrived && turnInfo != null) {
-                val targetAngle = turnInfo.angleDeg
-                val smoothTarget = remember { mutableFloatStateOf(targetAngle) }
-
-                LaunchedEffect(targetAngle) {
-                    val prev = smoothTarget.floatValue
-                    val rawDiff = targetAngle - prev
-                    val wrappedDiff = ((rawDiff + 180f) % 360f + 360f) % 360f - 180f
-                    smoothTarget.floatValue = prev + wrappedDiff
-                }
-
-                val animatedAngle by animateFloatAsState(
-                    targetValue = smoothTarget.floatValue,
-                    animationSpec = spring(dampingRatio = 0.8f, stiffness = 80f),
-                    label = "arrowRot"
-                )
-
-                val turnText = when {
-                    abs(targetAngle) < 25f -> "Go straight"
-                    targetAngle > 25f && targetAngle < 150f -> "Turn right"
-                    targetAngle < -25f && targetAngle > -150f -> "Turn left"
-                    else -> "Turn around"
-                }
-
-                val icon = when {
-                    abs(targetAngle) < 25f -> Icons.Default.ArrowUpward
-                    targetAngle > 0 -> Icons.AutoMirrored.Filled.ArrowForward
-                    else -> Icons.AutoMirrored.Filled.ArrowBack
-                }
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.offset(y = (-40).dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(
-                                Brush.horizontalGradient(
-                                    listOf(Color.Black.copy(0.72f), NavBlueDark.copy(0.72f))
-                                )
-                            )
-                            .padding(horizontal = 24.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(imageVector = icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            Text(text = turnText, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
-                            Text(text = "in ${state.remainingDistanceM} m", color = Color.White.copy(0.7f), fontWeight = FontWeight.Normal, fontSize = 13.sp)
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(60.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(160.dp)
-                            .graphicsLayer {
-                                rotationZ = animatedAngle
-                                rotationX = 28f
-                                shadowElevation = 12f
-                            }
-                    ) {
-                        Canvas(modifier = Modifier.fillMaxSize()) {
-                            val w = size.width
-                            val h = size.height
-                            val arrowPath = androidx.compose.ui.graphics.Path().apply {
-                                moveTo(w * 0.5f, h * 0.05f)
-                                lineTo(w * 0.9f, h * 0.45f)
-                                lineTo(w * 0.68f, h * 0.45f)
-                                lineTo(w * 0.68f, h * 0.95f)
-                                lineTo(w * 0.32f, h * 0.95f)
-                                lineTo(w * 0.32f, h * 0.45f)
-                                lineTo(w * 0.1f, h * 0.45f)
-                                close()
-                            }
-                            drawPath(
-                                path = arrowPath,
-                                color = Color.Black.copy(alpha = 0.35f),
-                                style = Stroke(width = 20f, join = StrokeJoin.Round)
-                            )
-                            drawPath(
-                                path = arrowPath,
-                                color = Color.White,
-                                style = Stroke(width = 10f, join = StrokeJoin.Round)
-                            )
-                            drawPath(path = arrowPath, color = NavBlue)
-                        }
-                    }
+            Column(Modifier.padding(20.dp)) {
+                Text(state.destinationName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Spacer(Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("${state.remainingDistanceM}m", color = PathColor, fontWeight = FontWeight.Bold)
+                    Text(" • ${state.walkMinutes} min walk", color = Color.White.copy(0.6f))
                 }
             }
         }
     }
 }
+
+@Composable
+private fun HudTab(label: String, selected: Boolean, onClick: () -> Unit) {
+    Surface(
+        shape = CircleShape,
+        color = if (selected) NavBlue else Color.Transparent,
+        modifier = Modifier.clickable { onClick() }
+    ) {
+        Text(
+            label,
+            color = if (selected) Color.White else Color.White.copy(0.6f),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+

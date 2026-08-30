@@ -16,6 +16,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.example.mallar.ar.ArCoreSessionManager
+import com.example.mallar.ar.LocalizationLayer
+import com.example.mallar.ar.NavigationSessionInputAdapter
+import com.example.mallar.ar.RoutePathLayer
 import com.example.mallar.ui.localization.NavigationState
 
 /**
@@ -34,6 +38,21 @@ class UnifiedNavigationViewModel(application: Application) : AndroidViewModel(ap
             ?: throw IllegalStateException("MallGraph not loaded before starting navigation")
     )
 
+    val arCoreSessionManager = ArCoreSessionManager(context)
+
+    /** Module 9 performs the sole subsystem boundary read for this session. */
+    private val navigationSnapshot = NavigationSessionInputAdapter.takeSnapshot()
+    val routePathLayer: RoutePathLayer? = navigationSnapshot?.let {
+        MallGraphRepository.loadedGraph?.let { graph -> RoutePathLayer(it, graph) }
+    }
+    val localizationLayer: LocalizationLayer? = MallGraphRepository.loadedGraph?.let { graph ->
+        LocalizationLayer(graph)
+    }
+    val initialLocalizationStartNode: GraphNode? = navigationSnapshot?.startNodeId?.let { id ->
+        MallGraphRepository.loadedGraph?.nodes?.firstOrNull { it.id == id }
+    }
+    val initialLocalizationHeading: Float? = navigationSnapshot?.initialHeadingDeg
+
     val navState: StateFlow<NavSessionState> = sessionManager.sessionState
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NavSessionState())
 
@@ -49,11 +68,14 @@ class UnifiedNavigationViewModel(application: Application) : AndroidViewModel(ap
     private val barometerManager = BarometerManager(context)
     private val sensorFusionManager = SensorFusionManager(context)
 
+    val driftRecoverySupervisor = com.example.mallar.ar.supervision.DriftRecoverySupervisor()
+
     companion object {
         private const val POSE_GRACE_MS = 1500L
     }
 
     init {
+        sessionManager.setRelocalizationCallbackEnabled(false)
         setupCallbacks()
         startSession()
         enablePoseAfterGrace()
@@ -126,15 +148,15 @@ class UnifiedNavigationViewModel(application: Application) : AndroidViewModel(ap
     }
 
     private fun startSession() {
-        val path  = NavigationState.aStarPath ?: return
         val graph = MallGraphRepository.loadedGraph ?: return
+        val snapshot = navigationSnapshot ?: return
 
-        val nodes    = path.nodeIds.mapNotNull { id -> graph.nodes.firstOrNull { it.id == id } }
-        val destName = nodes.lastOrNull()?.shopName ?: NavigationState.selectedPlace?.brand ?: ""
+        val nodes    = snapshot.pathNodeIds.mapNotNull { id -> graph.nodes.firstOrNull { it.id == id } }
+        val destName = snapshot.destinationName
 
         if (nodes.size >= 2) {
             sessionManager.initialize(nodes, destName)
-            if (NavigationState.startWithAr) {
+            if (snapshot.startWithAr) {
                 sessionManager.switchMode(NavMode.CAMERA)
             }
             orientationManager.start(nodes)

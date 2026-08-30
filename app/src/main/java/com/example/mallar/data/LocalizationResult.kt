@@ -54,7 +54,13 @@ data class LocalizationResult(
      * the nearest walkable node to [estimatedMapX]/[estimatedMapY].
      * This is what gets written to [com.example.mallar.ui.localization.NavigationState].
      */
-    val bestStartNode: GraphNode?
+    val bestStartNode: GraphNode?,
+
+    /**
+     * Number of unique landmarks contributing to this fix.
+     * Used for provisional vs confirmed confidence tiering.
+     */
+    val landmarkCount: Int
 )
 
 /**

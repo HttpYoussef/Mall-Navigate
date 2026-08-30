@@ -69,10 +69,18 @@ class NavigationSessionManager(
     private var pathTransitions: List<FloorTransitionHelper.PathFloorTransition> = emptyList()
     private var completedTransitionCount = 0
 
+    val driftState: DriftMonitor.DriftState get() = driftMonitor.driftState
+
     var onRerouteNeeded: (() -> Unit)? = null
     var onArrived: (() -> Unit)? = null
     var onRelocalizationNeeded: ((reason: String) -> Unit)? = null
     var onFloorTransitionReached: ((FloorTransitionHelper.PathFloorTransition) -> Unit)? = null
+
+    fun setRelocalizationCallbackEnabled(enabled: Boolean) {
+        if (!enabled) {
+            driftMonitor.onRelocalizationNeeded = null
+        }
+    }
 
     /**
      * Prepares the session with a calculated path.

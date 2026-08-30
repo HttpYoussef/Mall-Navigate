@@ -1,5 +1,6 @@
 package com.example.mallar.ui.localization
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
@@ -322,7 +323,10 @@ fun LogoScanScreen(
             onDispose {
                 cancelled.set(true)
                 try { imageAnalysis?.clearAnalyzer() } catch (_: Exception) { }
-                try { boundProvider?.unbindAll() } catch (_: Exception) { }
+                try { 
+                    boundProvider?.unbindAll()
+                    Log.d("LogoScan", "Module 2 Handoff: Camera released by LogoScanScreen.")
+                } catch (_: Exception) { }
                 executor.shutdown()
             }
         }
@@ -678,7 +682,7 @@ fun LogoScanScreen(
                             Spacer(Modifier.height(18.dp))
                             Row(Modifier.fillMaxWidth()) {
                                 Button(
-                                    onClick = { startNavigation(mallGraph, startPlace, destination, destDistM, onStoreSelected, useAr = true) },
+                                    onClick = { startNavigation(context, mallGraph, startPlace, destination, destDistM, onStoreSelected, useAr = true) },
                                     modifier = Modifier.weight(1f).height(54.dp),
                                     shape = RoundedCornerShape(27.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = Teal)
@@ -689,7 +693,7 @@ fun LogoScanScreen(
                                 }
                                 Spacer(Modifier.width(12.dp))
                                 Button(
-                                    onClick = { startNavigation(mallGraph, startPlace, destination, destDistM, onStoreSelected, useAr = false) },
+                                    onClick = { startNavigation(context, mallGraph, startPlace, destination, destDistM, onStoreSelected, useAr = false) },
                                     modifier = Modifier.weight(1f).height(54.dp),
                                     shape = RoundedCornerShape(27.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF455A64))
@@ -887,6 +891,7 @@ fun LogoScanScreen(
 }
 
 private fun startNavigation(
+    context: Context,
     mallGraph: com.example.mallar.data.MallGraph?,
     startPlace: Place?,
     destination: Place?,
@@ -894,6 +899,11 @@ private fun startNavigation(
     onStoreSelected: (Boolean) -> Unit,
     useAr: Boolean
 ) {
+    try {
+        androidx.camera.lifecycle.ProcessCameraProvider.getInstance(context).get().unbindAll()
+        Log.d("LogoScan", "Module 2 Handoff: CameraX synchronously unbound prior to AR launch.")
+    } catch (_: Exception) { }
+
     val start = startPlace
     val end   = destination
     if (start != null && end != null) {

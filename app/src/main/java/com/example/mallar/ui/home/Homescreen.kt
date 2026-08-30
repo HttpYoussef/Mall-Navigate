@@ -1,5 +1,8 @@
 package com.example.mallar.ui.home
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -81,8 +84,11 @@ private val navItems = listOf(
 // HomeScreen Redesign
 // ─────────────────────────────────────────────────────────────────────────────
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onDestinationSelected: (Place) -> Unit,
     onSettingsClick: () -> Unit,
     onMapClick: () -> Unit = {},
@@ -258,6 +264,14 @@ fun HomeScreen(
 
                         Box(
                             modifier = Modifier
+                                .then(
+                                    with(sharedTransitionScope) {
+                                        Modifier.sharedBounds(
+                                            sharedContentState = rememberSharedContentState(key = "nav_cta_card"),
+                                            animatedVisibilityScope = animatedVisibilityScope
+                                        )
+                                    }
+                                )
                                 .fillMaxWidth()
                                 .padding(horizontal = 20.dp, vertical = 20.dp)
                                 .heightIn(min = 140.dp)
