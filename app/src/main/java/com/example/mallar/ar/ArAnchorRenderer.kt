@@ -16,8 +16,9 @@ import io.github.sceneview.ar.ARSceneView
 import io.github.sceneview.ar.node.AnchorNode
 import io.github.sceneview.material.setColor
 import io.github.sceneview.math.Position
-import io.github.sceneview.node.CubeNode
 import io.github.sceneview.node.Node
+import io.github.sceneview.node.RenderableNode
+import dev.romainguy.kotlin.math.Float3
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -47,7 +48,7 @@ class ArAnchorRenderer(
     private data class ManagedAnchor(
         val spec: AnchorSpec,
         val anchorNode: AnchorNode,
-        val marker: CubeNode,
+        val marker: Node,
         val materialColor: Color,
         val initialWorldX: Float,
         val initialWorldZ: Float,
@@ -165,7 +166,14 @@ class ArAnchorRenderer(
             } else {
                 managed.alpha = (managed.alpha + FADE_STEP).coerceAtMost(maxAlpha)
             }
-            managed.marker.materialInstance.setColor(managed.materialColor.copy(alpha = managed.alpha))
+            val renderable = managed.marker as? RenderableNode
+            val matInstance = renderable?.materialInstance
+            if (matInstance != null && matInstance.material.hasParameter("color")) {
+                matInstance.setColor(managed.materialColor.copy(alpha = managed.alpha))
+            }
+            managed.marker.isVisible = managed.alpha > 0.05f
+            val currentScale = managed.alpha.coerceIn(0.01f, 1.0f)
+            managed.marker.scale = Float3(currentScale, currentScale, currentScale)
             val baseElevation = if (managed.spec.kind == AnchorKind.TURN) {
                 GuidanceVisualFactory.ELEVATION_TURN_METERS
             } else {

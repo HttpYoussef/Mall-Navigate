@@ -4,44 +4,43 @@ import android.content.Context
 import androidx.compose.ui.graphics.Color
 import com.example.mallar.ar.AnchorKind
 import com.example.mallar.ar.AnchorSpec
-import com.example.mallar.ar.model.RouteNodeMetadata
 import com.google.android.filament.Engine
 import dev.romainguy.kotlin.math.Float3
-import dev.romainguy.kotlin.math.Float4
 import io.github.sceneview.loaders.MaterialLoader
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Rotation
-import io.github.sceneview.node.CubeNode
+import io.github.sceneview.node.ImageNode
 import io.github.sceneview.node.Node
 import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
  * Module 7 — Full Fidelity 3D Guidance Visual Factory
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * Constructs Live-View-style directional floor chevrons, amber turn markers,
- * and prominent emerald green arrival beacons.
- * Computes orientation strictly in ARCore World Space to align geometry with
- * physical corridor hallways.
+ * Constructs Google Maps Live-View-style directional floor chevrons, amber turn
+ * markers, and prominent emerald green arrival beacons.
+ *
+ * Markers are rendered as self-luminous, unlit, anti-aliased decals lying flat
+ * directly on the corridor floor and oriented strictly in ARCore World Space
+ * to align with physical hallway trajectories.
  */
 class GuidanceVisualFactory(
     private val context: Context
 ) {
     companion object {
-        val COLOR_STANDARD = Color(0xFF00BCD4) // High-contrast Cyan
-        val COLOR_TURN = Color(0xFFFFB300)     // High-visibility Amber
-        val COLOR_ARRIVAL = Color(0xFF4CAF50)  // High-visibility Emerald Green for Arrival Beacon
+        val COLOR_STANDARD = Color(0xFF1A73E8) // Google Blue
+        val COLOR_TURN = Color(0xFFFF9100)     // High-visibility Amber
+        val COLOR_ARRIVAL = Color(0xFF00E676)  // High-visibility Emerald Green for Arrival Beacon
 
-        const val ELEVATION_STANDARD_METERS = 0.025f
-        const val ELEVATION_TURN_METERS = 0.040f
-        const val ELEVATION_ARRIVAL_METERS = 0.60f
+        const val ELEVATION_STANDARD_METERS = 0.020f
+        const val ELEVATION_TURN_METERS = 0.025f
+        const val ELEVATION_ARRIVAL_METERS = 0.030f
 
-        val SCALE_STANDARD = Float3(0.20f, 0.05f, 0.45f)
-        val SCALE_TURN = Float3(0.35f, 0.08f, 0.35f)
-        val SCALE_ARRIVAL = Float3(0.40f, 1.20f, 0.40f)
+        // Expanded, highly visible Google Maps AR walking arrow dimensions
+        val SIZE_STANDARD_METERS = Float3(0.70f, 0.70f, 0f)
+        val SIZE_TURN_METERS = Float3(0.85f, 0.85f, 0f)
+        val SIZE_ARRIVAL_METERS = Float3(1.10f, 1.10f, 0f)
 
         /**
          * Computes the heading angle (in degrees) in ARCore World Space
@@ -70,45 +69,51 @@ class GuidanceVisualFactory(
     }
 
     /**
-     * Creates a styled, path-oriented 3D guidance marker for an anchor.
+     * Creates a styled, path-oriented Google Maps-style directional floor chevron.
      */
     fun createGuidanceMarker(
         engine: Engine,
         spec: AnchorSpec,
         headingDeg: Float
-    ): CubeNode {
+    ): Node {
         val loader = getOrCreateMaterialLoader(engine)
-        val baseColor = if (spec.kind == AnchorKind.TURN) COLOR_TURN else COLOR_STANDARD
-        val materialInstance = loader.createColorInstance(baseColor.copy(alpha = 1f))
+        val bitmap = if (spec.kind == AnchorKind.TURN) {
+            ArVisualAssetGenerator.getTurnChevron()
+        } else {
+            ArVisualAssetGenerator.getStandardChevron()
+        }
+        val size = if (spec.kind == AnchorKind.TURN) SIZE_TURN_METERS else SIZE_STANDARD_METERS
+        val elevation = if (spec.kind == AnchorKind.TURN) ELEVATION_TURN_METERS else ELEVATION_STANDARD_METERS
 
-        val marker = CubeNode(
-            engine = engine,
-            materialInstance = materialInstance
+        val marker = ImageNode(
+            materialLoader = loader,
+            bitmap = bitmap,
+            size = size
         )
 
-        marker.scale = if (spec.kind == AnchorKind.TURN) SCALE_TURN else SCALE_STANDARD
-        val baseElevation = if (spec.kind == AnchorKind.TURN) ELEVATION_TURN_METERS else ELEVATION_STANDARD_METERS
-        marker.position = Position(0f, baseElevation, 0f)
-        marker.rotation = Rotation(0f, headingDeg, 0f)
+        marker.position = Position(0f, elevation, 0f)
+        // Rotate -90 degrees around X to lay flat horizontally on the floor,
+        // and around Y to point along the corridor heading.
+        marker.rotation = Rotation(-90f, headingDeg, 0f)
         marker.isHittable = false
 
         return marker
     }
 
     /**
-     * Creates a prominent 3D emerald green beacon indicating destination arrival.
+     * Creates a prominent Google Maps-style arrival target decal indicating destination arrival.
      */
-    fun createArrivalBeacon(engine: Engine): CubeNode {
+    fun createArrivalBeacon(engine: Engine): Node {
         val loader = getOrCreateMaterialLoader(engine)
-        val materialInstance = loader.createColorInstance(COLOR_ARRIVAL.copy(alpha = 1f))
+        val bitmap = ArVisualAssetGenerator.getArrivalBeacon()
 
-        val beacon = CubeNode(
-            engine = engine,
-            materialInstance = materialInstance
+        val beacon = ImageNode(
+            materialLoader = loader,
+            bitmap = bitmap,
+            size = SIZE_ARRIVAL_METERS
         )
-        beacon.scale = SCALE_ARRIVAL
         beacon.position = Position(0f, ELEVATION_ARRIVAL_METERS, 0f)
-        beacon.rotation = Rotation(0f, 0f, 0f)
+        beacon.rotation = Rotation(-90f, 0f, 0f)
         beacon.isHittable = false
 
         return beacon
@@ -117,5 +122,6 @@ class GuidanceVisualFactory(
     fun dispose() {
         materialLoader?.destroy()
         materialLoader = null
+        ArVisualAssetGenerator.dispose()
     }
 }
