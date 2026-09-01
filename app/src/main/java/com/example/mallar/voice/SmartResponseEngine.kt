@@ -3,7 +3,7 @@ package com.example.mallar.voice
 import com.example.mallar.data.AStarPath
 import com.example.mallar.data.MallGraph
 import com.example.mallar.navigation.NavSessionState
-import com.example.mallar.overlay.OverlayTurnDirection
+import com.example.mallar.navigation.NavigationTurnDirection
 import com.example.mallar.ui.localization.NavigationState
 import kotlin.math.roundToInt
 
@@ -322,31 +322,57 @@ object SmartResponseEngine {
 
     // ── Live turn phrases (session voice coordinator) ───────────────────────────
 
-    fun turnApproach(direction: OverlayTurnDirection, distM: Int, isArabic: Boolean): String {
-        if (direction == OverlayTurnDirection.STRAIGHT || direction == OverlayTurnDirection.U_TURN) {
-            return straightApproach(distM, isArabic)
-        }
-        val isLeft = direction == OverlayTurnDirection.LEFT
-        return if (isArabic) {
-            if (isLeft) pick(listOf("لف يسار بعد حوالي $distM متر", "خد شمال بعد $distM متر", "اتجه يساراً بعد $distM متر"))
-            else pick(listOf("لف يمين بعد حوالي $distM متر", "خد يمين بعد $distM متر", "اتجه يميناً بعد $distM متر"))
-        } else {
-            if (isLeft) pick(listOf("Turn left in about $distM metres", "Left turn coming in $distM metres", "Bear left in $distM metres"))
-            else pick(listOf("Turn right in about $distM metres", "Right turn coming in $distM metres", "Bear right in $distM metres"))
+    fun turnApproach(direction: NavigationTurnDirection, distM: Int, isArabic: Boolean): String {
+        return when (direction) {
+            NavigationTurnDirection.STRAIGHT, NavigationTurnDirection.U_TURN -> straightApproach(distM, isArabic)
+            NavigationTurnDirection.LEFT -> if (isArabic) {
+                pick(listOf("لف يسار بعد حوالي $distM متر", "خد شمال بعد $distM متر", "اتجه يساراً بعد $distM متر"))
+            } else {
+                pick(listOf("Turn left in about $distM metres", "Left turn coming in $distM metres", "Bear left in $distM metres"))
+            }
+            NavigationTurnDirection.RIGHT -> if (isArabic) {
+                pick(listOf("لف يمين بعد حوالي $distM متر", "خد يمين بعد $distM متر", "اتجه يميناً بعد $distM متر"))
+            } else {
+                pick(listOf("Turn right in about $distM metres", "Right turn coming in $distM metres", "Bear right in $distM metres"))
+            }
+            NavigationTurnDirection.ELEVATOR -> if (isArabic) {
+                pick(listOf("توجه إلى المصعد بعد حوالي $distM متر", "المصعد قادم بعد $distM متر", "استخدم المصعد بعد $distM متر"))
+            } else {
+                pick(listOf("Take the elevator in about $distM metres", "Elevator coming in $distM metres", "Head to the elevator in $distM metres"))
+            }
+            NavigationTurnDirection.STAIRS -> if (isArabic) {
+                pick(listOf("توجه إلى الدرج بعد حوالي $distM متر", "السلالم قادمة بعد $distM متر", "استخدم الدرج بعد $distM متر"))
+            } else {
+                pick(listOf("Take the stairs in about $distM metres", "Stairs coming in $distM metres", "Head to the stairs in $distM metres"))
+            }
+            NavigationTurnDirection.ARRIVED -> if (isArabic) "وصلت إلى وجهتك" else "You have arrived at your destination"
         }
     }
 
-    fun turnNow(direction: OverlayTurnDirection, isArabic: Boolean): String {
-        if (direction == OverlayTurnDirection.STRAIGHT || direction == OverlayTurnDirection.U_TURN) {
-            return straightNow(isArabic)
-        }
-        val isLeft = direction == OverlayTurnDirection.LEFT
-        return if (isArabic) {
-            if (isLeft) pick(listOf("لف يسار دلوقتي", "يسار", "اتجه يساراً الآن"))
-            else pick(listOf("لف يمين دلوقتي", "يمين", "اتجه يميناً الآن", "وجهتك على اليمين"))
-        } else {
-            if (isLeft) pick(listOf("Turn left now", "Left here", "Take the left"))
-            else pick(listOf("Turn right now", "Right here", "Take the right"))
+    fun turnNow(direction: NavigationTurnDirection, isArabic: Boolean): String {
+        return when (direction) {
+            NavigationTurnDirection.STRAIGHT, NavigationTurnDirection.U_TURN -> straightNow(isArabic)
+            NavigationTurnDirection.LEFT -> if (isArabic) {
+                pick(listOf("لف يسار دلوقتي", "يسار", "اتجه يساراً الآن"))
+            } else {
+                pick(listOf("Turn left now", "Left here", "Take the left"))
+            }
+            NavigationTurnDirection.RIGHT -> if (isArabic) {
+                pick(listOf("لف يمين دلوقتي", "يمين", "اتجه يميناً الآن", "وجهتك على اليمين"))
+            } else {
+                pick(listOf("Turn right now", "Right here", "Take the right"))
+            }
+            NavigationTurnDirection.ELEVATOR -> if (isArabic) {
+                pick(listOf("ادخل المصعد الآن", "استخدم المصعد للصعود أو الهبوط", "المصعد هنا"))
+            } else {
+                pick(listOf("Take the elevator now", "Enter the elevator", "Use the elevator here"))
+            }
+            NavigationTurnDirection.STAIRS -> if (isArabic) {
+                pick(listOf("اصعد أو انزل الدرج الآن", "استخدم السلالم الآن", "الدرج هنا"))
+            } else {
+                pick(listOf("Take the stairs now", "Use the stairs here", "Head up or down the stairs"))
+            }
+            NavigationTurnDirection.ARRIVED -> if (isArabic) "وصلت إلى وجهتك" else "You have arrived at your destination"
         }
     }
 

@@ -11,6 +11,22 @@ import kotlin.math.sin
 
 enum class AnchorKind { STANDARD, TURN }
 
+enum class DeviceTier {
+    STANDARD,
+    CONSTRAINED;
+
+    companion object {
+        fun detect(context: android.content.Context): DeviceTier {
+            val am = context.getSystemService(android.content.Context.ACTIVITY_SERVICE) as? android.app.ActivityManager
+            val memInfo = android.app.ActivityManager.MemoryInfo()
+            am?.getMemoryInfo(memInfo)
+            val totalRamGb = memInfo.totalMem / (1024.0 * 1024.0 * 1024.0)
+            val isLowRam = am?.isLowRamDevice == true || totalRamGb < 4.0
+            return if (isLowRam) CONSTRAINED else STANDARD
+        }
+    }
+}
+
 data class AnchorWindowConfig(
     val aheadCount: Int = 10,
     val trailingCount: Int = 2,
@@ -18,8 +34,29 @@ data class AnchorWindowConfig(
     val turnAngleThresholdDeg: Double = 120.0,
     val correctionFrames: Int = 8,
     val floorHeightMeters: Float = -1.35f,
-    val pixelsPerMeter: Double = NavConfig.PIXELS_PER_METER.toDouble()
-)
+    val pixelsPerMeter: Double = NavConfig.PIXELS_PER_METER.toDouble(),
+    val smoothingAlpha: Float = 0.15f,
+    val recognitionThrottleMs: Long = 3000L
+) {
+    companion object {
+        fun forTier(tier: DeviceTier): AnchorWindowConfig = when (tier) {
+            DeviceTier.STANDARD -> AnchorWindowConfig(
+                aheadCount = 10,
+                trailingCount = 2,
+                maxActiveAnchors = 15,
+                smoothingAlpha = 0.15f,
+                recognitionThrottleMs = 3000L
+            )
+            DeviceTier.CONSTRAINED -> AnchorWindowConfig(
+                aheadCount = 5,
+                trailingCount = 1,
+                maxActiveAnchors = 8,
+                smoothingAlpha = 0.25f,
+                recognitionThrottleMs = 5000L
+            )
+        }
+    }
+}
 
 data class AnchorSpec(
     val node: RouteNodeMetadata,

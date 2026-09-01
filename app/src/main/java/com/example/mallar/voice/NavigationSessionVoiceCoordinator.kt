@@ -1,7 +1,7 @@
 package com.example.mallar.voice
 
 import com.example.mallar.navigation.NavSessionState
-import com.example.mallar.overlay.OverlayTurnDirection
+import com.example.mallar.navigation.NavigationTurnDirection
 import com.example.mallar.ui.localization.NavigationState
 
 /**
@@ -81,7 +81,7 @@ class NavigationSessionVoiceCoordinator(
         val seg = state.segmentIdx
 
         val approachKey = "${seg}_${dir}_A"
-        if (dir != OverlayTurnDirection.U_TURN && dist in 5..14) {
+        if (dir != NavigationTurnDirection.U_TURN && dist in 5..14) {
             if (approachKey !in approachKeys && canSpeak(4200L)) {
                 approachKeys.add(approachKey)
                 speak(SmartResponseEngine.turnApproach(dir, dist, ar), force = false)
@@ -89,7 +89,7 @@ class NavigationSessionVoiceCoordinator(
         }
 
         val nowKey = "${seg}_${dir}_N"
-        if (dir != OverlayTurnDirection.U_TURN && dist <= 4) {
+        if (dir != NavigationTurnDirection.U_TURN && dist <= 4) {
             if (nowKey !in nowKeys && canSpeak(3200L)) {
                 nowKeys.add(nowKey)
                 speak(SmartResponseEngine.turnNow(dir, ar), force = false)

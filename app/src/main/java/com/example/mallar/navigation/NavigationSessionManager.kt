@@ -4,9 +4,6 @@ import android.util.Log
 import com.example.mallar.data.GraphNode
 import com.example.mallar.data.MallGraph
 import com.example.mallar.data.MallGraphRepository
-import com.example.mallar.overlay.OverlayProjectionEngine
-import com.example.mallar.overlay.ProjectedPoint
-import com.example.mallar.overlay.TurnInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,8 +34,7 @@ data class NavSessionState(
     val walkMinutes: Int              = 0,
     val mode: NavMode                 = NavMode.MAP,
     val modeSelection: NavigationModeSelection = NavigationModeSelection.AUTO,
-    val projectedPoints: List<ProjectedPoint> = emptyList(),
-    val turnInfo: TurnInfo?           = null,
+    val turnInfo: NavigationTurnInfo? = null,
     val isRerouting: Boolean          = false,
     val isArrived: Boolean            = false,
     val isOnPath: Boolean             = true,
@@ -62,7 +58,6 @@ class NavigationSessionManager(
     val sessionState: StateFlow<NavSessionState> = _sessionState.asStateFlow()
 
     private var positionTracker: IndoorPositionTracker? = null
-    private val projectionEngine = OverlayProjectionEngine()
     private val driftMonitor     = DriftMonitor()
     private val smoother         = PositionSmoother()
 
@@ -330,9 +325,6 @@ class NavigationSessionManager(
     }
 
     fun setScreenSize(w: Float, h: Float, fovDeg: Float = 68f) {
-        projectionEngine.screenW = w
-        projectionEngine.screenH = h
-        projectionEngine.fovDeg  = fovDeg
         recomputeForCurrentMode()
     }
 
@@ -348,29 +340,21 @@ class NavigationSessionManager(
         val seg = state.segmentIdx
         val nextNode = path.getOrNull(seg + 1)
         val turnInfo = if (nextNode != null) {
-            projectionEngine.computeTurnInfo(
-                nextNodeMapX = nextNode.x.toFloat(),
-                nextNodeMapY = nextNode.y.toFloat(),
-                userMapX     = state.userMapX,
-                userMapY     = state.userMapY,
-                headingDeg   = state.headingDeg
-            )
+            val dx = nextNode.x.toFloat() - state.userMapX
+            val dy = nextNode.y.toFloat() - state.userMapY
+            val targetAngle = Math.toDegrees(kotlin.math.atan2(dx.toDouble(), -dy.toDouble())).toFloat()
+            val deltaAngle = ((targetAngle - state.headingDeg + 540) % 360) - 180
+            val dist = kotlin.math.hypot(dx.toDouble(), dy.toDouble()).toFloat() / NavConfig.PIXELS_PER_METER
+            val direction = when {
+                nextNode.isFloorTransition -> NavigationTurnDirection.ELEVATOR
+                kotlin.math.abs(deltaAngle) < 20f -> NavigationTurnDirection.STRAIGHT
+                deltaAngle > 0f -> NavigationTurnDirection.RIGHT
+                else -> NavigationTurnDirection.LEFT
+            }
+            NavigationTurnInfo(direction = direction, distanceM = dist)
         } else null
 
-        if (state.mode == NavMode.CAMERA) {
-            val projected = projectionEngine.project(
-                pathNodes         = path,
-                userMapX          = state.userMapX,
-                userMapY          = state.userMapY,
-                headingDeg        = state.headingDeg,
-                lookaheadStartIdx = seg
-            )
-            _sessionState.update {
-                it.copy(projectedPoints = projected, turnInfo = turnInfo)
-            }
-        } else {
-            _sessionState.update { it.copy(turnInfo = turnInfo) }
-        }
+        _sessionState.update { it.copy(turnInfo = turnInfo) }
     }
 
     private fun computeRemainingDistancePx(

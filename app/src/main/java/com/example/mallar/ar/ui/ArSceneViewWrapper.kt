@@ -73,7 +73,13 @@ fun ArSceneViewWrapper(
     val detector = remember(context) { lazy { LogoDetector.getInstance(context) } }
     val places = remember(context) { lazy { PlaceRepository.load(context) } }
     val graph = remember { MallGraphRepository.loadedGraph }
-    val anchorRenderer = remember(context) { ArAnchorRenderer(context) }
+    val detectedTier = remember(context) { com.example.mallar.ar.DeviceTier.detect(context) }
+    val anchorRenderer = remember(context, detectedTier) { 
+        ArAnchorRenderer(
+            context = context,
+            config = com.example.mallar.ar.AnchorWindowConfig.forTier(detectedTier)
+        ) 
+    }
     var lastDiagnosticLogMs = remember { 0L }
 
     // Android Lifecycle Integration (Finding 2)

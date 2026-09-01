@@ -33,9 +33,9 @@ import io.github.sceneview.node.Node
  */
 class ArAnchorRenderer(
     private val context: Context,
-    private val planner: AnchorWindowPlanner = AnchorWindowPlanner(),
-    private val config: AnchorWindowConfig = AnchorWindowConfig(),
-    val poseSmoother: RenderPoseSmoother = RenderPoseSmoother(),
+    private val config: AnchorWindowConfig = AnchorWindowConfig.forTier(DeviceTier.detect(context)),
+    private val planner: AnchorWindowPlanner = AnchorWindowPlanner(config),
+    val poseSmoother: RenderPoseSmoother = RenderPoseSmoother(minCutoffHz = if (config.smoothingAlpha > 0.2f) 1.5 else 1.0),
     val planeConfidenceMonitor: FloorPlaneConfidenceMonitor = FloorPlaneConfidenceMonitor(),
     val visualFactory: GuidanceVisualFactory = GuidanceVisualFactory(context)
 ) {
