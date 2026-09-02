@@ -202,4 +202,19 @@
     <string name="bottom_nav_map">Map</string>
     <string name="bottom_nav_saved">Saved</string>
     <string name="bottom_nav_profile">Profile</string>
+
+    <!-- Mall Selection Screen -->
+    <string name="mall_select_title">Choose your mall</string>
+    <string name="mall_select_subtitle">Where are you navigating this visit?</string>
+    <string name="mall_coming_soon">Coming soon</string>
+    <string name="mall_retry">Retry</string>
+
+    <!-- Mall names and locations -->
+    <string name="mall_city_stars_name">City Stars</string>
+    <string name="mall_city_stars_location">Nasr City, Cairo</string>
+    <string name="mall_city_centre_almaza_name">City Centre Almaza</string>
+    <string name="mall_city_centre_almaza_location">Heliopolis, Cairo</string>
+    <string name="mall_of_egypt_name">Mall of Egypt</string>
+    <string name="mall_of_egypt_location">6th of October, Giza</string>
+
 </resources>

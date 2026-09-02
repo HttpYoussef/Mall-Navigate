@@ -45,6 +45,10 @@ import com.example.mallar.ui.destination.DestinationSearchScreen
 import com.example.mallar.ui.destination.DestinationCategoryScreen
 import com.example.mallar.ui.localization.*
 import com.example.mallar.ui.theme.MallARTheme
+import com.example.mallar.data.Mall
+import com.example.mallar.data.MallSession
+import com.example.mallar.ui.mall.MallSelectionScreen
+import androidx.navigation.compose.currentBackStackEntryAsState
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -111,19 +115,35 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
         prefs.edit().putBoolean("is_first_launch", false).apply()
     }
 
-    // Handle initial intent for deep linking after splash
+    // After splash, always go to the mall picker first.
+    // The welcome vs home branch is relocated into the mall_selection callback below.
     val navigateAfterSplash: () -> Unit = {
-        val destination = if (isFirstLaunch.value) "welcome" else "home"
-        
-        // If we have deep link data, we ensure the standard transition occurs correctly.
-        // Deep links are typically handled by the NavHost automatically if configured,
-        // or we could explicitly route based on initialIntentData here.
-        navController.navigate(destination) {
+        navController.navigate("mall_selection") {
             popUpTo("splash") { inclusive = true }
         }
     }
 
     SharedTransitionLayout {
+        // ── Lifecycle gate (.scratch/mall-selection/spec.md §4c) ──────────────
+        // If the process is killed and Android restores a back-stack entry past
+        // the mall picker (e.g. "home"), MallSession.selected will be null because
+        // it is not persisted.  This gate catches that and redirects to the picker.
+        // Depends only on MallSession — NOT on StartupState — so logout is safe.
+        val currentBackStack by navController.currentBackStackEntryAsState()
+        val currentRoute = currentBackStack?.destination?.route
+        val selectedMall by MallSession.selected.collectAsState()
+        LaunchedEffect(currentRoute, selectedMall) {
+            if (selectedMall == null &&
+                currentRoute != null &&
+                currentRoute != "splash" &&
+                currentRoute != "mall_selection"
+            ) {
+                navController.navigate("mall_selection") {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                }
+            }
+        }
+
         NavHost(
             navController    = navController,
             startDestination = "splash"
@@ -141,6 +161,28 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
                 onTimeout = navigateAfterSplash,
                 onRetry = {
                     StartupCoordinator.retry(context = context)
+                }
+            )
+        }
+
+        // ── Mall Selection ────────────────────────────────────────────────────
+        // Shows on every cold launch, directly after splash.
+        // The welcome vs home branch from the old navigateAfterSplash is
+        // relocated verbatim here.
+        composable(
+            route = "mall_selection",
+            enterTransition = { fadeIn(tween(300)) },
+            exitTransition  = { fadeOut(tween(200)) },
+        ) {
+            MallSelectionScreen(
+                startupState = startupState,
+                onRetry = { StartupCoordinator.retry(context) },
+                onMallSelected = { mall: Mall ->
+                    MallSession.select(mall)
+                    val destination = if (isFirstLaunch.value) "welcome" else "home"
+                    navController.navigate(destination) {
+                        popUpTo("mall_selection") { inclusive = true }
+                    }
                 }
             )
         }

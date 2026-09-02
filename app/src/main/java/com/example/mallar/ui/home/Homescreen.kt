@@ -42,13 +42,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.res.stringResource
 import com.example.mallar.data.FavoritesManager
 import com.example.mallar.data.Place
 import com.example.mallar.data.PlaceRepository
 import com.example.mallar.data.MallGraph
 import com.example.mallar.data.MallGraphRepository
+import com.example.mallar.data.MallSession
 import com.example.mallar.ui.chatbot.ChatBottomSheet
 import com.example.mallar.ui.localization.NavigationState
+import com.example.mallar.ui.mall.mallNameRes
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -191,8 +194,13 @@ fun HomeScreen(
                                         letterSpacing = (-0.5).sp
                                     )
                                     Spacer(Modifier.height(4.dp))
+                                    val selectedMall by MallSession.selected.collectAsState()
+                                    val brandsSubtitle = "Discover your favorite brands"
                                     Text(
-                                        text = "Discover your favorite brands",
+                                        text = when (val mall = selectedMall) {
+                                            null -> brandsSubtitle
+                                            else -> "${stringResource(mallNameRes(mall))} · $brandsSubtitle"
+                                        },
                                         color = currentTextMain.copy(alpha = 0.7f),
                                         fontSize = 14.sp
                                     )
