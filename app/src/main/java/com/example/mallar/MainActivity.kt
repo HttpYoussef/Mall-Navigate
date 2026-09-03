@@ -3,7 +3,6 @@ package com.example.mallar
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.os.Bundle
 import android.net.Uri
 import androidx.navigation.NavType
@@ -20,7 +19,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import com.example.mallar.data.PlaceRepository
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,24 +48,8 @@ import com.example.mallar.data.Mall
 import com.example.mallar.data.MallSession
 import com.example.mallar.ui.mall.MallSelectionScreen
 import androidx.navigation.compose.currentBackStackEntryAsState
-import java.util.Locale
 
-class MainActivity : ComponentActivity() {
-
-    override fun attachBaseContext(newBase: android.content.Context) {
-        // Apply saved language preference before inflation
-        val prefs = newBase.getSharedPreferences("mallar_app_prefs", android.content.Context.MODE_PRIVATE)
-        val lang = prefs.getString("language", "en") ?: "en"
-        val locale = java.util.Locale(lang)
-        Locale.setDefault(locale)
-        val config = Configuration(newBase.resources.configuration).apply {
-            setLocale(locale)
-            setLayoutDirection(locale)
-        }
-        @Suppress("DEPRECATION")
-        newBase.resources.updateConfiguration(config, newBase.resources.displayMetrics)
-        super.attachBaseContext(newBase.createConfigurationContext(config))
-    }
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // 1. Install System Splash (Dismisses immediately into Compose Splash)

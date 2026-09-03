@@ -1,6 +1,7 @@
 package com.example.mallar
 
 import android.app.Application
+import com.example.mallar.data.LegacyLanguageMigration
 import com.example.mallar.data.StartupCoordinator
 
 /**
@@ -9,6 +10,8 @@ import com.example.mallar.data.StartupCoordinator
 class MallARApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        // Run one-time legacy language migration before any components initialize
+        LegacyLanguageMigration.runOnce(this)
         // Trigger initialization as soon as the process starts
         StartupCoordinator.initialize(this)
     }

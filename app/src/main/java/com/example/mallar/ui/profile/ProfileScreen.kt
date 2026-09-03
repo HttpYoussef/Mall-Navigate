@@ -1,12 +1,9 @@
 package com.example.mallar.ui.profile
 
 import android.app.Activity
-import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,7 +42,6 @@ import com.example.mallar.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 @Composable
 fun ProfileScreen(
@@ -54,7 +50,6 @@ fun ProfileScreen(
 ) {
     val context = LocalContext.current
     val isDarkMode by AppPreferences.isDarkMode.collectAsState()
-    val currentLang by AppPreferences.language.collectAsState()
     val favoriteIds by FavoritesManager.favorites.collectAsState()
     val colorScheme = MaterialTheme.colorScheme
 
@@ -237,32 +232,6 @@ fun ProfileScreen(
             color = colorScheme.surfaceVariant
         ) {
             Column {
-                // Language Toggle
-                LanguageToggleRow(
-                    currentLang = currentLang,
-                    colorScheme = colorScheme,
-                    onLanguageChange = { lang ->
-                        AppPreferences.setLanguage(lang)
-                        val locale = java.util.Locale(lang)
-                        java.util.Locale.setDefault(locale)
-                        val config = android.content.res.Configuration(context.resources.configuration).apply {
-                            setLocale(locale)
-                            setLayoutDirection(locale)
-                        }
-                        @Suppress("DEPRECATION")
-                        context.resources.updateConfiguration(config, context.resources.displayMetrics)
-                        val intent = android.content.Intent(context, com.example.mallar.MainActivity::class.java).apply {
-                            addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        }
-                        context.startActivity(intent)
-                    }
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    color = colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
-                )
-
                 // Dark Mode Toggle
                 DarkModeToggleRow(
                     isDarkMode = isDarkMode,
@@ -487,92 +456,6 @@ private fun FavoriteStoreRow(
                 modifier = Modifier.size(18.dp)
             )
         }
-    }
-}
-
-// ── Language Toggle Row ──────────────────────────────────────────────────────
-@Composable
-private fun LanguageToggleRow(
-    currentLang: String,
-    colorScheme: ColorScheme,
-    onLanguageChange: (String) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Default.Language,
-            contentDescription = null,
-            tint = Teal,
-            modifier = Modifier.size(22.dp)
-        )
-
-        Spacer(modifier = Modifier.width(14.dp))
-
-        Text(
-            text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.language),
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            color = colorScheme.onSurface,
-            modifier = Modifier.weight(1f)
-        )
-
-        // Segmented toggle
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            color = colorScheme.background,
-            modifier = Modifier.height(36.dp)
-        ) {
-            Row {
-                LanguageChip(
-                    label = "EN",
-                    isSelected = currentLang == "en",
-                    onClick = { onLanguageChange("en") }
-                )
-                LanguageChip(
-                    label = "عربي",
-                    isSelected = currentLang == "ar",
-                    onClick = { onLanguageChange("ar") }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun LanguageChip(
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val bgColor by animateColorAsState(
-        if (isSelected) Teal else Color.Transparent,
-        tween(200),
-        label = "langBg"
-    )
-    val textColor by animateColorAsState(
-        if (isSelected) White else MaterialTheme.colorScheme.onSurfaceVariant,
-        tween(200),
-        label = "langText"
-    )
-
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(bgColor)
-            .clickable { onClick() }
-            .padding(horizontal = 14.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = label,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = textColor
-        )
     }
 }
 
