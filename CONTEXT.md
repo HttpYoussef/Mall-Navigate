@@ -35,3 +35,24 @@ Determining where the user physically is inside the Mall, by matching the camera
 view of a store logo against the Mall's embeddings database.
 _Avoid_: positioning, tracking (tracking is the ongoing pose update after
 localization)
+
+**App language**:
+The language the app's interface text is displayed in. A separate concept from
+**Localization**, which here means physical position-fixing inside the Mall, not
+translation. One App language is active at a time; it defaults from the device
+and the user can change it on the Language screen.
+_Avoid_: localization, internationalization, locale (locale is the technical
+identifier; App language is the user-facing concept)
+
+**Supported language**:
+A language the app ships interface text for. _Live_: English (the base) and
+Arabic (Egyptian colloquial, written right-to-left). _Prepared but not yet
+offered_: Spanish and French — their resource files exist but hold English
+placeholder text until translated.
+_Avoid_: —
+
+**Canonical category**:
+The fixed vocabulary of store categories the interface groups Places by:
+Fashion, Jewellery, Perfumes & Cosmetics, Dining, Pharmacy. Taken from the Mall
+graph's `category` field; category names outside this set are not shown.
+_Avoid_: department, section, store type

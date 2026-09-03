@@ -64,6 +64,11 @@ android {
         noCompress += listOf("tflite")
     }
 
+    lint {
+        error += "MissingTranslation"
+        disable += "LocalContextConfigurationRead"
+    }
+
     // TFLite
 }
 

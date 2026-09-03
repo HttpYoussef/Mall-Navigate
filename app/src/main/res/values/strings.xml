@@ -133,9 +133,6 @@
     <string name="remove">Remove</string>
     <string name="remove_photo">Remove photo</string>
     <string name="edit_profile">Edit profile</string>
-    <string name="user_first_name">Mohamed</string>
-    <string name="user_last_name">Ibrahim</string>
-    <string name="joined_time">Joined 5 weeks ago</string>
     <string name="saved_locations">Saved Locations</string>
     <string name="recent_places">Recent Places</string>
     <string name="messages">Messages</string>

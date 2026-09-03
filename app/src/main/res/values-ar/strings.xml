@@ -124,9 +124,6 @@
     <string name="remove">إزالة</string>
     <string name="remove_photo">إزالة الصورة</string>
     <string name="edit_profile">تعديل الملف الشخصي</string>
-    <string name="user_first_name">محمد</string>
-    <string name="user_last_name">إبراهيم</string>
-    <string name="joined_time">انضم منذ ٥ أسابيع</string>
     <string name="saved_locations">الأماكن المحفوظة</string>
     <string name="recent_places">الأماكن الأخيرة</string>
     <string name="messages">الرسائل</string>
@@ -165,6 +162,7 @@
     <string name="remove_saved_desc">إزالة المحفوظ</string>
     <string name="map_unavailable">الخريطة غير متوفرة</string>
     <string name="inside_mall">داخل المول</string>
+    <string name="store_inside_mall">متجر · داخل المول</string>
     <string name="ask_me">اسألني</string>
     <string name="destination_label">الوجهة</string>
 
@@ -208,5 +206,19 @@
     <string name="bottom_nav_map">الخريطة</string>
     <string name="bottom_nav_saved">المحفوظة</string>
     <string name="bottom_nav_profile">حسابي</string>
+
+    <!-- Mall Selection Screen -->
+    <string name="mall_select_title">اختار المول</string>
+    <string name="mall_select_subtitle">رايح فين في زيارتك دي؟</string>
+    <string name="mall_coming_soon">قريباً</string>
+    <string name="mall_retry">إعادة المحاولة</string>
+
+    <!-- Mall names and locations -->
+    <string name="mall_city_stars_name">سيتي ستارز</string>
+    <string name="mall_city_stars_location">مدينة نصر، القاهرة</string>
+    <string name="mall_city_centre_almaza_name">سيتي سنتر ألماظة</string>
+    <string name="mall_city_centre_almaza_location">مصر الجديدة، القاهرة</string>
+    <string name="mall_of_egypt_name">مول مصر</string>
+    <string name="mall_of_egypt_location">6 أكتوبر، الجيزة</string>
 
 </resources>
