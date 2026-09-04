@@ -20,7 +20,7 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. No
 | 06 | Canonical categories + floor helper | ✅ committed | `5213294` |
 | 03 | In-app Language screen | ✅ committed | `314936a` |
 | 07 | Externalize: auth/onboarding/permissions/mall-picker/splash | ✅ committed | `0548242` |
-| 08 | Externalize: home/destination/offers/vouchers/store-detail | ⬜ blocked by 05✅ 06 | — |
+| 08 | Externalize: home/destination/offers/vouchers/store-detail | ✅ committed | `1fd2331` |
 | 09 | Externalize: profile/saved-places/settings | ⬜ blocked by 05✅ 06 | — |
 | 10 | Externalize: parking | ✅ committed | `41fcdc7` |
 | 11 | Externalize: assistant chrome | ✅ committed | `8183083` |
@@ -28,7 +28,12 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. No
 | 01 | AppCompat migration spike | ⬜ **USER on device** — not an agy task | — |
 | 13 | RTL + localization QA sweep | ⬜ **USER on device** | — |
 
-**Recommended remaining order for agy:** ~~06~~ → ~~03~~ → ~~07~~ → ~~10~~ → ~~11~~ → **08** → 09 → 12.
+**Recommended remaining order for agy:** ~~06~~ → ~~03~~ → ~~07~~ → ~~10~~ → ~~11~~ → ~~08~~ → **09** → 12.
+
+**New shared string templates from ticket 08 (reuse in 09/12):** `store_category_floor` ("%1$s · %2$s"),
+`store_floor_distance` ("%1$s • %2$s"), `distance_meters` ("%1$sm"), `<plurals> duration_minutes`,
+`category_all`, `store_fallback`, `where_would_you_go`. Also `Icons.Default.ArrowBack/Forward` are
+deprecated — use `Icons.AutoMirrored.Filled.*` (RTL).
 
 **Ticket 11 note:** done inline by orchestrator (not agy) — pure wiring, every chrome string
 already existed in `values/` + `values-ar/` from a prior effort; only the two chrome .kt files
