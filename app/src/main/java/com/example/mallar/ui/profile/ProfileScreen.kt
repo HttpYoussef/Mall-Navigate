@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mallar.ui.components.StoreLogoContainer
+import com.example.mallar.data.AppLanguagePlatform
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.FavoritesManager
 import com.example.mallar.data.Place
@@ -46,6 +48,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun ProfileScreen(
     onBackClick: () -> Unit,
+    onLanguageClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
     val context = LocalContext.current
@@ -237,6 +240,16 @@ fun ProfileScreen(
                     isDarkMode = isDarkMode,
                     colorScheme = colorScheme,
                     onToggle = { AppPreferences.setDarkMode(it) }
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                )
+
+                LanguageRow(
+                    colorScheme = colorScheme,
+                    onClick = onLanguageClick
                 )
             }
         }
@@ -501,3 +514,54 @@ private fun DarkModeToggleRow(
         )
     }
 }
+
+// ── Language Row ─────────────────────────────────────────────────────────────
+@Composable
+private fun LanguageRow(
+    colorScheme: ColorScheme,
+    onClick: () -> Unit
+) {
+    val context = LocalContext.current
+    val currentAutonym = AppLanguagePlatform.currentLanguage(context).autonym
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Language,
+            contentDescription = null,
+            tint = Teal,
+            modifier = Modifier.size(22.dp)
+        )
+
+        Spacer(modifier = Modifier.width(14.dp))
+
+        Text(
+            text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.language),
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            color = colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+
+        Text(
+            text = currentAutonym,
+            fontSize = 14.sp,
+            color = colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+

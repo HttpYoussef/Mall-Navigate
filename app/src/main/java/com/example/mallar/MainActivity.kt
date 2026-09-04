@@ -37,6 +37,7 @@ import com.example.mallar.ui.navigation.*
 import com.example.mallar.ui.splash.SplashScreen
 import com.example.mallar.ui.auth.*
 import com.example.mallar.ui.profile.*
+import com.example.mallar.ui.language.LanguageScreen
 import com.example.mallar.ui.parking.*
 import com.example.mallar.ui.home.*
 import com.example.mallar.ui.destination.DestinationSelectionScreen
@@ -483,8 +484,9 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
 
         composable("profile") {
             ProfileScreen(
-                onBackClick   = { navController.popBackStack() },
-                onLogoutClick = {
+                onBackClick     = { navController.popBackStack() },
+                onLanguageClick = { navController.navigate("language") },
+                onLogoutClick   = {
                     isFirstLaunch.value = true
                     prefs.edit().putBoolean("is_first_launch", true).apply()
                     StartupCoordinator.reset()
@@ -492,6 +494,12 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
                         popUpTo(0) { inclusive = true }
                     }
                 }
+            )
+        }
+
+        composable("language") {
+            LanguageScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
 
