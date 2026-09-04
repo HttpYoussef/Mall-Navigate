@@ -23,11 +23,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mallar.R
 import kotlin.math.sin
 import kotlin.math.cos
 import kotlin.math.PI
@@ -178,7 +180,7 @@ fun FloatingVoiceButton(
         ) {
             Icon(
                 imageVector = if (isActive) Icons.Default.Mic else Icons.Default.Mic,
-                contentDescription = "Voice Assistant",
+                contentDescription = stringResource(R.string.voice_assistant),
                 tint = if (isActive) Color.White else AiBlue,
                 modifier = Modifier.size(size * 0.45f)
             )
@@ -204,11 +206,11 @@ fun NavigationVoiceFab(
 @Composable
 private fun StatusPill(status: VoiceAssistantStatus) {
     val (text, color) = when (status) {
-        VoiceAssistantStatus.IDLE      -> "Voice Assistant" to AiTextMuted
-        VoiceAssistantStatus.LISTENING -> "Listening…" to AiBlue
-        VoiceAssistantStatus.THINKING  -> "Thinking…" to AiPurple
-        VoiceAssistantStatus.SPEAKING  -> "Speaking" to AiSuccess
-        VoiceAssistantStatus.ERROR     -> "Try again" to AiError
+        VoiceAssistantStatus.IDLE      -> stringResource(R.string.voice_assistant) to AiTextMuted
+        VoiceAssistantStatus.LISTENING -> stringResource(R.string.listening) to AiBlue
+        VoiceAssistantStatus.THINKING  -> stringResource(R.string.thinking) to AiPurple
+        VoiceAssistantStatus.SPEAKING  -> stringResource(R.string.speaking) to AiSuccess
+        VoiceAssistantStatus.ERROR     -> stringResource(R.string.try_again) to AiError
     }
 
     val dotAlpha by rememberInfiniteTransition(label = "dot").animateFloat(
@@ -442,7 +444,7 @@ private fun TextDisplay(uiState: VoiceAssistantUiState) {
         ) {
             Text(
                 text = when (uiState.status) {
-                    VoiceAssistantStatus.IDLE      -> "اضغط للتحدث • Tap to speak"
+                    VoiceAssistantStatus.IDLE      -> stringResource(R.string.tap_to_speak)
                     VoiceAssistantStatus.LISTENING -> "…"
                     VoiceAssistantStatus.THINKING  -> "…"
                     else -> ""
@@ -483,10 +485,10 @@ private fun BottomActionRow(
         // Hint text
         Text(
             text = when (status) {
-                VoiceAssistantStatus.LISTENING -> "Tap mic to stop"
-                VoiceAssistantStatus.SPEAKING  -> "Speaking…"
-                VoiceAssistantStatus.THINKING  -> "Processing…"
-                else -> "عربي • English"
+                VoiceAssistantStatus.LISTENING -> stringResource(R.string.tap_mic_stop)
+                VoiceAssistantStatus.SPEAKING  -> stringResource(R.string.speaking_ellipsis)
+                VoiceAssistantStatus.THINKING  -> stringResource(R.string.processing)
+                else -> stringResource(R.string.ar_en_toggle)
             },
             color = AiTextMuted,
             fontSize = 12.sp
@@ -500,7 +502,7 @@ private fun BottomActionRow(
                 .padding(horizontal = 10.dp, vertical = 6.dp)
         ) {
             Text(
-                text = if (isArabic) "عربي" else "EN",
+                text = if (isArabic) stringResource(R.string.lang_ar) else stringResource(R.string.lang_en),
                 color = AiBlue, fontSize = 12.sp, fontWeight = FontWeight.Bold
             )
         }
