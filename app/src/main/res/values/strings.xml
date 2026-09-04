@@ -1,8 +1,19 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Brand name. Do NOT translate. -->
     <string name="app_name">MallAR</string>
+    <!-- Brand wordmark. Do NOT translate. -->
+    <string name="app_wordmark">MallAR</string>
 
     <!-- Splash -->
     <string name="start">Start</string>
+    <!-- Primary call-to-action on splash screen connection failure -->
+    <string name="splash_retry_connection">Retry Connection</string>
+    <!-- Hero title line 1 on splash screen -->
+    <string name="splash_navigate">Navigate</string>
+    <!-- Hero title line 2 on splash screen -->
+    <string name="splash_through_anywhere">through anywhere</string>
+    <!-- Tagline under app wordmark on splash screen -->
+    <string name="splash_indoor_navigation">INDOOR NAVIGATION</string>
 
     <!-- Permissions -->
     <string name="permissions_title">MallAR Needs Your Permission</string>
@@ -11,6 +22,8 @@
     <string name="enable_location">Enable Location</string>
     <string name="enable_motion">Enable Motion</string>
     <string name="continue_btn">Continue</string>
+    <!-- Accessibility description for MallAR logo on permissions screen -->
+    <string name="permissions_logo_cd">MallAR logo</string>
 
     <!-- Phone Auth -->
     <string name="enter_phone">Enter your Phone Number</string>
@@ -19,11 +32,23 @@
     <string name="send">Send</string>
     <string name="skip">Skip</string>
     <string name="country_code">+20</string>
+    <!-- Placeholder sample digits shown before user enters phone number -->
+    <string name="phone_auth_placeholder_number">11 123 456 78</string>
+    <!-- Accessibility description for keypad backspace button -->
+    <string name="phone_auth_backspace_cd">Backspace</string>
 
     <!-- OTP -->
     <string name="verify_code">Verify Code</string>
     <string name="otp_subtitle">We sent a 6-digit code to your phone number.</string>
     <string name="verify">Verify</string>
+    <!-- Accessibility description for MallAR logo on OTP verification screen -->
+    <string name="otp_logo_cd">MallAR logo</string>
+    <!-- Message informing user that verification code was sent to their phone -->
+    <string name="otp_sent_code_to_phone">We sent a 6-digit code to your phone.</string>
+    <!-- Button to resend verification code if not received -->
+    <string name="otp_resend">Haven\'t received it? Resend</string>
+    <!-- Accessibility description for OTP keypad backspace button -->
+    <string name="otp_backspace_cd">Backspace</string>
 
     <!-- logos Scan -->
     <string name="scan_instruction">Point camera at a store logo to detect your location</string>
@@ -45,6 +70,8 @@
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="skip_for_now">Skip for now</string>
+    <!-- Accessibility description for partner brands illustration -->
+    <string name="welcome_major_brands">Major Brands</string>
 
     <!-- Auth Screens -->
     <string name="create_account">Create Account</string>
@@ -182,7 +209,8 @@
     <string name="toast_valid_phone">Enter a valid phone number</string>
     <string name="toast_verification_completed">Verification Completed</string>
     <string name="toast_code_sent">Code Sent</string>
-    <string name="toast_welcome_user">Welcome, %1$s!</string>
+    <!-- Welcome toast message shown after successful sign up -->
+    <string name="toast_welcome_user">Welcome, <xliff:g id="first_name" example="Sarah">%1$s</xliff:g>!</string>
     <string name="toast_wrong_otp">Wrong OTP</string>
     <string name="toast_login_success">Login Success</string>
     <string name="save_place_desc">Save place</string>

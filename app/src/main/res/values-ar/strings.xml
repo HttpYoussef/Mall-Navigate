@@ -1,12 +1,23 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Brand name. Do NOT translate. -->
     <string name="app_name">MallAR</string>
+    <!-- Brand wordmark. Do NOT translate. -->
+    <string name="app_wordmark">MallAR</string>
 
     <!-- Splash -->
     <string name="start">ابدأ</string>
+    <!-- Primary call-to-action on splash screen connection failure -->
+    <string name="splash_retry_connection">إعادة محاولة الاتصال</string>
+    <!-- Hero title line 1 on splash screen -->
+    <string name="splash_navigate">تنقّل</string>
+    <!-- Hero title line 2 on splash screen -->
+    <string name="splash_through_anywhere">في أي مكان</string>
+    <!-- Tagline under app wordmark on splash screen -->
+    <string name="splash_indoor_navigation">ملاحة داخلية</string>
 
     <!-- Permissions -->
-    <string name="permissions_title">مولار يحتاج إذنك</string>
-    <string name="permissions_subtitle">لمساعدتك في التنقل في المول، يحتاج مولار الوصول إلى التالي</string>
+    <string name="permissions_title">MallAR يحتاج إذنك</string>
+    <string name="permissions_subtitle">لمساعدتك في التنقل في المول، يحتاج <xliff:g id="app_name" example="MallAR">MallAR</xliff:g> الوصول إلى التالي</string>
     <string name="enable_camera">تفعيل الكاميرا</string>
     <string name="enable_location">تفعيل الموقع</string>
     <string name="enable_motion">تفعيل الحركة</string>
@@ -14,28 +25,42 @@
     <string name="permission_camera_subtitle">لوضع علامات المسار</string>
     <string name="permission_location_subtitle">لمعرفة الطابق الذي تتواجد فيه</string>
     <string name="permission_motion_subtitle">لتقدير سرعة حركتك</string>
+    <!-- Accessibility description for MallAR logo on permissions screen -->
+    <string name="permissions_logo_cd">شعار MallAR</string>
 
     <!-- Phone Auth -->
     <string name="enter_phone">أدخل رقم هاتفك</string>
-    <string name="phone_subtitle">ستصلك رسالة تحتوي على رمز مكون من ٦ أرقام</string>
+    <string name="phone_subtitle">ستصلك رسالة تحتوي على رمز مكون من 6 أرقام</string>
     <string name="phone_label">رقم الهاتف</string>
     <string name="send">إرسال</string>
     <string name="skip">تخطي</string>
-    <string name="country_code">+٢٠</string>
+    <string name="country_code">+20</string>
     <string name="enter_phone_nl">أدخل\nرقم الهاتف</string>
-    <string name="receive_6_digit">ستصلك رسالة تحتوي على رمز مكون من ٦ أرقام</string>
+    <string name="receive_6_digit">ستصلك رسالة تحتوي على رمز مكون من 6 أرقام</string>
     <string name="phone_placeholder">رقم الهاتف (مثال: 10 123 456 78)</string>
     <string name="send_code">إرسال الرمز</string>
+    <!-- Placeholder sample digits shown before user enters phone number -->
+    <string name="phone_auth_placeholder_number">11 123 456 78</string>
+    <!-- Accessibility description for keypad backspace button -->
+    <string name="phone_auth_backspace_cd">حذف</string>
     <string name="welcome_back">مرحباً بعودتك</string>
     <string name="enter_phone_signin">أدخل رقم هاتفك لتسجيل الدخول</string>
 
     <!-- OTP -->
     <string name="verify_code">تحقق من الرمز</string>
-    <string name="otp_subtitle">أرسلنا رمز مكون من ٦ أرقام إلى رقم هاتفك.</string>
+    <string name="otp_subtitle">أرسلنا رمز مكون من 6 أرقام إلى رقم هاتفك.</string>
     <string name="verify">تحقق</string>
-    <string name="we_sent_code">أرسلنا رمزاً من ٦ أرقام إلى هاتفك</string>
-    <string name="enter_otp">أدخل الرمز المكون من ٦ أرقام</string>
+    <string name="we_sent_code">أرسلنا رمزاً من 6 أرقام إلى هاتفك</string>
+    <string name="enter_otp">أدخل الرمز المكون من 6 أرقام</string>
     <string name="did_not_receive">لم يصلك الرمز؟ أعد الإرسال</string>
+    <!-- Accessibility description for MallAR logo on OTP verification screen -->
+    <string name="otp_logo_cd">شعار MallAR</string>
+    <!-- Message informing user that verification code was sent to their phone -->
+    <string name="otp_sent_code_to_phone">أرسلنا رمزاً من 6 أرقام إلى هاتفك.</string>
+    <!-- Button to resend verification code if not received -->
+    <string name="otp_resend">لم يصلك الرمز؟ أعد الإرسال</string>
+    <!-- Accessibility description for OTP keypad backspace button -->
+    <string name="otp_backspace_cd">حذف</string>
 
     <!-- Logo Scan -->
     <string name="scan_instruction">وجّه الكاميرا نحو شعار متجر لتحديد موقعك</string>
@@ -102,6 +127,8 @@
     <string name="sign_in">تسجيل الدخول</string>
     <string name="sign_up">إنشاء حساب</string>
     <string name="skip_for_now">تخطي الآن</string>
+    <!-- Accessibility description for partner brands illustration -->
+    <string name="welcome_major_brands">العلامات التجارية الكبرى</string>
 
     <!-- Auth Screens -->
     <string name="create_account">إنشاء حساب</string>
@@ -197,7 +224,8 @@
     <string name="toast_valid_phone">يرجى إدخال رقم هاتف صحيح</string>
     <string name="toast_verification_completed">اكتمل التحقق</string>
     <string name="toast_code_sent">تم إرسال الرمز</string>
-    <string name="toast_welcome_user">مرحباً بك، %1$s!</string>
+    <!-- Welcome toast message shown after successful sign up -->
+    <string name="toast_welcome_user">مرحباً بك، <xliff:g id="first_name" example="Sarah">%1$s</xliff:g>!</string>
     <string name="toast_wrong_otp">رمز التحقق غير صحيح</string>
     <string name="toast_login_success">تم تسجيل الدخول بنجاح</string>
 

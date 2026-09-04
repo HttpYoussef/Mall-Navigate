@@ -19,10 +19,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mallar.R
 import com.example.mallar.ui.theme.*
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
@@ -77,7 +81,7 @@ fun PhoneAuthScreen(
 
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = Teal,
                             modifier = Modifier.size(24.dp)
                         )
@@ -85,7 +89,7 @@ fun PhoneAuthScreen(
                 }
 
                 Text(
-                    text = "Skip",
+                    text = stringResource(R.string.skip),
                     color = White,
                     fontSize = 17.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -102,7 +106,7 @@ fun PhoneAuthScreen(
 
             // Title
             Text(
-                text = "Enter your\nPhone Number",
+                text = stringResource(R.string.enter_phone_nl),
                 color = White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
@@ -113,7 +117,7 @@ fun PhoneAuthScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "You will receive a 6 digit code",
+                text = stringResource(R.string.receive_6_digit),
                 color = White.copy(alpha = 0.9f),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center
@@ -122,59 +126,61 @@ fun PhoneAuthScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             // Phone Input
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .height(64.dp),
-
-                shape = RoundedCornerShape(16.dp),
-                color = White
-            ) {
-
-                Row(
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                Surface(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .height(64.dp),
 
-                    verticalAlignment = Alignment.CenterVertically
+                    shape = RoundedCornerShape(16.dp),
+                    color = White
                 ) {
 
                     Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        Text(
-                            text = "+20",
-                            color = Teal,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
 
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null,
-                            tint = Teal
+                            Text(
+                                text = stringResource(R.string.country_code),
+                                color = Teal,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                                tint = Teal
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        Text(
+                            text = if (phoneNumber.isEmpty())
+                                stringResource(R.string.phone_auth_placeholder_number)
+                            else
+                                formatPhoneNumberDisplay(phoneNumber),
+
+                            color = if (phoneNumber.isEmpty())
+                                Teal.copy(alpha = 0.3f)
+                            else
+                                Teal,
+
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 1.sp
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Text(
-                        text = if (phoneNumber.isEmpty())
-                            "11 123 456 78"
-                        else
-                            formatPhoneNumberDisplay(phoneNumber),
-
-                        color = if (phoneNumber.isEmpty())
-                            Teal.copy(alpha = 0.3f)
-                        else
-                            Teal,
-
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 1.sp
-                    )
                 }
             }
 
@@ -190,22 +196,24 @@ fun PhoneAuthScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                NumericKeypad(
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    NumericKeypad(
 
-                    onKeyPress = { key ->
+                        onKeyPress = { key ->
 
-                        if (phoneNumber.length < 10) {
-                            phoneNumber += key
+                            if (phoneNumber.length < 10) {
+                                phoneNumber += key
+                            }
+                        },
+
+                        onBackspace = {
+
+                            if (phoneNumber.isNotEmpty()) {
+                                phoneNumber = phoneNumber.dropLast(1)
+                            }
                         }
-                    },
-
-                    onBackspace = {
-
-                        if (phoneNumber.isNotEmpty()) {
-                            phoneNumber = phoneNumber.dropLast(1)
-                        }
-                    }
-                )
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -214,6 +222,7 @@ fun PhoneAuthScreen(
 
                     onClick = {
 
+                        // Egypt-only phone auth: the +20 country code is a documented product constraint (spec §Digits).
                         val fullPhone = "+20$phoneNumber"
 
                         val callbacks =
@@ -225,7 +234,7 @@ fun PhoneAuthScreen(
 
                                     Toast.makeText(
                                         context,
-                                        "Verification Completed",
+                                        context.getString(R.string.toast_verification_completed),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -248,7 +257,7 @@ fun PhoneAuthScreen(
 
                                     Toast.makeText(
                                         context,
-                                        "Code Sent",
+                                        context.getString(R.string.toast_code_sent),
                                         Toast.LENGTH_SHORT
                                     ).show()
 
@@ -284,7 +293,7 @@ fun PhoneAuthScreen(
                 ) {
 
                     Text(
-                        text = "Send",
+                        text = stringResource(R.string.send),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
@@ -370,7 +379,7 @@ private fun KeyButton(
 
                 Icon(
                     imageVector = Icons.Default.Backspace,
-                    contentDescription = "Backspace",
+                    contentDescription = stringResource(R.string.phone_auth_backspace_cd),
                     tint = White,
                     modifier = Modifier.size(26.dp)
                 )

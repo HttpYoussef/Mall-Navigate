@@ -20,10 +20,13 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
@@ -130,7 +133,7 @@ fun SplashScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = DesignPurple.copy(alpha = 0.2f)),
                     border = BorderStroke(1.dp, DesignPurple.copy(alpha = 0.5f))
                 ) {
-                    Text("Retry Connection", color = Color.White)
+                    Text(stringResource(R.string.splash_retry_connection), color = Color.White)
                 }
             }
         }
@@ -236,27 +239,43 @@ private fun PerspectiveFloor(progressProvider: () -> Float) {
 
 @Composable
 private fun TopLeftMark() {
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     Column(
         modifier = Modifier
             .statusBarsPadding()
             .padding(top = 40.dp, start = 30.dp)
     ) {
         Box {
-            Canvas(modifier = Modifier.size(60.dp).offset(x = (-10).dp, y = (-10).dp)) {
+            Canvas(
+                modifier = Modifier
+                    .size(60.dp)
+                    .offset(x = if (isRtl) 10.dp else (-10).dp, y = (-10).dp)
+            ) {
                 val s = size.width
                 val p = Path().apply {
-                    moveTo(s, 0f)
-                    lineTo(0f, 0f)
-                    lineTo(0f, s)
+                    if (isRtl) {
+                        moveTo(0f, 0f)
+                        lineTo(s, 0f)
+                        lineTo(s, s)
+                    } else {
+                        moveTo(s, 0f)
+                        lineTo(0f, 0f)
+                        lineTo(0f, s)
+                    }
                 }
                 drawPath(p, DesignCyan, style = Stroke(2.dp.toPx(), cap = StrokeCap.Round))
-                drawCircle(DesignCyan, 4f, Offset(s, 0f))
-                drawCircle(DesignCyan, 4f, Offset(0f, s))
+                if (isRtl) {
+                    drawCircle(DesignCyan, 4f, Offset(0f, 0f))
+                    drawCircle(DesignCyan, 4f, Offset(s, s))
+                } else {
+                    drawCircle(DesignCyan, 4f, Offset(s, 0f))
+                    drawCircle(DesignCyan, 4f, Offset(0f, s))
+                }
             }
 
             Column {
                 Text(
-                    text = "Navigate",
+                    text = stringResource(R.string.splash_navigate),
                     style = TextStyle(
                         color = Color.White,
                         fontSize = 28.sp,
@@ -266,7 +285,7 @@ private fun TopLeftMark() {
                     )
                 )
                 Text(
-                    text = "through anywhere",
+                    text = stringResource(R.string.splash_through_anywhere),
                     style = TextStyle(
                         color = Color.White,
                         fontSize = 28.sp,
@@ -326,7 +345,7 @@ private fun CenterIdentity(
         Spacer(Modifier.height(16.dp))
         
         Text(
-            text = "MallAR",
+            text = stringResource(R.string.app_wordmark),
             style = TextStyle(
                 color = Color.White,
                 fontSize = 42.sp,
@@ -336,7 +355,7 @@ private fun CenterIdentity(
         )
         
         Text(
-            text = "INDOOR NAVIGATION",
+            text = stringResource(R.string.splash_indoor_navigation),
             style = TextStyle(
                 color = Color.White.copy(alpha = 0.6f),
                 fontSize = 14.sp,

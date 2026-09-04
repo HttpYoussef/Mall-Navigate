@@ -18,9 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mallar.R
@@ -83,7 +86,7 @@ fun OtpVerifyScreen(
 
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = Teal,
                             modifier = Modifier.size(24.dp)
                         )
@@ -96,7 +99,7 @@ fun OtpVerifyScreen(
             // Logo
             Image(
                 painter = painterResource(id = R.drawable.logo_main),
-                contentDescription = "logo",
+                contentDescription = stringResource(R.string.otp_logo_cd),
 
                 modifier = Modifier
                     .fillMaxWidth(0.55f)
@@ -107,7 +110,7 @@ fun OtpVerifyScreen(
 
             // Title
             Text(
-                text = "Verify Code",
+                text = stringResource(R.string.verify_code),
                 color = White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
@@ -117,7 +120,7 @@ fun OtpVerifyScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "We sent a 6-digit code to your phone.",
+                text = stringResource(R.string.otp_sent_code_to_phone),
                 color = White.copy(alpha = 0.9f),
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center,
@@ -128,40 +131,42 @@ fun OtpVerifyScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             // OTP Boxes
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
 
-                horizontalArrangement = Arrangement.spacedBy(
-                    8.dp,
-                    Alignment.CenterHorizontally
-                )
-            ) {
+                    horizontalArrangement = Arrangement.spacedBy(
+                        8.dp,
+                        Alignment.CenterHorizontally
+                    )
+                ) {
 
-                repeat(6) { index ->
+                    repeat(6) { index ->
 
-                    val char = otpValue.getOrNull(index)
+                        val char = otpValue.getOrNull(index)
 
-                    Surface(
-                        modifier = Modifier.size(
-                            width = 48.dp,
-                            height = 64.dp
-                        ),
+                        Surface(
+                            modifier = Modifier.size(
+                                width = 48.dp,
+                                height = 64.dp
+                            ),
 
-                        shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(12.dp),
 
-                        color = White
-                    ) {
+                            color = White
+                        ) {
 
-                        Box(contentAlignment = Alignment.Center) {
+                            Box(contentAlignment = Alignment.Center) {
 
-                            Text(
-                                text = char?.toString() ?: "",
-                                color = Teal,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                                Text(
+                                    text = char?.toString() ?: "",
+                                    color = Teal,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
                 }
@@ -187,7 +192,7 @@ fun OtpVerifyScreen(
 
                                 Toast.makeText(
                                     context,
-                                    "Login Success",
+                                    context.getString(R.string.toast_login_success),
                                     Toast.LENGTH_SHORT
                                 ).show()
 
@@ -197,7 +202,7 @@ fun OtpVerifyScreen(
 
                                 Toast.makeText(
                                     context,
-                                    "Wrong OTP",
+                                    context.getString(R.string.toast_wrong_otp),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -226,7 +231,7 @@ fun OtpVerifyScreen(
             ) {
 
                 Text(
-                    text = "Verify",
+                    text = stringResource(R.string.verify),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -244,27 +249,29 @@ fun OtpVerifyScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                NumericKeypad(
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    NumericKeypad(
 
-                    onKeyPress = { key ->
+                        onKeyPress = { key ->
 
-                        if (otpValue.length < 6) {
-                            otpValue += key
+                            if (otpValue.length < 6) {
+                                otpValue += key
+                            }
+                        },
+
+                        onBackspace = {
+
+                            if (otpValue.isNotEmpty()) {
+                                otpValue = otpValue.dropLast(1)
+                            }
                         }
-                    },
-
-                    onBackspace = {
-
-                        if (otpValue.isNotEmpty()) {
-                            otpValue = otpValue.dropLast(1)
-                        }
-                    }
-                )
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Haven't received it? Resend",
+                    text = stringResource(R.string.otp_resend),
                     color = White.copy(alpha = 0.7f),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -354,7 +361,7 @@ private fun KeyButton(
 
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Backspace,
-                    contentDescription = "Backspace",
+                    contentDescription = stringResource(R.string.otp_backspace_cd),
                     tint = White,
                     modifier = Modifier.size(26.dp)
                 )
