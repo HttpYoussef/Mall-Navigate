@@ -22,13 +22,17 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. No
 | 07 | Externalize: auth/onboarding/permissions/mall-picker/splash | ✅ committed | `0548242` |
 | 08 | Externalize: home/destination/offers/vouchers/store-detail | ⬜ blocked by 05✅ 06 | — |
 | 09 | Externalize: profile/saved-places/settings | ⬜ blocked by 05✅ 06 | — |
-| 10 | Externalize: parking | ⬜ blocked by 04✅ 05✅ | — |
+| 10 | Externalize: parking | ✅ committed | `41fcdc7` |
 | 11 | Externalize: assistant chrome | ⬜ blocked by 04✅ 05✅ | — |
 | 12 | Externalize: navigation-guidance | ⬜ blocked by 06, 08 | — |
 | 01 | AppCompat migration spike | ⬜ **USER on device** — not an agy task | — |
 | 13 | RTL + localization QA sweep | ⬜ **USER on device** | — |
 
-**Recommended remaining order for agy:** ~~06~~ → ~~03~~ → ~~07~~ → **10** → 11 → 08 → 09 → 12.
+**Recommended remaining order for agy:** ~~06~~ → ~~03~~ → ~~07~~ → ~~10~~ → **11** → 08 → 09 → 12.
+
+**New reusable primitive (ticket 10):** `com.example.mallar.data.Timestamps.format(epochMillis)` →
+locale-neutral Western-digit `"yyyy-MM-dd HH:mm"`. Use for every timestamp shown in the UI
+(ticket 12 navigation-guidance likely needs it). Bidi-isolate it inside Arabic text.
 (03/07/10/11 are all unblocked once 06 lands; 08/09 need 06; 12 needs 06+08.)
 
 ---
