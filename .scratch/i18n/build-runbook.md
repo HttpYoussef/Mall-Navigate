@@ -21,14 +21,14 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. No
 | 03 | In-app Language screen | ✅ committed | `314936a` |
 | 07 | Externalize: auth/onboarding/permissions/mall-picker/splash | ✅ committed | `0548242` |
 | 08 | Externalize: home/destination/offers/vouchers/store-detail | ✅ committed | `1fd2331` |
-| 09 | Externalize: profile/saved-places/settings | ⬜ blocked by 05✅ 06 | — |
+| 09 | Externalize: profile/saved-places/settings | ✅ committed | `fd2b4d7` |
 | 10 | Externalize: parking | ✅ committed | `41fcdc7` |
 | 11 | Externalize: assistant chrome | ✅ committed | `8183083` |
 | 12 | Externalize: navigation-guidance | ⬜ blocked by 06, 08 | — |
 | 01 | AppCompat migration spike | ⬜ **USER on device** — not an agy task | — |
 | 13 | RTL + localization QA sweep | ⬜ **USER on device** | — |
 
-**Recommended remaining order for agy:** ~~06~~ → ~~03~~ → ~~07~~ → ~~10~~ → ~~11~~ → ~~08~~ → **09** → 12.
+**Recommended remaining order for agy:** ~~06~~ → ~~03~~ → ~~07~~ → ~~10~~ → ~~11~~ → ~~08~~ → ~~09~~ → **12** (LAST — AR/nav, strings-only, extra review).
 
 **New shared string templates from ticket 08 (reuse in 09/12):** `store_category_floor` ("%1$s · %2$s"),
 `store_floor_distance` ("%1$s • %2$s"), `distance_meters` ("%1$sm"), `<plurals> duration_minutes`,
