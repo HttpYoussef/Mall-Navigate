@@ -17,7 +17,7 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. No
 | 04 | Resource contract + MissingTranslation lint gate | ✅ committed | `6bc341c` |
 | 02 | AppCompat per-app-language foundation | ✅ committed | `e6824b6` |
 | 05 | Localization primitives: Cairo + formatters | ✅ committed | `c26866c` |
-| 06 | Canonical categories + floor helper | ✅ committed | `<06>` |
+| 06 | Canonical categories + floor helper | ✅ committed | `5213294` |
 | 03 | In-app Language screen | ⬜ not started (blocked by 02 ✅) | — |
 | 07 | Externalize: auth/onboarding/permissions/mall-picker/splash | ⬜ blocked by 04✅ 05✅ | — |
 | 08 | Externalize: home/destination/offers/vouchers/store-detail | ⬜ blocked by 05✅ 06 | — |
