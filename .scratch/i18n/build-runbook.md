@@ -18,7 +18,7 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. No
 | 02 | AppCompat per-app-language foundation | ✅ committed | `e6824b6` |
 | 05 | Localization primitives: Cairo + formatters | ✅ committed | `c26866c` |
 | 06 | Canonical categories + floor helper | ✅ committed | `5213294` |
-| 03 | In-app Language screen | ⬜ not started (blocked by 02 ✅) | — |
+| 03 | In-app Language screen | ✅ committed | `314936a` |
 | 07 | Externalize: auth/onboarding/permissions/mall-picker/splash | ⬜ blocked by 04✅ 05✅ | — |
 | 08 | Externalize: home/destination/offers/vouchers/store-detail | ⬜ blocked by 05✅ 06 | — |
 | 09 | Externalize: profile/saved-places/settings | ⬜ blocked by 05✅ 06 | — |
@@ -28,7 +28,7 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. No
 | 01 | AppCompat migration spike | ⬜ **USER on device** — not an agy task | — |
 | 13 | RTL + localization QA sweep | ⬜ **USER on device** | — |
 
-**Recommended remaining order for agy:** 06 → 03 → 07 → 10 → 11 → 08 → 09 → 12.
+**Recommended remaining order for agy:** ~~06~~ → ~~03~~ → **07** → 10 → 11 → 08 → 09 → 12.
 (03/07/10/11 are all unblocked once 06 lands; 08/09 need 06; 12 needs 06+08.)
 
 ---
