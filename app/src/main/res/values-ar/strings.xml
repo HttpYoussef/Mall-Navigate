@@ -257,4 +257,114 @@
     <string name="category_dining">مطاعم</string>
     <string name="category_pharmacy">صيدلية</string>
 
+    <!-- Parking Shared -->
+    <!-- Field label for parking zone (e.g. Zone A) -->
+    <string name="park_field_zone">المنطقة</string>
+    <!-- Field label for parking slot number (e.g. Slot 12) -->
+    <string name="park_field_slot">المكان</string>
+    <!-- Field label for parking floor level (e.g. Floor P1) -->
+    <string name="park_field_floor">الطابق</string>
+    <!-- Accessibility description for car icon -->
+    <string name="park_car_cd">سيارة</string>
+    <!-- Generic OK button in dialogs -->
+    <string name="dialog_ok">موافق</string>
+    <!-- Generic Cancel button in dialogs -->
+    <string name="dialog_cancel">إلغاء</string>
+
+    <!-- Parking Home Screen -->
+    <!-- Title of the My Parking home screen -->
+    <string name="park_home_title">موقفي</string>
+    <!-- Banner title on empty parking screen -->
+    <string name="park_home_banner_title">اركن ولاقي عربيتك</string>
+    <!-- Banner description explaining AI parking feature -->
+    <string name="park_home_banner_desc">صوّر عامود الركنة. الذكاء الاصطناعي هيقرأ المنطقة والمكان والدور تلقائياً عشان تعرف ترجع لعربيتك.</string>
+    <!-- Button to initiate camera capture for saving parking location -->
+    <string name="park_home_btn_save">حفظ مكان الركنة</string>
+    <!-- Section header explaining how parking feature works -->
+    <string name="park_home_how_it_works">إزاي بيشتغل</string>
+    <!-- Title for step 1 of parking guide -->
+    <string name="park_home_step1_title">1. اركن عربيتك</string>
+    <!-- Description for step 1 of parking guide -->
+    <string name="park_home_step1_desc">اختار مكان وجهّز تليفونك لمسح أقرب علامة عامود.</string>
+    <!-- Title for step 2 of parking guide -->
+    <string name="park_home_step2_title">2. امسح العامود</string>
+    <!-- Description for step 2 of parking guide -->
+    <string name="park_home_step2_desc">وجّه الكاميرا لعلامة العامود (زي <xliff:g id="example_slot" example="B-12">B-12</xliff:g>). هيتقرأ في لحظتها.</string>
+    <!-- Title for step 3 of parking guide -->
+    <string name="park_home_step3_title">3. تم حفظ المكان</string>
+    <!-- Description for step 3 of parking guide -->
+    <string name="park_home_step3_desc">مكانك اتحفظ. تقدر ترجعله من أي مكان جوه المول.</string>
+    <!-- Header for saved parking details card -->
+    <string name="park_home_saved_location">المكان المحفوظ</string>
+    <!-- Accessibility description for delete parking location button -->
+    <string name="park_home_delete_location_cd">حذف المكان</string>
+    <!-- Accessibility description for edit parking location button -->
+    <string name="park_home_edit_location_cd">تعديل المكان</string>
+    <!-- Label for saved timestamp row in details card -->
+    <string name="park_home_saved_time">وقت الحفظ</string>
+    <!-- Primary button to navigate back to parked car -->
+    <string name="park_home_btn_navigate">التوجه إلى السيارة</string>
+    <!-- Button to view parked car on 2D map -->
+    <string name="park_home_btn_view_on_map">عرض على الخريطة</string>
+
+    <!-- Parking Camera Screen -->
+    <!-- Title when camera permission has not been granted -->
+    <string name="park_camera_permission_required">إذن الكاميرا مطلوب</string>
+    <!-- Message explaining why camera permission is needed for parking -->
+    <string name="park_camera_permission_desc">الميزة دي بتحتاج إذن الوصول للكاميرا عشان تصوّر علامة عامود الركنة.</string>
+    <!-- Button to request camera permission -->
+    <string name="park_camera_grant_permission">منح الإذن</string>
+    <!-- Header title on camera scan overlay -->
+    <string name="park_camera_title">مساعد الركنة</string>
+    <!-- Framing instruction shown at bottom of camera view -->
+    <string name="park_camera_instruction">حط الكود جوه الإطار\nتأكد إنه واضح والإضاءة كويسة</string>
+    <!-- Accessibility description for pick from gallery button -->
+    <string name="park_camera_gallery_cd">المعرض</string>
+    <!-- Accessibility description for camera flash toggle -->
+    <string name="park_camera_flash_cd">الفلاش</string>
+
+    <!-- Parking Scan Result Screen -->
+    <!-- Header title on parking scan result screen -->
+    <string name="park_scan_title">نتيجة المسح</string>
+    <!-- Loading text while OCR processes column image -->
+    <string name="park_scan_reading">جاري قراءة نص العامود…</string>
+    <!-- Accessibility description for captured column photo -->
+    <string name="park_scan_captured_spot_cd">صورة الموقف</string>
+    <!-- Title for raw OCR detected text card -->
+    <string name="park_scan_raw_detected">النص المكتشف</string>
+    <!-- Badge shown when OCR match confidence is low -->
+    <string name="park_scan_low_confidence">دقة منخفضة / تطابق جزئي</string>
+    <!-- Title for parsed location card -->
+    <string name="park_scan_detected_location">الموقع المكتشف</string>
+    <!-- Placeholder when a field value could not be detected -->
+    <string name="park_scan_not_detected">(لم يتم اكتشافه)</string>
+    <!-- Accessibility description for edit field button -->
+    <string name="park_scan_edit_cd">تعديل</string>
+    <!-- Banner confirming parking location was saved -->
+    <string name="park_scan_location_saved">تم حفظ مكان الركنة</string>
+    <!-- Button to confirm and save scanned parking spot -->
+    <string name="park_scan_btn_save">حفظ المكان</string>
+    <!-- Dialog title for editing a specific parking field -->
+    <string name="park_scan_edit_field">تعديل <xliff:g id="field_name" example="المنطقة">%1$s</xliff:g></string>
+
+    <!-- Parking Map Screen -->
+    <!-- Header title on 2D parking map screen -->
+    <string name="park_map_title">خريطة الموقف</string>
+    <!-- Header for car location bottom card on map -->
+    <string name="park_map_your_car_location">مكان عربيتك</string>
+    <!-- Text shown when no parking location has been saved -->
+    <string name="park_map_no_location_saved">لا يوجد مكان محفوظ</string>
+    <!-- Summary format showing spot code and floor -->
+    <string name="park_map_location_summary"><xliff:g id="spot" example="B-12">%1$s</xliff:g> | <xliff:g id="floor" example="الطابق P1">%2$s</xliff:g></string>
+    <!-- Button to stop in-parking navigation route -->
+    <string name="park_map_stop_nav">إيقاف الملاحة</string>
+    <!-- Button to start in-parking navigation route -->
+    <string name="park_map_start_nav">بدء الملاحة</string>
+    <!-- Road marking label drawn on parking canvas -->
+    <string name="park_map_slow">مهل</string>
+    <!-- Exit arrow label drawn on parking canvas -->
+    <string name="park_map_exit">الخروج ➔</string>
+    <!-- Pin label drawn at current user location on parking canvas -->
+    <string name="park_map_you_are_here">أنت هنا</string>
+
 </resources>

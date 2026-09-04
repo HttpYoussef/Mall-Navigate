@@ -38,11 +38,13 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.mallar.R
 import com.example.mallar.ui.theme.*
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.ExecutorService
@@ -85,7 +87,7 @@ fun ParkingCameraScreen(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
                 Text(
-                    text = "Camera Permission Required",
+                    text = stringResource(R.string.park_camera_permission_required),
                     color = if (isDarkMode) DarkTextPrimary else TextPrimary,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
@@ -93,7 +95,7 @@ fun ParkingCameraScreen(
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = "This feature needs camera access to take a photo of the parking column marker.",
+                    text = stringResource(R.string.park_camera_permission_desc),
                     color = if (isDarkMode) DarkTextSecondary else TextSecondary,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
@@ -104,7 +106,7 @@ fun ParkingCameraScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF258799)),
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    Text("Grant Permission", color = White)
+                    Text(stringResource(R.string.park_camera_grant_permission), color = White)
                 }
             }
         }
@@ -203,11 +205,11 @@ fun ParkingCameraScreen(
                 color = Color.Black.copy(alpha = 0.5f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = White)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = White)
                 }
             }
             Text(
-                text = "Parking Assistant",
+                text = stringResource(R.string.park_camera_title),
                 color = White,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
@@ -223,7 +225,7 @@ fun ParkingCameraScreen(
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.DirectionsCar,
-                        contentDescription = "Car",
+                        contentDescription = stringResource(R.string.park_car_cd),
                         tint = White,
                         modifier = Modifier.size(20.dp)
                     )
@@ -272,7 +274,7 @@ fun ParkingCameraScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Position the code inside the frame\nMake sure it's clear and well lit",
+                        text = stringResource(R.string.park_camera_instruction),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
@@ -295,7 +297,7 @@ fun ParkingCameraScreen(
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = Icons.Default.Photo,
-                                    contentDescription = "Gallery",
+                                    contentDescription = stringResource(R.string.park_camera_gallery_cd),
                                     tint = Color.White,
                                     modifier = Modifier.size(22.dp)
                                 )
@@ -378,7 +380,7 @@ fun ParkingCameraScreen(
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = if (flashEnabled) Icons.Default.FlashOn else Icons.Default.FlashOff,
-                                    contentDescription = "Flash",
+                                    contentDescription = stringResource(R.string.park_camera_flash_cd),
                                     tint = Color.White,
                                     modifier = Modifier.size(22.dp)
                                 )

@@ -250,4 +250,114 @@
     <string name="category_dining">Dining</string>
     <string name="category_pharmacy">Pharmacy</string>
 
+    <!-- Parking Shared -->
+    <!-- Field label for parking zone (e.g. Zone A) -->
+    <string name="park_field_zone">Zone</string>
+    <!-- Field label for parking slot number (e.g. Slot 12) -->
+    <string name="park_field_slot">Slot</string>
+    <!-- Field label for parking floor level (e.g. Floor P1) -->
+    <string name="park_field_floor">Floor</string>
+    <!-- Accessibility description for car icon -->
+    <string name="park_car_cd">Car</string>
+    <!-- Generic OK button in dialogs -->
+    <string name="dialog_ok">OK</string>
+    <!-- Generic Cancel button in dialogs -->
+    <string name="dialog_cancel">Cancel</string>
+
+    <!-- Parking Home Screen -->
+    <!-- Title of the My Parking home screen -->
+    <string name="park_home_title">My Parking</string>
+    <!-- Banner title on empty parking screen -->
+    <string name="park_home_banner_title">Park &amp; Find Your Car</string>
+    <!-- Banner description explaining AI parking feature -->
+    <string name="park_home_banner_desc">Take a photo of the parking column. AI will automatically read the zone, slot and floor so you can find your way back.</string>
+    <!-- Button to initiate camera capture for saving parking location -->
+    <string name="park_home_btn_save">Save Parking Location</string>
+    <!-- Section header explaining how parking feature works -->
+    <string name="park_home_how_it_works">How It Works</string>
+    <!-- Title for step 1 of parking guide -->
+    <string name="park_home_step1_title">1. Park Your Car</string>
+    <!-- Description for step 1 of parking guide -->
+    <string name="park_home_step1_desc">Find a spot and prepare to scan the nearest column marker.</string>
+    <!-- Title for step 2 of parking guide -->
+    <string name="park_home_step2_title">2. Scan Column</string>
+    <!-- Description for step 2 of parking guide -->
+    <string name="park_home_step2_desc">Point your camera at the column sign (e.g. <xliff:g id="example_slot" example="B-12">B-12</xliff:g>). ML Kit reads it instantly.</string>
+    <!-- Title for step 3 of parking guide -->
+    <string name="park_home_step3_title">3. Navigation Saved</string>
+    <!-- Description for step 3 of parking guide -->
+    <string name="park_home_step3_desc">Your location is stored. Navigate back to it from anywhere in the mall.</string>
+    <!-- Header for saved parking details card -->
+    <string name="park_home_saved_location">Saved Location</string>
+    <!-- Accessibility description for delete parking location button -->
+    <string name="park_home_delete_location_cd">Delete Location</string>
+    <!-- Accessibility description for edit parking location button -->
+    <string name="park_home_edit_location_cd">Edit Location</string>
+    <!-- Label for saved timestamp row in details card -->
+    <string name="park_home_saved_time">Saved Time</string>
+    <!-- Primary button to navigate back to parked car -->
+    <string name="park_home_btn_navigate">NAVIGATE TO CAR</string>
+    <!-- Button to view parked car on 2D map -->
+    <string name="park_home_btn_view_on_map">VIEW ON MAP</string>
+
+    <!-- Parking Camera Screen -->
+    <!-- Title when camera permission has not been granted -->
+    <string name="park_camera_permission_required">Camera Permission Required</string>
+    <!-- Message explaining why camera permission is needed for parking -->
+    <string name="park_camera_permission_desc">This feature needs camera access to take a photo of the parking column marker.</string>
+    <!-- Button to request camera permission -->
+    <string name="park_camera_grant_permission">Grant Permission</string>
+    <!-- Header title on camera scan overlay -->
+    <string name="park_camera_title">Parking Assistant</string>
+    <!-- Framing instruction shown at bottom of camera view -->
+    <string name="park_camera_instruction">Position the code inside the frame\nMake sure it\'s clear and well lit</string>
+    <!-- Accessibility description for pick from gallery button -->
+    <string name="park_camera_gallery_cd">Gallery</string>
+    <!-- Accessibility description for camera flash toggle -->
+    <string name="park_camera_flash_cd">Flash</string>
+
+    <!-- Parking Scan Result Screen -->
+    <!-- Header title on parking scan result screen -->
+    <string name="park_scan_title">Scan Result</string>
+    <!-- Loading text while OCR processes column image -->
+    <string name="park_scan_reading">Reading column text…</string>
+    <!-- Accessibility description for captured column photo -->
+    <string name="park_scan_captured_spot_cd">Captured Spot</string>
+    <!-- Title for raw OCR detected text card -->
+    <string name="park_scan_raw_detected">Raw Detected Text</string>
+    <!-- Badge shown when OCR match confidence is low -->
+    <string name="park_scan_low_confidence">Low Confidence / Partial Match</string>
+    <!-- Title for parsed location card -->
+    <string name="park_scan_detected_location">Detected Location</string>
+    <!-- Placeholder when a field value could not be detected -->
+    <string name="park_scan_not_detected">(not detected)</string>
+    <!-- Accessibility description for edit field button -->
+    <string name="park_scan_edit_cd">Edit</string>
+    <!-- Banner confirming parking location was saved -->
+    <string name="park_scan_location_saved">Parking location saved</string>
+    <!-- Button to confirm and save scanned parking spot -->
+    <string name="park_scan_btn_save">SAVE LOCATION</string>
+    <!-- Dialog title for editing a specific parking field -->
+    <string name="park_scan_edit_field">Edit <xliff:g id="field_name" example="Zone">%1$s</xliff:g></string>
+
+    <!-- Parking Map Screen -->
+    <!-- Header title on 2D parking map screen -->
+    <string name="park_map_title">Parking Map</string>
+    <!-- Header for car location bottom card on map -->
+    <string name="park_map_your_car_location">Your Car Location</string>
+    <!-- Text shown when no parking location has been saved -->
+    <string name="park_map_no_location_saved">No Location Saved</string>
+    <!-- Summary format showing spot code and floor -->
+    <string name="park_map_location_summary"><xliff:g id="spot" example="B-12">%1$s</xliff:g> | <xliff:g id="floor" example="Floor P1">%2$s</xliff:g></string>
+    <!-- Button to stop in-parking navigation route -->
+    <string name="park_map_stop_nav">Stop Navigation</string>
+    <!-- Button to start in-parking navigation route -->
+    <string name="park_map_start_nav">Start Navigation</string>
+    <!-- Road marking label drawn on parking canvas -->
+    <string name="park_map_slow">SLOW</string>
+    <!-- Exit arrow label drawn on parking canvas -->
+    <string name="park_map_exit">EXIT ➔</string>
+    <!-- Pin label drawn at current user location on parking canvas -->
+    <string name="park_map_you_are_here">You are here</string>
+
 </resources>

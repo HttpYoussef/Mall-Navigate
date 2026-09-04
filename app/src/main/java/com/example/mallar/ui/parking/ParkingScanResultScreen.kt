@@ -1,8 +1,6 @@
 package com.example.mallar.ui.parking
 
 import android.graphics.Bitmap
-import android.text.format.DateFormat
-import java.util.Date
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -27,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -34,8 +33,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mallar.R
 import com.example.mallar.data.ParkingLocation
 import com.example.mallar.data.ParkingManager
+import com.example.mallar.data.Timestamps
+import com.example.mallar.data.bidiIsolated
 import com.example.mallar.ml.ParkingOcrEngine
 import com.example.mallar.ui.theme.*
 
@@ -86,9 +88,15 @@ fun ParkingScanResultScreen(
     }
 
     if (showEditDialog) {
+        val fieldLabel = when (editFieldType) {
+            "zone" -> stringResource(R.string.park_field_zone)
+            "slot" -> stringResource(R.string.park_field_slot)
+            "floor" -> stringResource(R.string.park_field_floor)
+            else -> editFieldType
+        }
         AlertDialog(
             onDismissRequest = { showEditDialog = false },
-            title = { Text("Edit ${editFieldType.replaceFirstChar { it.uppercase() }}", color = currentTextMain) },
+            title = { Text(stringResource(R.string.park_scan_edit_field, fieldLabel), color = currentTextMain) },
             text = {
                 OutlinedTextField(
                     value = editValue,
@@ -115,12 +123,12 @@ fun ParkingScanResultScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = HomePrimary)
                 ) {
-                    Text("OK", color = White)
+                    Text(stringResource(R.string.dialog_ok), color = White)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showEditDialog = false }) {
-                    Text("Cancel", color = HomePrimary)
+                    Text(stringResource(R.string.dialog_cancel), color = HomePrimary)
                 }
             }
         )
@@ -152,14 +160,14 @@ fun ParkingScanResultScreen(
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = if (isDarkMode) White else TextPrimary
                         )
                     }
                 }
                 Spacer(Modifier.width(16.dp))
                 Text(
-                    text = "Scan Result",
+                    text = stringResource(R.string.park_scan_title),
                     color = currentTextMain,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -176,7 +184,7 @@ fun ParkingScanResultScreen(
                         CircularProgressIndicator(color = HomePrimary, modifier = Modifier.size(52.dp))
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            text = "Reading column text...",
+                            text = stringResource(R.string.park_scan_reading),
                             color = currentTextMain,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold
@@ -204,7 +212,7 @@ fun ParkingScanResultScreen(
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                 Image(
                                     bitmap = it.asImageBitmap(),
-                                    contentDescription = "Captured Spot",
+                                    contentDescription = stringResource(R.string.park_scan_captured_spot_cd),
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.fillMaxSize()
                                 )
@@ -244,7 +252,7 @@ fun ParkingScanResultScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
-                                        text = "Raw Detected Text",
+                                        text = stringResource(R.string.park_scan_raw_detected),
                                         color = currentTextMain,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold
@@ -255,7 +263,7 @@ fun ParkingScanResultScreen(
                                             shape = RoundedCornerShape(8.dp)
                                         ) {
                                             Text(
-                                                text = "Low Confidence / Partial Match",
+                                                text = stringResource(R.string.park_scan_low_confidence),
                                                 color = Color(0xFFFF9800),
                                                 fontSize = 11.sp,
                                                 fontWeight = FontWeight.Bold,
@@ -294,7 +302,7 @@ fun ParkingScanResultScreen(
                                 .padding(20.dp)
                         ) {
                             Text(
-                                text = "Detected Location",
+                                text = stringResource(R.string.park_scan_detected_location),
                                 color = Color(0xFF00BCD4),
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold
@@ -314,16 +322,16 @@ fun ParkingScanResultScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Zone", color = Color.White.copy(0.6f), fontSize = 14.sp)
+                                Text(stringResource(R.string.park_field_zone), color = Color.White.copy(0.6f), fontSize = 14.sp)
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        text = zoneVal.ifBlank { "(not detected)" },
+                                        text = if (zoneVal.isBlank()) stringResource(R.string.park_scan_not_detected) else zoneVal.bidiIsolated(),
                                         color = if (zoneVal.isBlank()) Color.White.copy(0.3f) else Color.White,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Spacer(Modifier.width(8.dp))
-                                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Color(0xFF00BCD4), modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.park_scan_edit_cd), tint = Color(0xFF00BCD4), modifier = Modifier.size(16.dp))
                                 }
                             }
                             HorizontalDivider(color = Color.White.copy(0.08f), modifier = Modifier.padding(vertical = 4.dp))
@@ -341,16 +349,16 @@ fun ParkingScanResultScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Slot", color = Color.White.copy(0.6f), fontSize = 14.sp)
+                                Text(stringResource(R.string.park_field_slot), color = Color.White.copy(0.6f), fontSize = 14.sp)
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        text = slotVal.ifBlank { "(not detected)" },
+                                        text = if (slotVal.isBlank()) stringResource(R.string.park_scan_not_detected) else slotVal.bidiIsolated(),
                                         color = if (slotVal.isBlank()) Color.White.copy(0.3f) else Color.White,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Spacer(Modifier.width(8.dp))
-                                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Color(0xFF00BCD4), modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.park_scan_edit_cd), tint = Color(0xFF00BCD4), modifier = Modifier.size(16.dp))
                                 }
                             }
                             HorizontalDivider(color = Color.White.copy(0.08f), modifier = Modifier.padding(vertical = 4.dp))
@@ -368,16 +376,16 @@ fun ParkingScanResultScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Floor", color = Color.White.copy(0.6f), fontSize = 14.sp)
+                                Text(stringResource(R.string.park_field_floor), color = Color.White.copy(0.6f), fontSize = 14.sp)
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        text = floorVal.ifBlank { "(not detected)" },
+                                        text = if (floorVal.isBlank()) stringResource(R.string.park_scan_not_detected) else floorVal.bidiIsolated(),
                                         color = if (floorVal.isBlank()) Color.White.copy(0.3f) else Color.White,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Spacer(Modifier.width(8.dp))
-                                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Color(0xFF00BCD4), modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.park_scan_edit_cd), tint = Color(0xFF00BCD4), modifier = Modifier.size(16.dp))
                                 }
                             }
                         }
@@ -406,13 +414,13 @@ fun ParkingScanResultScreen(
                             Spacer(Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = "Parking location saved",
+                                    text = stringResource(R.string.park_scan_location_saved),
                                     color = Color.White,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                                 val dateString = remember {
-                                    DateFormat.format("MMMM dd, yyyy - hh:mm a", Date()).toString()
+                                    Timestamps.format(System.currentTimeMillis()).bidiIsolated()
                                 }
                                 Text(
                                     text = dateString,
@@ -444,7 +452,7 @@ fun ParkingScanResultScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4)) // cyan
                     ) {
                         Text(
-                            text = "SAVE LOCATION",
+                            text = stringResource(R.string.park_scan_btn_save),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White

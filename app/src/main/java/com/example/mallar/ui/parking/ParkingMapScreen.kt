@@ -29,11 +29,15 @@ import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mallar.R
 import com.example.mallar.data.ParkingLocation
 import com.example.mallar.data.ParkingManager
+import com.example.mallar.data.bidiIsolated
 import com.example.mallar.ui.theme.*
 
 private val HomePrimary      = Color(0xFF258799)
@@ -71,6 +75,10 @@ fun ParkingMapScreen(
     val zone = parkingLocation?.zone ?: "B"
     val slotNum = parkingLocation?.slot ?: "12"
     val savedSlotName = "$zone-$slotNum"
+
+    val slowLabel = stringResource(R.string.park_map_slow)
+    val exitLabel = stringResource(R.string.park_map_exit)
+    val youAreHereLabel = stringResource(R.string.park_map_you_are_here)
 
     // Floor Selector State
     var selectedFloor by remember { mutableStateOf(floorLabel) }
@@ -197,9 +205,10 @@ fun ParkingMapScreen(
                         textSize = 14f
                         isAntiAlias = true
                         isFakeBoldText = true
+                        textAlign = if (layoutDirection == LayoutDirection.Rtl) Paint.Align.RIGHT else Paint.Align.LEFT
                     }
-                    drawText("SLOW", 155f, 300f, roadPaint)
-                    drawText("EXIT ➔", 220f, 595f, roadPaint)
+                    drawText(slowLabel, 155f, 300f, roadPaint)
+                    drawText(exitLabel, 220f, 595f, roadPaint)
                 }
 
                 // Draw slots
@@ -325,8 +334,9 @@ fun ParkingMapScreen(
                             isAntiAlias = true
                             isFakeBoldText = true
                             setShadowLayer(2f, 1f, 1f, android.graphics.Color.BLACK)
+                            textAlign = if (layoutDirection == LayoutDirection.Rtl) Paint.Align.RIGHT else Paint.Align.LEFT
                         }
-                        drawText("You are here", startPt.x + 12f / scale, startPt.y + 4f / scale, paint)
+                        drawText(youAreHereLabel, startPt.x + 12f / scale, startPt.y + 4f / scale, paint)
                     }
                 }
 
@@ -380,7 +390,7 @@ fun ParkingMapScreen(
                 color = Color.Black.copy(alpha = 0.6f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = White)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = White)
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -389,7 +399,7 @@ fun ParkingMapScreen(
                 color = Color.Black.copy(alpha = 0.6f)
             ) {
                 Text(
-                    "Parking Map",
+                    text = stringResource(R.string.park_map_title),
                     color = White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
@@ -406,7 +416,7 @@ fun ParkingMapScreen(
                 color = Color.Black.copy(alpha = 0.6f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.CenterFocusStrong, "Re-center", tint = White)
+                    Icon(Icons.Default.CenterFocusStrong, contentDescription = stringResource(R.string.re_center), tint = White)
                 }
             }
         }
@@ -496,17 +506,19 @@ fun ParkingMapScreen(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "Your Car Location",
+                            text = stringResource(R.string.park_map_your_car_location),
                             color = White,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
+                        val locationSummary = if (parkingLocation != null) {
+                            val floorText = stringResource(R.string.floor_label, selectedFloor.bidiIsolated())
+                            stringResource(R.string.park_map_location_summary, savedSlotName.bidiIsolated(), floorText)
+                        } else {
+                            stringResource(R.string.park_map_no_location_saved)
+                        }
                         Text(
-                            text = if (parkingLocation != null) {
-                                "$savedSlotName | Floor $selectedFloor"
-                            } else {
-                                "No Location Saved"
-                            },
+                            text = locationSummary,
                             color = White.copy(alpha = 0.7f),
                             fontSize = 12.sp
                         )
@@ -527,7 +539,7 @@ fun ParkingMapScreen(
                     Icon(Icons.Default.Navigation, contentDescription = null, tint = White, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (isNavigating) "Stop Navigation" else "Start Navigation",
+                        text = if (isNavigating) stringResource(R.string.park_map_stop_nav) else stringResource(R.string.park_map_start_nav),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = White
