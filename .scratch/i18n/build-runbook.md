@@ -55,6 +55,10 @@ locale-neutral Western-digit `"yyyy-MM-dd HH:mm"`. Use for every timestamp shown
      --model "gemini-3.8-flash-high" --timeout 55m
    ```
    Run with `run_in_background: true`. Wait for the completion notification.
+   **Tickets 07 + 10 relay outcomes: KILLED / TIMED-OUT while agy waited on its own gradle gate
+   run — edits were complete both times, orchestrator recovered.** For large tickets, tell agy in
+   the brief NOT to run gradle itself (just edit + report); the orchestrator runs all 4 gates
+   anyway. This makes the relay finish reliably.
    Model id is `gemini-3.8-flash-high` — do NOT pass a separate `--effort` (effort is baked in;
    passing it errors). agy headless writes require `command(*)` in
    `~/.gemini/antigravity-cli/settings.json` `permissions.allow` — already set this session.
