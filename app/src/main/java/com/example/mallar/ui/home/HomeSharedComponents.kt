@@ -25,11 +25,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mallar.data.Place
+import com.example.mallar.data.categoryDisplayRes
+import com.example.mallar.data.floorDisplayLabel
 import com.example.mallar.ui.components.StoreLogo
 import java.util.Locale
 
@@ -76,12 +79,11 @@ internal fun rememberHomeColorScheme(isDarkMode: Boolean): HomeColorScheme {
 
 @Composable
 internal fun rememberPlaceMetadata(place: Place): Pair<String, String> {
-    return remember(place.id) {
-        val level = if (place.floor == 1) "Level 1" else "Level 2"
-        // Mock distance derived from coordinate hash
-        val dist = (place.brand.hashCode().coerceAtLeast(0) % 20 * 10 + 60)
-        Pair(level, "${dist}m")
+    val floor = floorDisplayLabel(place.floor)
+    val dist = remember(place.id) {
+        (place.brand.hashCode().coerceAtLeast(0) % 20 * 10 + 60)
     }
+    return Pair(floor, "${dist}m")
 }
 
 // ── Design Spec Components ───────────────────────────────────────────────────
@@ -261,7 +263,7 @@ internal fun PopularStoreCard(
     currentTextSub: Color,
     onClick: () -> Unit
 ) {
-    val (level, dist) = rememberPlaceMetadata(place)
+    val (floor, dist) = rememberPlaceMetadata(place)
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
     val pressScale by animateFloatAsState(if (pressed) 0.97f else 1f, label = "pop_card_press")
@@ -307,7 +309,7 @@ internal fun PopularStoreCard(
             Icon(Icons.Default.LocationOn, null, tint = currentAccent, modifier = Modifier.size(10.dp))
             Spacer(Modifier.width(4.dp))
             Text(
-                text = "$level  •  $dist",
+                text = "$floor  •  $dist",
                 color = currentTextSub,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium
@@ -325,7 +327,7 @@ internal fun RefinedStoreRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val (level, dist) = rememberPlaceMetadata(place)
+    val (floor, dist) = rememberPlaceMetadata(place)
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -356,7 +358,7 @@ internal fun RefinedStoreRow(
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text = "$level  •  $dist",
+                text = "$floor  •  $dist",
                 color = currentTextSub,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium
@@ -532,10 +534,11 @@ internal fun StoreRow(
                 letterSpacing = (-0.4).sp
             )
             Spacer(Modifier.height(4.dp))
-            val categoryLabel = place.category?.take(20) ?: "Store"
-            val floorLabel = if (place.floor == 1) "Ground Floor" else "First Floor"
+            val categoryRes = categoryDisplayRes(place.category)
+            val categoryLabel = if (categoryRes != null) stringResource(categoryRes) else (place.category?.take(20) ?: "Store")
+            val floor = floorDisplayLabel(place.floor)
             Text(
-                text = "$categoryLabel · $floorLabel",
+                text = "$categoryLabel · $floor",
                 fontSize = 14.sp,
                 color = currentTextSub,
                 fontWeight = FontWeight.Medium
@@ -646,9 +649,11 @@ internal fun DestinationConfirmSheet(
                     fontSize = 24.sp,
                     letterSpacing = (-0.6).sp
                 )
-                val floorLabel = if (place.floor == 1) "Ground Floor" else "First Floor"
+                val categoryRes = categoryDisplayRes(place.category)
+                val categoryLabel = if (categoryRes != null) stringResource(categoryRes) else (place.category ?: "Store")
+                val floor = floorDisplayLabel(place.floor)
                 Text(
-                    text = "${place.category ?: "Store"} · $floorLabel",
+                    text = "$categoryLabel · $floor",
                     color = currentTextSub,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium

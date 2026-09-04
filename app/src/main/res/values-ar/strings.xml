@@ -221,4 +221,12 @@
     <string name="mall_of_egypt_name">مول مصر</string>
     <string name="mall_of_egypt_location">6 أكتوبر، الجيزة</string>
 
+    <!-- Floor and Canonical Category Labels -->
+    <string name="floor_label">الطابق %1$s</string>
+    <string name="category_fashion">أزياء</string>
+    <string name="category_jewellery">مجوهرات</string>
+    <string name="category_perfumes_cosmetics">عطور ومستحضرات تجميل</string>
+    <string name="category_dining">مطاعم</string>
+    <string name="category_pharmacy">صيدلية</string>
+
 </resources>

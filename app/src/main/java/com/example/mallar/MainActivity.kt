@@ -344,9 +344,9 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
                 animatedVisibilityScope = this@composable,
                 onBackClick = { navController.popBackStack() },
                 onSearchClick = { navController.navigate("destination_search") },
-                onCategoryClick = { key, label -> 
+                onCategoryClick = { key -> 
                     val encodedKey = if (key.isBlank()) "all" else Uri.encode(key)
-                    navController.navigate("destination_category/$encodedKey/${Uri.encode(label)}") 
+                    navController.navigate("destination_category/$encodedKey") 
                 },
                 onDestinationSelected = { place ->
                     NavigationState.selectedPlace = place
@@ -374,19 +374,16 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
         }
 
         composable(
-            route = "destination_category/{categoryKey}/{categoryLabel}",
+            route = "destination_category/{categoryKey}",
             arguments = listOf(
-                navArgument("categoryKey") { type = NavType.StringType },
-                navArgument("categoryLabel") { type = NavType.StringType }
+                navArgument("categoryKey") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val categoryKey = backStackEntry.arguments?.getString("categoryKey").orEmpty()
-            val categoryLabel = backStackEntry.arguments?.getString("categoryLabel").orEmpty()
             val effectiveKey = if (categoryKey == "all") "" else categoryKey
             
             DestinationCategoryScreen(
                 categoryKey = effectiveKey,
-                categoryLabel = categoryLabel,
                 onBackClick = { navController.popBackStack() },
                 onDestinationSelected = { place ->
                     NavigationState.selectedPlace = place

@@ -49,6 +49,7 @@ import com.example.mallar.data.PlaceRepository
 import com.example.mallar.data.MallGraph
 import com.example.mallar.data.MallGraphRepository
 import com.example.mallar.data.MallSession
+import com.example.mallar.data.floorDisplayLabel
 import com.example.mallar.ui.chatbot.ChatBottomSheet
 import com.example.mallar.ui.localization.NavigationState
 import com.example.mallar.ui.mall.mallNameRes
@@ -64,13 +65,13 @@ private data class OfferItem(
     val tint: Color,
     val discount: String,
     val subtitle: String,
-    val floor: String,
+    val floor: Int,
 )
 
 private val sampleOffers = listOf(
-    OfferItem("v_starbucks_upsize", "logos/Starbucks.png","Starbucks", Color(0xFF1E6E4A), "Free Upsize", "On any beverage",   "2nd Floor"),
-    OfferItem("v_zara_15off",       "logos/ZARA.png",      "Zara",       Color(0xFF6E1E2E), "15% OFF",     "On selected items", "Ground Floor"),
-    OfferItem("v_mango_20off",      "logos/Mango.png",     "Mango",      Color(0xFF8B4513), "20% OFF",     "On all items",      "Ground Floor"),
+    OfferItem("v_starbucks_upsize", "logos/Starbucks.png","Starbucks", Color(0xFF1E6E4A), "Free Upsize", "On any beverage",   2),
+    OfferItem("v_zara_15off",       "logos/ZARA.png",      "Zara",       Color(0xFF6E1E2E), "15% OFF",     "On selected items", 1),
+    OfferItem("v_mango_20off",      "logos/Mango.png",     "Mango",      Color(0xFF8B4513), "20% OFF",     "On all items",      1),
 )
 
 // ── Bottom nav items ──────────────────────────────────────────────────────────
@@ -930,7 +931,7 @@ private fun OfferCard(
                     .border(1.dp, CyanGlow.copy(alpha = 0.35f), RoundedCornerShape(50))
                     .padding(horizontal = 10.dp, vertical = 5.dp)
             ) {
-                Text(offer.floor, color = CyanGlow, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                Text(floorDisplayLabel(offer.floor), color = CyanGlow, fontSize = 11.sp, fontWeight = FontWeight.Medium)
             }
         }
     }

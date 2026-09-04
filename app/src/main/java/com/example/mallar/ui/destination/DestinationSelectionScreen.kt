@@ -42,18 +42,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.rounded.Attractions
-import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Checkroom
-import androidx.compose.material.icons.rounded.LocalCafe
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Diamond
+import androidx.compose.material.icons.rounded.LocalPharmacy
 import androidx.compose.material.icons.rounded.Restaurant
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Storefront
-import androidx.compose.material.icons.rounded.SupportAgent
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.example.mallar.data.StoreCategory
+import com.example.mallar.data.categoryDisplayRes
+import com.example.mallar.data.floorDisplayLabel
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -147,21 +151,17 @@ private fun rememberDselTokens(isDarkMode: Boolean): DselTokens {
 }
 
 private data class DselCategory(
-    val label: String,
-    val icon: ImageVector,
     val categoryKey: String,
+    val icon: ImageVector,
 )
 
 private val dselCategories = listOf(
-    DselCategory("Food & Dining", Icons.Rounded.Restaurant,   categoryKey = "dining"),
-    DselCategory("Fashion",       Icons.Rounded.Checkroom,    categoryKey = "fashion"),
-    DselCategory("Cafés",         Icons.Rounded.LocalCafe,    categoryKey = "cafes"),
-    DselCategory("Entertainment", Icons.Rounded.Attractions,  categoryKey = "entertainment"),
-    DselCategory("Services",      Icons.Rounded.SupportAgent, categoryKey = "services"),
+    DselCategory(StoreCategory.DINING, Icons.Rounded.Restaurant),
+    DselCategory(StoreCategory.FASHION, Icons.Rounded.Checkroom),
+    DselCategory(StoreCategory.JEWELLERY, Icons.Rounded.Diamond),
+    DselCategory(StoreCategory.PERFUMES_COSMETICS, Icons.Rounded.Spa),
+    DselCategory(StoreCategory.PHARMACY, Icons.Rounded.LocalPharmacy),
 )
-
-private fun floorLabelFor(place: Place): String =
-    if (place.floor == 1) "Ground Floor" else "First Floor"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Start Navigation screen (destination selection)
@@ -175,7 +175,7 @@ fun DestinationSelectionScreen(
     viewModel: DestinationViewModel = viewModel(),
     onBackClick: () -> Unit,
     onSearchClick: () -> Unit,
-    onCategoryClick: (key: String, label: String) -> Unit,
+    onCategoryClick: (key: String) -> Unit,
     onDestinationSelected: (Place) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -279,7 +279,7 @@ fun DestinationSelectionScreen(
                                 DselCategoryTile(
                                     category = cat,
                                     tokens = tokens,
-                                    onClick = { onCategoryClick(cat.categoryKey, cat.label) }
+                                    onClick = { onCategoryClick(cat.categoryKey) }
                                 )
                             }
                         }
@@ -714,9 +714,11 @@ private fun DselCategoryTile(
         label = "dsel_tile_press"
     )
 
+    val displayLabel = categoryDisplayRes(category.categoryKey)?.let { stringResource(it) } ?: category.categoryKey
+
     Column(
         modifier = Modifier
-            .width(104.dp)
+            .width(88.dp)
             .scale(pressScale)
             .clickable(interactionSource = interactionSource, indication = null) { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally
@@ -736,7 +738,7 @@ private fun DselCategoryTile(
             )
             Icon(
                 imageVector = category.icon,
-                contentDescription = category.label,
+                contentDescription = displayLabel,
                 tint = tokens.accent,
                 modifier = Modifier.size(30.dp)
             )
@@ -744,7 +746,7 @@ private fun DselCategoryTile(
         Spacer(Modifier.height(12.dp))
         Box(modifier = Modifier.height(34.dp), contentAlignment = Alignment.TopCenter) {
             Text(
-                text = category.label,
+                text = displayLabel,
                 color = tokens.textMain,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -812,8 +814,11 @@ private fun DselPopularCard(
             overflow = TextOverflow.Ellipsis
         )
         Spacer(Modifier.height(3.dp))
+        val categoryRes = categoryDisplayRes(place.category)
+        val categoryLabel = if (categoryRes != null) stringResource(categoryRes) else (place.category ?: "Store")
+        val floor = floorDisplayLabel(place.floor)
         Text(
-            text = "${place.category ?: "Store"} · ${floorLabelFor(place)}",
+            text = "$categoryLabel · $floor",
             color = tokens.textSub,
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium,
@@ -880,8 +885,11 @@ private fun DselStoreRow(
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(2.dp))
+            val categoryRes = categoryDisplayRes(place.category)
+            val categoryLabel = if (categoryRes != null) stringResource(categoryRes) else (place.category ?: "Store")
+            val floor = floorDisplayLabel(place.floor)
             Text(
-                text = "${place.category ?: "Store"} · ${floorLabelFor(place)}",
+                text = "$categoryLabel · $floor",
                 color = tokens.textSub,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,

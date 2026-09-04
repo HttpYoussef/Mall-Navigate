@@ -45,6 +45,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.Voucher
 import com.example.mallar.data.VoucherRepository
+import com.example.mallar.data.categoryDisplayLabel
+import com.example.mallar.data.floorDisplayLabel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size as CoilSize
@@ -229,7 +231,7 @@ fun OffersScreen(
                 ) {
                     items(VoucherRepository.categories) { cat ->
                         OfferFilterChip(
-                            label = cat,
+                            label = categoryDisplayLabel(cat) ?: cat,
                             selected = selectedCategory == cat,
                             isDarkMode = isDarkMode,
                             currentAccent = currentAccent,
@@ -388,7 +390,7 @@ private fun VoucherCard(
                     .border(1.dp, currentAccent.copy(alpha = 0.3f), RoundedCornerShape(50))
                     .padding(horizontal = 10.dp, vertical = 5.dp)
             ) {
-                Text(voucher.floorLabel, color = currentAccent, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                Text(floorDisplayLabel(voucher.floor), color = currentAccent, fontSize = 11.sp, fontWeight = FontWeight.Medium)
             }
         }
 

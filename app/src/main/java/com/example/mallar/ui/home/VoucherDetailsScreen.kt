@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.Place
 import com.example.mallar.data.PlaceRepository
+import com.example.mallar.data.floorDisplayLabel
 import com.example.mallar.data.VoucherRepository
 import com.example.mallar.ui.theme.SuccessGreen
 import coil.compose.AsyncImage
@@ -161,7 +162,7 @@ fun VoucherDetailsScreen(
                         Spacer(Modifier.height(14.dp))
                         Text(voucher.storeBrand, color = currentTextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                         Spacer(Modifier.height(4.dp))
-                        Text(voucher.floorLabel, color = currentTextSub, fontSize = 13.sp)
+                        Text(floorDisplayLabel(voucher.floor), color = currentTextSub, fontSize = 13.sp)
 
                         Spacer(Modifier.height(16.dp))
                         Box(

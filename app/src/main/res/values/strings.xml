@@ -214,4 +214,12 @@
     <string name="mall_of_egypt_name">Mall of Egypt</string>
     <string name="mall_of_egypt_location">6th of October, Giza</string>
 
+    <!-- Floor and Canonical Category Labels -->
+    <string name="floor_label">Floor %1$s</string>
+    <string name="category_fashion">Fashion</string>
+    <string name="category_jewellery">Jewellery</string>
+    <string name="category_perfumes_cosmetics">Perfumes &amp; Cosmetics</string>
+    <string name="category_dining">Dining</string>
+    <string name="category_pharmacy">Pharmacy</string>
+
 </resources>
