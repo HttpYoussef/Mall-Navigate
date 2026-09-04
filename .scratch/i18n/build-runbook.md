@@ -19,7 +19,7 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. No
 | 05 | Localization primitives: Cairo + formatters | ✅ committed | `c26866c` |
 | 06 | Canonical categories + floor helper | ✅ committed | `5213294` |
 | 03 | In-app Language screen | ✅ committed | `314936a` |
-| 07 | Externalize: auth/onboarding/permissions/mall-picker/splash | ⬜ blocked by 04✅ 05✅ | — |
+| 07 | Externalize: auth/onboarding/permissions/mall-picker/splash | ✅ committed | `0548242` |
 | 08 | Externalize: home/destination/offers/vouchers/store-detail | ⬜ blocked by 05✅ 06 | — |
 | 09 | Externalize: profile/saved-places/settings | ⬜ blocked by 05✅ 06 | — |
 | 10 | Externalize: parking | ⬜ blocked by 04✅ 05✅ | — |
@@ -28,7 +28,7 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. No
 | 01 | AppCompat migration spike | ⬜ **USER on device** — not an agy task | — |
 | 13 | RTL + localization QA sweep | ⬜ **USER on device** | — |
 
-**Recommended remaining order for agy:** ~~06~~ → ~~03~~ → **07** → 10 → 11 → 08 → 09 → 12.
+**Recommended remaining order for agy:** ~~06~~ → ~~03~~ → ~~07~~ → **10** → 11 → 08 → 09 → 12.
 (03/07/10/11 are all unblocked once 06 lands; 08/09 need 06; 12 needs 06+08.)
 
 ---
@@ -137,9 +137,13 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. No
 
 ## Carry-forward items (things a later ticket must pick up)
 
-- **Ticket 07 brief must add**: a code comment near the `+20` E.164 construction in the auth
-  screens (grep `"+20"` in `ui/auth/`) noting Egypt-only phone auth is a documented product
-  constraint. (Ticket 06 was supposed to do this but agy skipped it.)
+- ~~**Ticket 07 brief must add**: `+20` E.164 comment in `ui/auth/`~~ — DONE in ticket 07
+  (`0548242`): comment added at all 4 construction sites (PhoneAuth, SignIn x2, SignUp).
+- **Ticket 07 note**: agy's relay was KILLED after it finished its edits (no result.json / report).
+  Orchestrator recovered: reviewed the full diff, confirmed no hardcoded literals remained, ran all
+  4 gates (green), fixed one 1-space indent typo in `SignUpScreen.kt`, committed. agy went beyond
+  the brief on RTL (correctly): forced LTR on phone/OTP fields + keypads via `LocalLayoutDirection`,
+  mirrored the splash corner mark. `phoneDisplay` param in `SignInOtpPhase` is dead (pre-existing).
 - **Ticket 06 non-brief changes** (accepted): `DestinationSelectionScreen` category-tile width
   104dp→88dp and swapped 3 category icons (Diamond/Spa/LocalPharmacy) — consequence of the new
   5-category set. `Voucher`/`OfferItem` "Ground Floor"+"1st Floor" both collapsed to `floor = 1`
