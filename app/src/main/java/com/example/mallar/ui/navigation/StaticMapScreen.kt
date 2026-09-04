@@ -24,10 +24,17 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mallar.R
 import com.example.mallar.data.MallGraphRepository
+import com.example.mallar.data.WesternDigits
+import com.example.mallar.data.bidiIsolated
+import com.example.mallar.data.floorDisplayLabel
 import com.example.mallar.ui.theme.Teal
 import com.example.mallar.utils.CoordinateTransformer
 import com.example.mallar.utils.FloorMapAssets
@@ -72,6 +79,11 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
     var scale by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     var reCenterTrigger by remember { mutableStateOf(0) }
+
+    // Canvas draw blocks are not @Composable — resolve label strings here and capture them.
+    val startFallbackLabel = stringResource(R.string.nav_start)
+    val destFallbackLabel = stringResource(R.string.nav_destination)
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     var isDebugMode by remember { mutableStateOf(false) }
  
     // Auto-zoom to fit the path or entire map on first load/re-center
@@ -267,15 +279,19 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                                     isAntiAlias = true
                                     isFakeBoldText = true
                                     setShadowLayer(3f / scale, 1f / scale, 1f / scale, android.graphics.Color.BLACK)
+                                    textAlign = if (isRtl) android.graphics.Paint.Align.RIGHT else android.graphics.Paint.Align.LEFT
                                 }
+                                // Anchor the label on the side of the pin that keeps it in view for
+                                // the reading direction; the pin geometry itself is unchanged.
+                                val labelDx = if (isRtl) -18f / scale else 18f / scale
                                 // Start label
-                                val startLabel = NavigationState.startPlace?.brand ?: "Start"
-                                drawText(startLabel, startX + 18f / scale, startY - 8f / scale, textPaint)
+                                val startLabel = NavigationState.startPlace?.brand ?: startFallbackLabel
+                                drawText(startLabel, startX + labelDx, startY - 8f / scale, textPaint)
 
                                 // End label
                                 if (lastNode != null) {
-                                    val endLabel = NavigationState.selectedPlace?.brand ?: "Destination"
-                                    drawText(endLabel, endX + 18f / scale, endY - 8f / scale, textPaint)
+                                    val endLabel = NavigationState.selectedPlace?.brand ?: destFallbackLabel
+                                    drawText(endLabel, endX + labelDx, endY - 8f / scale, textPaint)
                                 }
                             }
 
@@ -316,7 +332,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
 
         if (mapBitmap == null) {
             Text(
-                "Map unavailable",
+                stringResource(R.string.map_unavailable),
                 color = White.copy(0.6f),
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -338,7 +354,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                     color = Color.Black.copy(alpha = 0.6f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = White)
                     }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
@@ -347,7 +363,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                     color = Color.Black.copy(alpha = 0.6f)
                 ) {
                     Text(
-                        "Route Map · Floor $displayFloor",
+                        stringResource(R.string.nav_route_map_title, floorDisplayLabel(displayFloor)),
                         color = White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -374,7 +390,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                     color = Color.Black.copy(alpha = 0.6f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.CenterFocusStrong, "Re-center", tint = White)
+                        Icon(Icons.Default.CenterFocusStrong, stringResource(R.string.re_center), tint = White)
                     }
                 }
             }
@@ -401,7 +417,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "From: $startBrand",
+                                stringResource(R.string.from_label, startBrand.bidiIsolated()),
                                 color = White, fontSize = 14.sp, fontWeight = FontWeight.Medium
                             )
                         }
@@ -416,7 +432,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "To: $destBrand",
+                                stringResource(R.string.to_label, destBrand.bidiIsolated()),
                                 color = White, fontSize = 14.sp, fontWeight = FontWeight.Medium
                             )
                         }
@@ -427,11 +443,17 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            "Distance: ${NavigationState.estimatedDistance}m",
+                            stringResource(
+                                R.string.nav_distance_label,
+                                WesternDigits.format(NavigationState.estimatedDistance)
+                            ),
                             color = White.copy(alpha = 0.7f), fontSize = 13.sp
                         )
                         Text(
-                            "Est. Time: ${NavigationState.estimatedMinutes} min",
+                            stringResource(
+                                R.string.nav_est_time_label,
+                                WesternDigits.format(NavigationState.estimatedMinutes)
+                            ),
                             color = White.copy(alpha = 0.7f), fontSize = 13.sp
                         )
                     }
@@ -440,7 +462,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
         }
 
         Text(
-            "Pinch to zoom • Drag to pan",
+            stringResource(R.string.nav_map_gesture_hint),
             color = White.copy(alpha = 0.5f),
             fontSize = 12.sp,
             modifier = Modifier

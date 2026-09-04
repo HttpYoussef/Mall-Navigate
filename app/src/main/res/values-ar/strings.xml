@@ -120,6 +120,31 @@
     <string name="choose_nav_mode">اختر وضع التنقل الخاص بك</string>
     <string name="going_to">الذهاب إلى</string>
 
+    <!-- ================================================================= -->
+    <!-- Ticket 12: Navigation guidance -->
+    <!-- ================================================================= -->
+    <string name="nav_get_oriented">حدّد اتجاهك</string>
+    <string name="nav_floor_change">تغيير الطابق</string>
+    <string name="nav_floor_up">اركب السلم الكهربائي أو الأسانسير لـ<xliff:g id="floor" example="الطابق 2">%1$s</xliff:g></string>
+    <string name="nav_floor_down">انزل لـ<xliff:g id="floor" example="الطابق 1">%1$s</xliff:g></string>
+    <string name="nav_continue_on_floor">كمّل في <xliff:g id="floor" example="الطابق 2">%1$s</xliff:g></string>
+    <plurals name="nav_walk_minutes">
+        <item quantity="zero">"  •  المشي "<xliff:g id="count" example="0">%1$s</xliff:g>" دقيقة"</item>
+        <item quantity="one">"  •  دقيقة مشي"</item>
+        <item quantity="two">"  •  دقيقتين مشي"</item>
+        <item quantity="few">"  •  المشي "<xliff:g id="count" example="3">%1$s</xliff:g>" دقائق"</item>
+        <item quantity="many">"  •  المشي "<xliff:g id="count" example="15">%1$s</xliff:g>" دقيقة"</item>
+        <item quantity="other">"  •  المشي "<xliff:g id="count" example="100">%1$s</xliff:g>" دقيقة"</item>
+    </plurals>
+    <string name="nav_start">البداية</string>
+    <string name="nav_destination">الوجهة</string>
+    <string name="nav_route_map_title">خريطة المسار · <xliff:g id="floor" example="الطابق 1">%1$s</xliff:g></string>
+    <string name="nav_distance_label">المسافة: <xliff:g id="meters" example="120">%1$s</xliff:g> متر</string>
+    <string name="nav_est_time_label">الوقت التقديري: <xliff:g id="minutes" example="3">%1$s</xliff:g> دقيقة</string>
+    <string name="nav_map_gesture_hint">اقرص للتكبير • اسحب للتحريك</string>
+    <string name="nav_voice_mute">كتم صوت التوجيه</string>
+    <string name="nav_voice_unmute">تشغيل صوت التوجيه</string>
+
     <!-- Welcome Screen -->
     <string name="get_started">ابدأ الآن</string>
     <string name="loading">جاري التحميل</string>

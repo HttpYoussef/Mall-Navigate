@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -35,7 +37,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mallar.R
 import com.example.mallar.data.MallGraphRepository
+import com.example.mallar.data.WesternDigits
+import com.example.mallar.data.floorDisplayLabel
 import com.example.mallar.navigation.*
 import com.example.mallar.utils.FloorMapAssets
 import com.example.mallar.voice.NavigationSessionVoiceCoordinator
@@ -207,7 +212,7 @@ fun UnifiedNavigationScreen(
             ) {
                 Icon(
                     imageVector = if (voiceMuted) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
-                    contentDescription = if (voiceMuted) "Unmute navigation voice" else "Mute navigation voice",
+                    contentDescription = if (voiceMuted) stringResource(R.string.nav_voice_unmute) else stringResource(R.string.nav_voice_mute),
                     tint = Color.White,
                     modifier = Modifier.size(22.dp)
                 )
@@ -260,7 +265,7 @@ private fun OrientationOverlay(orientationState: OrientationUiState) {
                 )
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    text = "Get Oriented",
+                    text = stringResource(R.string.nav_get_oriented),
                     color = Color.White.copy(0.7f),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
@@ -275,10 +280,11 @@ private fun FloorTransitionSheet(
     transition: FloorTransitionHelper.PathFloorTransition,
     onContinue: () -> Unit
 ) {
+    val toFloorLabel = floorDisplayLabel(transition.toFloor)
     val message = if (transition.toFloor > transition.fromFloor) {
-        "Take the escalator or elevator to Floor ${transition.toFloor}"
+        stringResource(R.string.nav_floor_up, toFloorLabel)
     } else {
-        "Go down to Floor ${transition.toFloor}"
+        stringResource(R.string.nav_floor_down, toFloorLabel)
     }
 
     Box(
@@ -304,7 +310,7 @@ private fun FloorTransitionSheet(
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                text = "Floor Change",
+                text = stringResource(R.string.nav_floor_change),
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
@@ -324,7 +330,7 @@ private fun FloorTransitionSheet(
                 colors = ButtonDefaults.buttonColors(containerColor = NavBlue)
             ) {
                 Text(
-                    "Continue on Floor ${transition.toFloor}",
+                    stringResource(R.string.nav_continue_on_floor, toFloorLabel),
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -364,7 +370,7 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
 
     if (mapBitmap == null) {
         Box(modifier.graphicsLayer { this.alpha = alpha }.background(NavSurface), Alignment.Center) {
-            Text("Map unavailable", color = Color.White.copy(0.4f), fontSize = 13.sp)
+            Text(stringResource(R.string.map_unavailable), color = Color.White.copy(0.4f), fontSize = 13.sp)
         }
         return
     }
@@ -462,8 +468,8 @@ private fun NavigationHud(
                 color = Color.Black.copy(0.45f)
             ) {
                 Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp)) {
-                    HudTab("Map", !isCameraMode) { onModeSelected(NavigationModeSelection.MAP) }
-                    HudTab("AR", isCameraMode) { onModeSelected(NavigationModeSelection.AR) }
+                    HudTab(stringResource(R.string.map_mode), !isCameraMode) { onModeSelected(NavigationModeSelection.MAP) }
+                    HudTab(stringResource(R.string.ar_mode), isCameraMode) { onModeSelected(NavigationModeSelection.AR) }
                 }
             }
         }
@@ -483,8 +489,19 @@ private fun NavigationHud(
                 Text(state.destinationName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("${state.remainingDistanceM}m", color = PathColor, fontWeight = FontWeight.Bold)
-                    Text(" • ${state.walkMinutes} min walk", color = Color.White.copy(0.6f))
+                    Text(
+                        stringResource(R.string.distance_meters, WesternDigits.format(state.remainingDistanceM)),
+                        color = PathColor,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        pluralStringResource(
+                            R.plurals.nav_walk_minutes,
+                            state.walkMinutes,
+                            WesternDigits.format(state.walkMinutes)
+                        ),
+                        color = Color.White.copy(0.6f)
+                    )
                 }
             }
         }

@@ -185,6 +185,42 @@
     <string name="search_destination_hint">Search destination…</string>
     <string name="choose_nav_mode">Choose your navigation mode</string>
     <string name="going_to">Going to</string>
+
+    <!-- ================================================================= -->
+    <!-- Ticket 12: Navigation guidance (UnifiedNavigationScreen, StaticMapScreen) -->
+    <!-- ================================================================= -->
+    <!-- Orientation overlay caption while the walker re-orients -->
+    <string name="nav_get_oriented">Get Oriented</string>
+    <!-- Floor-transition sheet title -->
+    <string name="nav_floor_change">Floor Change</string>
+    <!-- Floor-transition instruction, going up. %1$s is a localized floor label e.g. "Floor 2" -->
+    <string name="nav_floor_up">Take the escalator or elevator to <xliff:g id="floor" example="Floor 2">%1$s</xliff:g></string>
+    <!-- Floor-transition instruction, going down. %1$s is a localized floor label -->
+    <string name="nav_floor_down">Go down to <xliff:g id="floor" example="Floor 1">%1$s</xliff:g></string>
+    <!-- Button on the floor-transition sheet. %1$s is a localized floor label -->
+    <string name="nav_continue_on_floor">Continue on <xliff:g id="floor" example="Floor 2">%1$s</xliff:g></string>
+    <!-- HUD walking-time chip, follows the distance. %1$s is a Western-digit minute count -->
+    <plurals name="nav_walk_minutes">
+        <item quantity="one">"  •  "<xliff:g id="count" example="1">%1$s</xliff:g>" min walk"</item>
+        <item quantity="other">"  •  "<xliff:g id="count" example="5">%1$s</xliff:g>" min walk"</item>
+    </plurals>
+    <!-- Route-map start-point label (fallback when the start store has no brand) -->
+    <string name="nav_start">Start</string>
+    <!-- Route-map destination-point label (fallback when the destination has no brand) -->
+    <string name="nav_destination">Destination</string>
+    <!-- Static route-map title. %1$s is a localized floor label e.g. "Floor 1" -->
+    <string name="nav_route_map_title">Route Map · <xliff:g id="floor" example="Floor 1">%1$s</xliff:g></string>
+    <!-- Route-map info row: total distance. %1$s is a Western-digit metre count -->
+    <string name="nav_distance_label">Distance: <xliff:g id="meters" example="120">%1$s</xliff:g>m</string>
+    <!-- Route-map info row: estimated walking time. %1$s is a Western-digit minute count -->
+    <string name="nav_est_time_label">Est. Time: <xliff:g id="minutes" example="3">%1$s</xliff:g> min</string>
+    <!-- Route-map gesture hint at the bottom of the screen -->
+    <string name="nav_map_gesture_hint">Pinch to zoom • Drag to pan</string>
+    <!-- Accessibility description for the navigation-voice toggle, currently unmuted -->
+    <string name="nav_voice_mute">Mute navigation voice</string>
+    <!-- Accessibility description for the navigation-voice toggle, currently muted -->
+    <string name="nav_voice_unmute">Unmute navigation voice</string>
+
     <string name="voice_assistant">Voice Assistant</string>
     <string name="listening">Listening…</string>
     <string name="thinking">Thinking…</string>
