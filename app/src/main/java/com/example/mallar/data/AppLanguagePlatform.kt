@@ -38,6 +38,18 @@ object AppLanguagePlatform {
     fun deviceLocales(): List<String> = deviceLocales(null)
 
     /**
+     * Returns the effective [AppLanguage] currently active.
+     */
+    fun currentLanguage(context: Context? = null): AppLanguage =
+        AppLanguageResolver.effective(currentTags(), deviceLocales(context))
+
+    /**
+     * Overload returning the current language without requiring a [Context].
+     */
+    fun currentLanguage(): AppLanguage = currentLanguage(null)
+
+
+    /**
      * Applies an explicit [AppLanguage] as the application locale.
      */
     fun apply(language: AppLanguage) {
