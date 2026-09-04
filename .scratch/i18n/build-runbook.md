@@ -10,7 +10,8 @@ Decision record + rationale: agent memory `app-localization-effort.md`.
 
 ## Status
 
-Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). Nothing pushed. Nothing device-verified.
+Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). **Pushed to `origin`; draft PR #1**
+(https://github.com/HttpYoussef/Mall-Navigate/pull/1). Nothing device-verified.
 
 | # | Ticket | State | Commit |
 |---|--------|-------|--------|
