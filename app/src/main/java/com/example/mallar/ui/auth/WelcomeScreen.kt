@@ -95,7 +95,7 @@ fun WelcomeScreen(
             // Main Brands Illustration
             Image(
                 painter = painterResource(id = R.drawable.brands_image),
-                contentDescription = "Major Brands",
+                contentDescription = androidx.compose.ui.res.stringResource(R.string.welcome_major_brands),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(350.dp),

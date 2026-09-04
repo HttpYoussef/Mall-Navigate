@@ -100,7 +100,7 @@ fun SignInScreen(
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.back),
                             tint = White,
                             modifier = Modifier.size(22.dp)
                         )
@@ -165,10 +165,11 @@ fun SignInScreen(
                             val rawPhone = phoneNumber.trim()
                             val formattedPhone = if (rawPhone.startsWith("0")) rawPhone.drop(1) else rawPhone
                             if (formattedPhone.length != 10) {
-                                Toast.makeText(context, "Enter a valid phone number", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(com.example.mallar.R.string.toast_valid_phone), Toast.LENGTH_SHORT).show()
                                 return@SignInPhonePhase
                             }
                             isLoading = true
+                            // Egypt-only phone auth: the +20 country code is a documented product constraint (spec §Digits).
                             val fullPhone = "+20$formattedPhone"
                             val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                                 override fun onVerificationCompleted(
@@ -187,7 +188,7 @@ fun SignInScreen(
                                     isLoading = false
                                     verificationId = id
                                     phase = 2
-                                    Toast.makeText(context, "Code Sent", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(com.example.mallar.R.string.toast_code_sent), Toast.LENGTH_SHORT).show()
                                 }
                             }
                             val options = PhoneAuthOptions.newBuilder(auth)
@@ -202,6 +203,7 @@ fun SignInScreen(
                     2 -> SignInOtpPhase(
                         otpValue = otpValue,
                         isLoading = isLoading,
+                        // Egypt-only phone auth: the +20 country code is a documented product constraint (spec §Digits).
                         phoneDisplay = "+20 ${formatSignInPhone(phoneNumber)}",
                         onOtpChange = { if (it.length <= 6) otpValue = it },
                         onBackspace = {
@@ -216,10 +218,10 @@ fun SignInScreen(
                                 .addOnCompleteListener { task ->
                                     isLoading = false
                                     if (task.isSuccessful) {
-                                        Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(com.example.mallar.R.string.toast_login_success), Toast.LENGTH_SHORT).show()
                                         onSuccess()
                                     } else {
-                                        Toast.makeText(context, "Wrong OTP", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(com.example.mallar.R.string.toast_wrong_otp), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                         },
@@ -412,43 +414,51 @@ private fun AuthTextField(
     placeholder: String,
     keyboardType: androidx.compose.ui.text.input.KeyboardType = androidx.compose.ui.text.input.KeyboardType.Text
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp),
-        shape = RoundedCornerShape(16.dp),
-        color = White.copy(alpha = 0.15f)
+    val isLtrOnly = keyboardType == androidx.compose.ui.text.input.KeyboardType.Phone ||
+            keyboardType == androidx.compose.ui.text.input.KeyboardType.Number
+
+    androidx.compose.runtime.CompositionLocalProvider(
+        androidx.compose.ui.platform.LocalLayoutDirection provides if (isLtrOnly) androidx.compose.ui.unit.LayoutDirection.Ltr else androidx.compose.ui.platform.LocalLayoutDirection.current
     ) {
-        androidx.compose.foundation.text.BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            singleLine = true,
-            textStyle = androidx.compose.ui.text.TextStyle(
-                color = White,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.SemiBold
-            ),
-            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = keyboardType),
+        Surface(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp),
-            decorationBox = { innerTextField ->
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if (value.isEmpty()) {
-                        Text(
-                            text = placeholder,
-                            color = White.copy(alpha = 0.4f),
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Medium
-                        )
+                .fillMaxWidth()
+                .height(60.dp),
+            shape = RoundedCornerShape(16.dp),
+            color = White.copy(alpha = 0.15f)
+        ) {
+            androidx.compose.foundation.text.BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                singleLine = true,
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    color = White,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    textDirection = if (isLtrOnly) androidx.compose.ui.text.style.TextDirection.Ltr else androidx.compose.ui.text.style.TextDirection.Content
+                ),
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = keyboardType),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (value.isEmpty()) {
+                            Text(
+                                text = placeholder,
+                                color = White.copy(alpha = 0.4f),
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
                 }
-            }
-        )
+            )
+        }
     }
 }
 

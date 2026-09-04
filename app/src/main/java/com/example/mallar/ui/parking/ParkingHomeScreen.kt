@@ -1,6 +1,5 @@
 package com.example.mallar.ui.parking
 
-import android.text.format.DateFormat
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -28,8 +27,9 @@ import androidx.compose.ui.unit.sp
 import com.example.mallar.R
 import com.example.mallar.data.ParkingLocation
 import com.example.mallar.data.ParkingManager
+import com.example.mallar.data.Timestamps
+import com.example.mallar.data.bidiIsolated
 import com.example.mallar.ui.theme.*
-import java.util.*
 
 // Brand colors matching Homescreen.kt
 private val HomePrimary      = Color(0xFF258799)
@@ -81,14 +81,14 @@ fun ParkingHomeScreen(
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = if (isDarkMode) White else TextPrimary
                         )
                     }
                 }
                 Spacer(Modifier.width(16.dp))
                 Text(
-                    text = "My Parking",
+                    text = stringResource(R.string.park_home_title),
                     color = currentTextMain,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -102,7 +102,7 @@ fun ParkingHomeScreen(
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             Icons.Default.DirectionsCar,
-                            contentDescription = "Car",
+                            contentDescription = stringResource(R.string.park_car_cd),
                             tint = if (isDarkMode) White else TextPrimary,
                             modifier = Modifier.size(20.dp)
                         )
@@ -166,14 +166,14 @@ private fun EmptyParkingState(
     ) {
         Column {
             Text(
-                text = "Park & Find Your Car",
+                text = stringResource(R.string.park_home_banner_title),
                 color = if (isDarkMode) White else Color.White,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "Take a photo of the parking column. AI will automatically read the zone, slot and floor so you can find your way back.",
+                text = stringResource(R.string.park_home_banner_desc),
                 color = if (isDarkMode) White.copy(0.8f) else Color.White.copy(0.85f),
                 fontSize = 13.sp,
                 lineHeight = 18.sp
@@ -196,7 +196,7 @@ private fun EmptyParkingState(
         Icon(Icons.Default.CameraAlt, contentDescription = null, tint = White)
         Spacer(Modifier.width(8.dp))
         Text(
-            text = "Save Parking Location",
+            text = stringResource(R.string.park_home_btn_save),
             fontSize = 16.sp,
             fontWeight = FontWeight.ExtraBold,
             color = White
@@ -207,7 +207,7 @@ private fun EmptyParkingState(
 
     // Features / How to use guide
     Text(
-        text = "How It Works",
+        text = stringResource(R.string.park_home_how_it_works),
         color = currentTextMain,
         fontSize = 16.sp,
         fontWeight = FontWeight.Bold,
@@ -218,8 +218,8 @@ private fun EmptyParkingState(
 
     ParkingStepItem(
         icon = Icons.Default.DirectionsCar,
-        title = "1. Park Your Car",
-        desc = "Find a spot and prepare to scan the nearest column marker.",
+        title = stringResource(R.string.park_home_step1_title),
+        desc = stringResource(R.string.park_home_step1_desc),
         currentTextMain = currentTextMain,
         currentTextSub = currentTextSub
     )
@@ -227,8 +227,8 @@ private fun EmptyParkingState(
 
     ParkingStepItem(
         icon = Icons.Default.QrCodeScanner,
-        title = "2. Scan Column",
-        desc = "Point your camera at the column sign (e.g. B-12). ML Kit reads it instantly.",
+        title = stringResource(R.string.park_home_step2_title),
+        desc = stringResource(R.string.park_home_step2_desc),
         currentTextMain = currentTextMain,
         currentTextSub = currentTextSub
     )
@@ -236,8 +236,8 @@ private fun EmptyParkingState(
 
     ParkingStepItem(
         icon = Icons.Default.PinDrop,
-        title = "3. Navigation Saved",
-        desc = "Your location is stored. Navigate back to it from anywhere in the mall.",
+        title = stringResource(R.string.park_home_step3_title),
+        desc = stringResource(R.string.park_home_step3_desc),
         currentTextMain = currentTextMain,
         currentTextSub = currentTextSub
     )
@@ -303,7 +303,7 @@ private fun SavedParkingState(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Saved Location",
+                    text = stringResource(R.string.park_home_saved_location),
                     color = Color(0xFF00BCD4),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -315,7 +315,7 @@ private fun SavedParkingState(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Location",
+                        contentDescription = stringResource(R.string.park_home_delete_location_cd),
                         tint = RedAccent.copy(0.7f),
                         modifier = Modifier.size(18.dp)
                     )
@@ -333,7 +333,7 @@ private fun SavedParkingState(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${location.zone}-${location.slot}",
+                    text = "${location.zone}-${location.slot}".bidiIsolated(),
                     color = Color.White,
                     fontSize = 44.sp,
                     fontWeight = FontWeight.Black,
@@ -342,14 +342,14 @@ private fun SavedParkingState(
                 Spacer(Modifier.width(8.dp))
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit Location",
+                    contentDescription = stringResource(R.string.park_home_edit_location_cd),
                     tint = Color(0xFF00BCD4),
                     modifier = Modifier.size(20.dp)
                 )
             }
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "Floor ${location.floor}",
+                text = stringResource(R.string.floor_label, location.floor.bidiIsolated()),
                 color = Color.White.copy(alpha = 0.8f),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -362,17 +362,17 @@ private fun SavedParkingState(
             Spacer(Modifier.height(20.dp))
 
             // Detail rows inside the card
-            DetailRow(label = "Zone", value = location.zone, Color.White, Color.White.copy(0.6f))
+            DetailRow(label = stringResource(R.string.park_field_zone), value = location.zone.bidiIsolated(), Color.White, Color.White.copy(0.6f))
             HorizontalDivider(color = Color.White.copy(0.05f), modifier = Modifier.padding(vertical = 10.dp))
             
-            DetailRow(label = "Slot", value = location.slot, Color.White, Color.White.copy(0.6f))
+            DetailRow(label = stringResource(R.string.park_field_slot), value = location.slot.bidiIsolated(), Color.White, Color.White.copy(0.6f))
             HorizontalDivider(color = Color.White.copy(0.05f), modifier = Modifier.padding(vertical = 10.dp))
             
-            DetailRow(label = "Floor", value = location.floor, Color.White, Color.White.copy(0.6f))
+            DetailRow(label = stringResource(R.string.park_field_floor), value = location.floor.bidiIsolated(), Color.White, Color.White.copy(0.6f))
             HorizontalDivider(color = Color.White.copy(0.05f), modifier = Modifier.padding(vertical = 10.dp))
             
-            val dateString = DateFormat.format("MMM dd, yyyy - hh:mm a", Date(location.savedAt)).toString()
-            DetailRow(label = "Saved Time", value = dateString, Color.White, Color.White.copy(0.6f))
+            val dateString = Timestamps.format(location.savedAt).bidiIsolated()
+            DetailRow(label = stringResource(R.string.park_home_saved_time), value = dateString, Color.White, Color.White.copy(0.6f))
         }
     }
 
@@ -391,7 +391,7 @@ private fun SavedParkingState(
         Icon(Icons.Default.NearMe, contentDescription = null, tint = White)
         Spacer(Modifier.width(8.dp))
         Text(
-            text = "NAVIGATE TO CAR",
+            text = stringResource(R.string.park_home_btn_navigate),
             fontSize = 16.sp,
             fontWeight = FontWeight.ExtraBold,
             color = White
@@ -413,7 +413,7 @@ private fun SavedParkingState(
         Icon(Icons.Default.Map, contentDescription = null, tint = Color(0xFF00BCD4))
         Spacer(Modifier.width(8.dp))
         Text(
-            text = "VIEW ON MAP",
+            text = stringResource(R.string.park_home_btn_view_on_map),
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF00BCD4)

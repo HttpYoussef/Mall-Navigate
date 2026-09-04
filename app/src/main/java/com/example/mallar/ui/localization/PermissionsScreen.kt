@@ -121,7 +121,7 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo_main),
-                    contentDescription = "logos",
+                    contentDescription = androidx.compose.ui.res.stringResource(R.string.permissions_logo_cd),
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier.fillMaxWidth(0.55f)
                 )
@@ -145,10 +145,11 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
                     Text(
                         text = buildAnnotatedString {
                             withStyle(SpanStyle(color = Teal, fontWeight = FontWeight.ExtraBold)) {
-                                append("MallAR ")
+                                append(androidx.compose.ui.res.stringResource(R.string.app_wordmark))
+                                append(" ")
                             }
                             withStyle(SpanStyle(color = colorScheme.onSurface, fontWeight = FontWeight.Bold)) {
-                                append(androidx.compose.ui.res.stringResource(R.string.permissions_title).removePrefix("MallAR "))
+                                append(androidx.compose.ui.res.stringResource(R.string.permissions_title).removePrefix("MallAR").trimStart())
                             }
                         },
                         fontSize = 28.sp,
@@ -175,7 +176,7 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
                             delay = 200,
                             icon = Icons.Outlined.CameraAlt,
                             title = androidx.compose.ui.res.stringResource(R.string.enable_camera),
-                            subtitle = "Place path markers",
+                            subtitle = androidx.compose.ui.res.stringResource(R.string.permission_camera_subtitle),
                             granted = cameraGranted,
                             color = Color(0xFF167D92),
                             onClick = { cameraLauncher.launch(Manifest.permission.CAMERA) }
@@ -185,7 +186,7 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
                             delay = 350,
                             icon = Icons.Outlined.LocationOn,
                             title = androidx.compose.ui.res.stringResource(R.string.enable_location),
-                            subtitle = "Find which floor you are on",
+                            subtitle = androidx.compose.ui.res.stringResource(R.string.permission_location_subtitle),
                             granted = locationGranted,
                             color = Color(0xFF2099B9),
                             onClick = { locationLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
@@ -195,7 +196,7 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
                             delay = 500,
                             icon = Icons.Outlined.DirectionsRun,
                             title = androidx.compose.ui.res.stringResource(R.string.enable_motion),
-                            subtitle = "Estimate movement speed",
+                            subtitle = androidx.compose.ui.res.stringResource(R.string.permission_motion_subtitle),
                             granted = motionGranted,
                             color = Color(0xFFC39D51),
                             onClick = {
@@ -224,7 +225,7 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
                         )
                     ) {
                         Text(
-                            text = if (allGranted) "..." else androidx.compose.ui.res.stringResource(R.string.continue_btn),
+                            text = if (allGranted) androidx.compose.ui.res.stringResource(R.string.dots) else androidx.compose.ui.res.stringResource(R.string.continue_btn),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold
                         )

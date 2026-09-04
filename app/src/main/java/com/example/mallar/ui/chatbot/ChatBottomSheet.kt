@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mallar.R
 import com.example.mallar.data.AStarPath
 import com.example.mallar.data.GraphNode
 import com.example.mallar.data.MallGraph
@@ -449,13 +451,13 @@ private fun ChatHeader(onDismiss: () -> Unit) {
 
         Column(Modifier.weight(1f)) {
             Text(
-                text       = "Mall Assistant",
+                text       = stringResource(R.string.chat_assistant_title),
                 fontWeight = FontWeight.Bold,
                 fontSize   = 16.sp,
                 color      = Color.Black
             )
             Text(
-                text     = "Ask me where you want to go",
+                text     = stringResource(R.string.chat_assistant_subtitle),
                 fontSize = 12.sp,
                 color    = Color.Gray
             )
@@ -479,7 +481,7 @@ private fun ChatHeader(onDismiss: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Close chat",
+                contentDescription = stringResource(R.string.close_chat),
                 tint = Color.Gray,
                 modifier = Modifier.size(20.dp)
             )
@@ -528,7 +530,7 @@ private fun ChatBubble(message: ChatMessage, onStartNavigation: ((Boolean) -> Un
                             modifier = Modifier.padding(start = 4.dp),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("🗺️ Show Map", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.show_map_btn), color = Color.White, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -657,7 +659,7 @@ private fun ChatInputBar(
                 modifier       = Modifier.weight(1f),
                 placeholder    = {
                     Text(
-                        "Where to go…",
+                        stringResource(R.string.where_to_go_placeholder),
                         color    = Color.Gray,
                         fontSize = 14.sp
                     )
@@ -685,7 +687,7 @@ private fun ChatInputBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Send,
-                    contentDescription = "Send",
+                    contentDescription = stringResource(R.string.send_btn),
                     modifier    = Modifier.size(20.dp)
                 )
             }

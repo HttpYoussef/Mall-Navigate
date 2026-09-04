@@ -25,11 +25,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mallar.R
 import com.example.mallar.data.Place
+import com.example.mallar.data.WesternDigits
+import com.example.mallar.data.categoryDisplayLabel
+import com.example.mallar.data.categoryDisplayRes
+import com.example.mallar.data.floorDisplayLabel
 import com.example.mallar.ui.components.StoreLogo
 import java.util.Locale
 
@@ -76,12 +82,12 @@ internal fun rememberHomeColorScheme(isDarkMode: Boolean): HomeColorScheme {
 
 @Composable
 internal fun rememberPlaceMetadata(place: Place): Pair<String, String> {
-    return remember(place.id) {
-        val level = if (place.floor == 1) "Level 1" else "Level 2"
-        // Mock distance derived from coordinate hash
-        val dist = (place.brand.hashCode().coerceAtLeast(0) % 20 * 10 + 60)
-        Pair(level, "${dist}m")
+    val floor = floorDisplayLabel(place.floor)
+    val dist = remember(place.id) {
+        (place.brand.hashCode().coerceAtLeast(0) % 20 * 10 + 60)
     }
+    val distStr = stringResource(R.string.distance_meters, WesternDigits.format(dist))
+    return Pair(floor, distStr)
 }
 
 // ── Design Spec Components ───────────────────────────────────────────────────
@@ -91,7 +97,7 @@ internal fun GlowingSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Search for stores, places...",
+    placeholder: String = stringResource(R.string.home_search_placeholder),
     isFocused: Boolean = false,
     onFocusChange: (Boolean) -> Unit = {},
     focusRequester: FocusRequester = remember { FocusRequester() },
@@ -184,7 +190,7 @@ internal fun GlowingSearchBar(
                 )
                 if (query.isNotEmpty()) {
                     IconButton(onClick = { onQueryChange("") }, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.Close, contentDescription = "Clear", tint = currentTextSub, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear), tint = currentTextSub, modifier = Modifier.size(18.dp))
                     }
                 }
             }
@@ -203,6 +209,8 @@ internal fun DestinationCategoryCard(
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
     val pressScale by animateFloatAsState(if (pressed) 0.95f else 1f, label = "cat_card_press")
+
+    val displayLabel = categoryDisplayLabel(category.categoryKey) ?: category.label
 
     Column(
         modifier = Modifier
@@ -240,7 +248,7 @@ internal fun DestinationCategoryCard(
         }
         Spacer(Modifier.height(12.dp))
         Text(
-            text = category.label,
+            text = displayLabel,
             color = currentTextMain,
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
@@ -261,7 +269,7 @@ internal fun PopularStoreCard(
     currentTextSub: Color,
     onClick: () -> Unit
 ) {
-    val (level, dist) = rememberPlaceMetadata(place)
+    val (floor, dist) = rememberPlaceMetadata(place)
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
     val pressScale by animateFloatAsState(if (pressed) 0.97f else 1f, label = "pop_card_press")
@@ -307,7 +315,7 @@ internal fun PopularStoreCard(
             Icon(Icons.Default.LocationOn, null, tint = currentAccent, modifier = Modifier.size(10.dp))
             Spacer(Modifier.width(4.dp))
             Text(
-                text = "$level  •  $dist",
+                text = stringResource(R.string.store_floor_distance, floor, dist),
                 color = currentTextSub,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium
@@ -325,7 +333,7 @@ internal fun RefinedStoreRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val (level, dist) = rememberPlaceMetadata(place)
+    val (floor, dist) = rememberPlaceMetadata(place)
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -356,7 +364,7 @@ internal fun RefinedStoreRow(
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text = "$level  •  $dist",
+                text = stringResource(R.string.store_floor_distance, floor, dist),
                 color = currentTextSub,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium
@@ -395,7 +403,7 @@ internal fun SectionHeader(
         )
         if (onSeeAll != null) {
             Text(
-                text = "See all",
+                text = stringResource(R.string.see_all),
                 color = currentAccent,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
@@ -443,6 +451,8 @@ internal fun CategoryChip(
     val haloAlpha by animateFloatAsState(if (selected) 0.15f else 0f, animationSpec = tween(400), label = "chip_halo")
     val pressScale by animateFloatAsState(if (pressed) 0.94f else 1f, label = "category_chip_press")
 
+    val displayLabel = categoryDisplayLabel(category.categoryKey) ?: category.label
+
     Box(
         modifier = Modifier
             .scale(pressScale)
@@ -467,7 +477,7 @@ internal fun CategoryChip(
             }
             Spacer(Modifier.width(10.dp))
             Text(
-                text = category.label,
+                text = displayLabel,
                 color = contentColor,
                 fontSize = 15.sp,
                 fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
@@ -532,10 +542,11 @@ internal fun StoreRow(
                 letterSpacing = (-0.4).sp
             )
             Spacer(Modifier.height(4.dp))
-            val categoryLabel = place.category?.take(20) ?: "Store"
-            val floorLabel = if (place.floor == 1) "Ground Floor" else "First Floor"
+            val categoryRes = categoryDisplayRes(place.category)
+            val categoryLabel = if (categoryRes != null) stringResource(categoryRes) else (place.category?.take(20) ?: stringResource(R.string.store_fallback))
+            val floor = floorDisplayLabel(place.floor)
             Text(
-                text = "$categoryLabel · $floorLabel",
+                text = stringResource(R.string.store_category_floor, categoryLabel, floor),
                 fontSize = 14.sp,
                 color = currentTextSub,
                 fontWeight = FontWeight.Medium
@@ -545,7 +556,7 @@ internal fun StoreRow(
         IconButton(onClick = onToggleSaved, modifier = Modifier.size(44.dp)) {
             Icon(
                 imageVector = if (isSaved) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = "Save place",
+                contentDescription = stringResource(R.string.save_place),
                 tint = if (isSaved) FavoriteHeartRed else currentTextSub,
                 modifier = Modifier.size(24.dp)
             )
@@ -583,13 +594,13 @@ internal fun EmptyState(currentTextSub: Color) {
             )
             Spacer(Modifier.height(18.dp))
             Text(
-                text = "No results found",
+                text = stringResource(R.string.home_no_results_found),
                 color = currentTextSub,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "Try a different keyword",
+                text = stringResource(R.string.home_try_different_keyword),
                 color = currentTextSub.copy(alpha = 0.7f),
                 fontSize = 14.sp
             )
@@ -646,9 +657,11 @@ internal fun DestinationConfirmSheet(
                     fontSize = 24.sp,
                     letterSpacing = (-0.6).sp
                 )
-                val floorLabel = if (place.floor == 1) "Ground Floor" else "First Floor"
+                val categoryRes = categoryDisplayRes(place.category)
+                val categoryLabel = if (categoryRes != null) stringResource(categoryRes) else (place.category ?: stringResource(R.string.store_fallback))
+                val floor = floorDisplayLabel(place.floor)
                 Text(
-                    text = "${place.category ?: "Store"} · $floorLabel",
+                    text = stringResource(R.string.store_category_floor, categoryLabel, floor),
                     color = currentTextSub,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
@@ -658,7 +671,7 @@ internal fun DestinationConfirmSheet(
 
         Spacer(Modifier.height(28.dp))
         Text(
-            text = "To get accurate directions, we'll scan a nearby store sign to find your exact spot.",
+            text = stringResource(R.string.home_confirm_scan_desc),
             color = currentTextSub,
             fontSize = 15.sp,
             lineHeight = 22.sp
@@ -676,12 +689,12 @@ internal fun DestinationConfirmSheet(
                 contentColor = Color.White
             )
         ) {
-            Text(text = "Start Navigation", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+            Text(text = stringResource(R.string.home_start_navigation_btn), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
         }
 
         Spacer(Modifier.height(16.dp))
         Text(
-            text = "Cancel",
+            text = stringResource(R.string.dialog_cancel),
             color = currentTextSub,
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,

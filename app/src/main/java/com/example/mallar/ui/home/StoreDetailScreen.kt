@@ -21,14 +21,19 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.mallar.R
 import com.example.mallar.data.Place
 import com.example.mallar.data.MallGraphRepository
+import com.example.mallar.data.WesternDigits
+import com.example.mallar.data.bidiIsolated
 import com.example.mallar.ui.theme.*
 import com.example.mallar.ui.localization.NavigationState
 
@@ -97,7 +102,7 @@ fun StoreDetailScreen(
                 color = if (isDarkMode) White.copy(alpha = 0.15f) else Color.Black.copy(0.05f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = if (isDarkMode) White else Color.Black)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = if (isDarkMode) White else Color.Black)
                 }
             }
 
@@ -108,7 +113,7 @@ fun StoreDetailScreen(
                 color = if (isDarkMode) White.copy(alpha = 0.15f) else Color.Black.copy(0.05f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.Close, "Close", tint = if (isDarkMode) White else Color.Black)
+                    Icon(Icons.Filled.Close, stringResource(R.string.close), tint = if (isDarkMode) White else Color.Black)
                 }
             }
         }
@@ -164,7 +169,7 @@ fun StoreDetailScreen(
                 Icon(Icons.Filled.LocationOn, null, tint = RedAccent, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    "${distM}m",
+                    stringResource(R.string.distance_meters, WesternDigits.format(distM)),
                     color = if (isDarkMode) White.copy(alpha = 0.8f) else com.example.mallar.ui.theme.TextSecondary,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
@@ -177,7 +182,7 @@ fun StoreDetailScreen(
                 ) {}
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    "${mins}min",
+                    pluralStringResource(R.plurals.duration_minutes, mins, WesternDigits.format(mins)),
                     color = if (isDarkMode) White.copy(alpha = 0.8f) else com.example.mallar.ui.theme.TextSecondary,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
@@ -209,7 +214,7 @@ fun StoreDetailScreen(
                 ) {
                     Icon(Icons.Filled.ViewInAr, null, tint = White, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("AR", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = White)
+                    Text(stringResource(R.string.ar_mode), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = White)
                 }
                 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -235,14 +240,14 @@ fun StoreDetailScreen(
                 ) {
                     Icon(Icons.Filled.Map, null, tint = White, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Map", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = White)
+                    Text(stringResource(R.string.map_mode), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = White)
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Choose your navigation mode to ${place.brand}",
+                text = stringResource(R.string.choose_nav_mode_to, place.brand.bidiIsolated()),
                 color = if (isDarkMode) White.copy(alpha = 0.5f) else com.example.mallar.ui.theme.TextSecondary,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center

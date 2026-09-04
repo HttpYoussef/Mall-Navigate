@@ -1,12 +1,9 @@
 package com.example.mallar.ui.profile
 
 import android.app.Activity
-import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -37,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mallar.ui.components.StoreLogoContainer
+import com.example.mallar.data.AppLanguagePlatform
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.FavoritesManager
 import com.example.mallar.data.Place
@@ -45,16 +44,15 @@ import com.example.mallar.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 @Composable
 fun ProfileScreen(
     onBackClick: () -> Unit,
+    onLanguageClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
     val context = LocalContext.current
     val isDarkMode by AppPreferences.isDarkMode.collectAsState()
-    val currentLang by AppPreferences.language.collectAsState()
     val favoriteIds by FavoritesManager.favorites.collectAsState()
     val colorScheme = MaterialTheme.colorScheme
 
@@ -120,7 +118,7 @@ fun ProfileScreen(
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.back),
                         tint = colorScheme.onSurface,
                         modifier = Modifier.size(20.dp)
                     )
@@ -237,25 +235,11 @@ fun ProfileScreen(
             color = colorScheme.surfaceVariant
         ) {
             Column {
-                // Language Toggle
-                LanguageToggleRow(
-                    currentLang = currentLang,
+                // Dark Mode Toggle
+                DarkModeToggleRow(
+                    isDarkMode = isDarkMode,
                     colorScheme = colorScheme,
-                    onLanguageChange = { lang ->
-                        AppPreferences.setLanguage(lang)
-                        val locale = java.util.Locale(lang)
-                        java.util.Locale.setDefault(locale)
-                        val config = android.content.res.Configuration(context.resources.configuration).apply {
-                            setLocale(locale)
-                            setLayoutDirection(locale)
-                        }
-                        @Suppress("DEPRECATION")
-                        context.resources.updateConfiguration(config, context.resources.displayMetrics)
-                        val intent = android.content.Intent(context, com.example.mallar.MainActivity::class.java).apply {
-                            addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        }
-                        context.startActivity(intent)
-                    }
+                    onToggle = { AppPreferences.setDarkMode(it) }
                 )
 
                 HorizontalDivider(
@@ -263,11 +247,9 @@ fun ProfileScreen(
                     color = colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
                 )
 
-                // Dark Mode Toggle
-                DarkModeToggleRow(
-                    isDarkMode = isDarkMode,
+                LanguageRow(
                     colorScheme = colorScheme,
-                    onToggle = { AppPreferences.setDarkMode(it) }
+                    onClick = onLanguageClick
                 )
             }
         }
@@ -343,7 +325,7 @@ private fun ProfileAvatarCard(
                                 .crossfade(true)
                                 .build()
                         ),
-                        contentDescription = "Profile photo",
+                        contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.profile_photo),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(96.dp)
@@ -373,7 +355,7 @@ private fun ProfileAvatarCard(
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
-                        contentDescription = "Change photo",
+                        contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.change_photo),
                         tint = Teal,
                         modifier = Modifier.size(16.dp)
                     )
@@ -386,7 +368,7 @@ private fun ProfileAvatarCard(
         // Name (from signup)
         if (isLoggedIn) {
             Text(
-                text = displayName.ifEmpty { "User" },
+                text = displayName.ifEmpty { androidx.compose.ui.res.stringResource(com.example.mallar.R.string.profile_user_fallback) },
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.onBackground
@@ -482,97 +464,11 @@ private fun FavoriteStoreRow(
         IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Remove",
+                contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.remove),
                 tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.size(18.dp)
             )
         }
-    }
-}
-
-// ── Language Toggle Row ──────────────────────────────────────────────────────
-@Composable
-private fun LanguageToggleRow(
-    currentLang: String,
-    colorScheme: ColorScheme,
-    onLanguageChange: (String) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Default.Language,
-            contentDescription = null,
-            tint = Teal,
-            modifier = Modifier.size(22.dp)
-        )
-
-        Spacer(modifier = Modifier.width(14.dp))
-
-        Text(
-            text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.language),
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            color = colorScheme.onSurface,
-            modifier = Modifier.weight(1f)
-        )
-
-        // Segmented toggle
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            color = colorScheme.background,
-            modifier = Modifier.height(36.dp)
-        ) {
-            Row {
-                LanguageChip(
-                    label = "EN",
-                    isSelected = currentLang == "en",
-                    onClick = { onLanguageChange("en") }
-                )
-                LanguageChip(
-                    label = "عربي",
-                    isSelected = currentLang == "ar",
-                    onClick = { onLanguageChange("ar") }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun LanguageChip(
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val bgColor by animateColorAsState(
-        if (isSelected) Teal else Color.Transparent,
-        tween(200),
-        label = "langBg"
-    )
-    val textColor by animateColorAsState(
-        if (isSelected) White else MaterialTheme.colorScheme.onSurfaceVariant,
-        tween(200),
-        label = "langText"
-    )
-
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(bgColor)
-            .clickable { onClick() }
-            .padding(horizontal = 14.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = label,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = textColor
-        )
     }
 }
 
@@ -618,3 +514,54 @@ private fun DarkModeToggleRow(
         )
     }
 }
+
+// ── Language Row ─────────────────────────────────────────────────────────────
+@Composable
+private fun LanguageRow(
+    colorScheme: ColorScheme,
+    onClick: () -> Unit
+) {
+    val context = LocalContext.current
+    val currentAutonym = AppLanguagePlatform.currentLanguage(context).autonym
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Language,
+            contentDescription = null,
+            tint = Teal,
+            modifier = Modifier.size(22.dp)
+        )
+
+        Spacer(modifier = Modifier.width(14.dp))
+
+        Text(
+            text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.language),
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            color = colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+
+        Text(
+            text = currentAutonym,
+            fontSize = 14.sp,
+            color = colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+

@@ -64,6 +64,10 @@ android {
         noCompress += listOf("tflite")
     }
 
+    lint {
+        error += "MissingTranslation"
+    }
+
     // TFLite
 }
 
@@ -80,6 +84,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")
 
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
 
     implementation(libs.androidx.lifecycle.runtime.ktx)

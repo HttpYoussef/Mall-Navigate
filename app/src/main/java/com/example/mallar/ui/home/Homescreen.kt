@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size as CoilSize
+import androidx.annotation.StringRes
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,12 +44,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.res.stringResource
+import com.example.mallar.R
 import com.example.mallar.data.FavoritesManager
 import com.example.mallar.data.Place
 import com.example.mallar.data.PlaceRepository
 import com.example.mallar.data.MallGraph
 import com.example.mallar.data.MallGraphRepository
 import com.example.mallar.data.MallSession
+import com.example.mallar.data.WesternDigits
+import com.example.mallar.data.bidiIsolated
+import com.example.mallar.data.floorDisplayLabel
 import com.example.mallar.ui.chatbot.ChatBottomSheet
 import com.example.mallar.ui.localization.NavigationState
 import com.example.mallar.ui.mall.mallNameRes
@@ -62,25 +67,25 @@ private data class OfferItem(
     val logoAssetPath: String,
     val brandName: String,
     val tint: Color,
-    val discount: String,
-    val subtitle: String,
-    val floor: String,
+    @StringRes val discountRes: Int,
+    @StringRes val subtitleRes: Int,
+    val floor: Int,
 )
 
 private val sampleOffers = listOf(
-    OfferItem("v_starbucks_upsize", "logos/Starbucks.png","Starbucks", Color(0xFF1E6E4A), "Free Upsize", "On any beverage",   "2nd Floor"),
-    OfferItem("v_zara_15off",       "logos/ZARA.png",      "Zara",       Color(0xFF6E1E2E), "15% OFF",     "On selected items", "Ground Floor"),
-    OfferItem("v_mango_20off",      "logos/Mango.png",     "Mango",      Color(0xFF8B4513), "20% OFF",     "On all items",      "Ground Floor"),
+    OfferItem("v_starbucks_upsize", "logos/Starbucks.png", "Starbucks", Color(0xFF1E6E4A), R.string.home_offer_free_upsize, R.string.home_offer_on_any_beverage,   2),
+    OfferItem("v_zara_15off",       "logos/ZARA.png",      "Zara",       Color(0xFF6E1E2E), R.string.home_offer_15_off,     R.string.home_offer_on_selected_items, 1),
+    OfferItem("v_mango_20off",      "logos/Mango.png",     "Mango",      Color(0xFF8B4513), R.string.home_offer_20_off,     R.string.home_offer_on_all_items,      1),
 )
 
 // ── Bottom nav items ──────────────────────────────────────────────────────────
-private data class NavItem(val label: String, val icon: ImageVector)
+private data class NavItem(@StringRes val labelRes: Int, val icon: ImageVector)
 
 private val navItems = listOf(
-    NavItem("Home",    Icons.Default.Home),
-    NavItem("Map",     Icons.Default.Map),
-    NavItem("Ask AI",  Icons.Default.SmartToy),
-    NavItem("Profile", Icons.Default.Person),
+    NavItem(R.string.bottom_nav_home,    Icons.Default.Home),
+    NavItem(R.string.bottom_nav_map,     Icons.Default.Map),
+    NavItem(R.string.bottom_nav_ask_ai,  Icons.Default.SmartToy),
+    NavItem(R.string.bottom_nav_profile, Icons.Default.Person),
 )
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -123,11 +128,12 @@ fun HomeScreen(
     
     LaunchedEffect(Unit) { contentVisible = true }
 
-    val userName = remember {
+    val defaultUserName = stringResource(R.string.home_default_user_name)
+    val userName = remember(defaultUserName) {
         FirebaseAuth.getInstance().currentUser?.displayName
             ?.split(" ")?.firstOrNull()
             ?: FirebaseAuth.getInstance().currentUser?.phoneNumber?.takeLast(4)
-            ?: "there"
+            ?: defaultUserName
     }
 
     // ── load data ────────────────────────────────────────────────────────────
@@ -187,7 +193,7 @@ fun HomeScreen(
                             ) {
                                 Column {
                                     Text(
-                                        text = "Hello, $userName 👋",
+                                        text = stringResource(R.string.home_greeting, userName.bidiIsolated()),
                                         color = currentTextMain,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 24.sp,
@@ -195,11 +201,10 @@ fun HomeScreen(
                                     )
                                     Spacer(Modifier.height(4.dp))
                                     val selectedMall by MallSession.selected.collectAsState()
-                                    val brandsSubtitle = "Discover your favorite brands"
                                     Text(
                                         text = when (val mall = selectedMall) {
-                                            null -> brandsSubtitle
-                                            else -> "${stringResource(mallNameRes(mall))} · $brandsSubtitle"
+                                            null -> stringResource(R.string.home_discover_brands)
+                                            else -> stringResource(R.string.home_mall_brands, stringResource(mallNameRes(mall)))
                                         },
                                         color = currentTextMain.copy(alpha = 0.7f),
                                         fontSize = 14.sp
@@ -224,7 +229,7 @@ fun HomeScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Notifications,
-                                        contentDescription = "Notifications",
+                                        contentDescription = stringResource(R.string.home_notifications_cd),
                                         tint = currentTextMain,
                                         modifier = Modifier.size(20.dp)
                                     )
@@ -361,7 +366,7 @@ fun HomeScreen(
 
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Start navigation",
+                                        text = stringResource(R.string.home_start_navigation),
                                         color = currentTextMain,
                                         fontSize = 22.sp,
                                         fontWeight = FontWeight.Bold,
@@ -369,7 +374,7 @@ fun HomeScreen(
                                     )
                                     Spacer(Modifier.height(6.dp))
                                     Text(
-                                        text = "Get walking directions to any store or place",
+                                        text = stringResource(R.string.home_start_nav_subtitle),
                                         color = currentTextSub,
                                         fontSize = 14.sp,
                                         lineHeight = 18.sp
@@ -386,7 +391,7 @@ fun HomeScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                        contentDescription = "Start navigation",
+                                        contentDescription = stringResource(R.string.home_start_navigation),
                                         tint = if (isDarkMode) DeepNavyBg else Color.White,
                                         modifier = Modifier.size(20.dp)
                                     )
@@ -420,7 +425,7 @@ fun HomeScreen(
                         visible = contentVisible,
                         enter = fadeIn(tween(280, delayMillis = 220)) + slideInVertically(tween(280, delayMillis = 220)) { it / 6 }
                     ) {
-                        SectionHeader(title = "Offers & vouchers", onSeeAll = onOffersClick, currentTextMain = currentTextMain, currentAccent = currentAccent)
+                        SectionHeader(title = stringResource(R.string.home_offers_vouchers), onSeeAll = onOffersClick, currentTextMain = currentTextMain, currentAccent = currentAccent)
                     }
                 }
                 item(key = "offers_spacer2") { Spacer(Modifier.height(14.dp)) }
@@ -450,7 +455,7 @@ fun HomeScreen(
                 item(key = "favorites_spacer") { Spacer(Modifier.height(30.dp)) }
                 item(key = "favorites_header") {
                     SectionHeader(
-                        title = "Your favorites",
+                        title = stringResource(R.string.home_your_favorites),
                         onSeeAll = onSavedClick,
                         currentTextMain = currentTextMain,
                         currentAccent = currentAccent
@@ -460,7 +465,7 @@ fun HomeScreen(
                 if (savedPlaces.isEmpty()) {
                     item(key = "favorites_empty") {
                         Text(
-                            text = "Tap the heart on any store to save it here.",
+                            text = stringResource(R.string.home_favorites_empty),
                             color = currentTextSub,
                             fontSize = 13.sp,
                             modifier = Modifier.padding(horizontal = 20.dp)
@@ -664,6 +669,8 @@ private fun BottomNavTab(
         label = "nav_tab_icon_scale"
     )
 
+    val label = stringResource(item.labelRes)
+
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(20.dp))
@@ -680,7 +687,7 @@ private fun BottomNavTab(
         ) {
             Icon(
                 imageVector = item.icon,
-                contentDescription = item.label,
+                contentDescription = label,
                 tint = tint,
                 modifier = Modifier
                     .size(22.dp)
@@ -688,7 +695,7 @@ private fun BottomNavTab(
             )
         }
         Text(
-            text = item.label,
+            text = label,
             fontSize = 11.sp,
             fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
             color = tint
@@ -775,7 +782,7 @@ private fun ParkingHeroCard(
                 .padding(20.dp)
         ) {
             Text(
-                text = "PARK SMART",
+                text = stringResource(R.string.home_park_smart),
                 color = ParkingPurple,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
@@ -783,7 +790,7 @@ private fun ParkingHeroCard(
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "Find parking\nin seconds.",
+                text = stringResource(R.string.home_find_parking_title),
                 color = currentTextMain,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -792,9 +799,10 @@ private fun ParkingHeroCard(
             Spacer(Modifier.height(8.dp))
 
             val subtitleText = if (parkingLocation != null) {
-                "Spot saved: ${parkingLocation!!.zone}-${parkingLocation!!.slot}"
+                val spot = "${parkingLocation!!.zone}-${parkingLocation!!.slot}".bidiIsolated()
+                stringResource(R.string.home_park_spot_saved, spot)
             } else {
-                "Real-time availability and directions."
+                stringResource(R.string.home_park_subtitle)
             }
             Text(
                 text = subtitleText,
@@ -816,7 +824,7 @@ private fun ParkingHeroCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (parkingLocation != null) "Find my car" else "Find parking",
+                    text = if (parkingLocation != null) stringResource(R.string.home_find_my_car) else stringResource(R.string.home_find_parking),
                     color = ParkingPurple,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold
@@ -851,9 +859,9 @@ private fun ParkingHeroCard(
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("SPACES", color = currentTextSub, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
-            Text("128", color = ParkingPurple, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text("Available", color = currentTextSub, fontSize = 8.sp)
+            Text(stringResource(R.string.home_park_spaces), color = currentTextSub, fontSize = 8.sp, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
+            Text(WesternDigits.format(128), color = ParkingPurple, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.home_park_available), color = currentTextSub, fontSize = 8.sp)
         }
     }
 }
@@ -918,9 +926,9 @@ private fun OfferCard(
 
             Spacer(Modifier.weight(1f))
 
-            Text(offer.discount, color = currentTextMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(offer.discountRes), color = currentTextMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(2.dp))
-            Text(offer.subtitle, color = currentTextSub, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(stringResource(offer.subtitleRes), color = currentTextSub, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(Modifier.height(10.dp))
 
             Box(
@@ -930,7 +938,7 @@ private fun OfferCard(
                     .border(1.dp, CyanGlow.copy(alpha = 0.35f), RoundedCornerShape(50))
                     .padding(horizontal = 10.dp, vertical = 5.dp)
             ) {
-                Text(offer.floor, color = CyanGlow, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                Text(floorDisplayLabel(offer.floor), color = CyanGlow, fontSize = 11.sp, fontWeight = FontWeight.Medium)
             }
         }
     }

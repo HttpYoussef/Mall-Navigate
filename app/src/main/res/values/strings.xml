@@ -1,8 +1,19 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Brand name. Do NOT translate. -->
     <string name="app_name">MallAR</string>
+    <!-- Brand wordmark. Do NOT translate. -->
+    <string name="app_wordmark">MallAR</string>
 
     <!-- Splash -->
     <string name="start">Start</string>
+    <!-- Primary call-to-action on splash screen connection failure -->
+    <string name="splash_retry_connection">Retry Connection</string>
+    <!-- Hero title line 1 on splash screen -->
+    <string name="splash_navigate">Navigate</string>
+    <!-- Hero title line 2 on splash screen -->
+    <string name="splash_through_anywhere">through anywhere</string>
+    <!-- Tagline under app wordmark on splash screen -->
+    <string name="splash_indoor_navigation">INDOOR NAVIGATION</string>
 
     <!-- Permissions -->
     <string name="permissions_title">MallAR Needs Your Permission</string>
@@ -11,6 +22,8 @@
     <string name="enable_location">Enable Location</string>
     <string name="enable_motion">Enable Motion</string>
     <string name="continue_btn">Continue</string>
+    <!-- Accessibility description for MallAR logo on permissions screen -->
+    <string name="permissions_logo_cd">MallAR logo</string>
 
     <!-- Phone Auth -->
     <string name="enter_phone">Enter your Phone Number</string>
@@ -19,11 +32,23 @@
     <string name="send">Send</string>
     <string name="skip">Skip</string>
     <string name="country_code">+20</string>
+    <!-- Placeholder sample digits shown before user enters phone number -->
+    <string name="phone_auth_placeholder_number">11 123 456 78</string>
+    <!-- Accessibility description for keypad backspace button -->
+    <string name="phone_auth_backspace_cd">Backspace</string>
 
     <!-- OTP -->
     <string name="verify_code">Verify Code</string>
     <string name="otp_subtitle">We sent a 6-digit code to your phone number.</string>
     <string name="verify">Verify</string>
+    <!-- Accessibility description for MallAR logo on OTP verification screen -->
+    <string name="otp_logo_cd">MallAR logo</string>
+    <!-- Message informing user that verification code was sent to their phone -->
+    <string name="otp_sent_code_to_phone">We sent a 6-digit code to your phone.</string>
+    <!-- Button to resend verification code if not received -->
+    <string name="otp_resend">Haven\'t received it? Resend</string>
+    <!-- Accessibility description for OTP keypad backspace button -->
+    <string name="otp_backspace_cd">Backspace</string>
 
     <!-- logos Scan -->
     <string name="scan_instruction">Point camera at a store logo to detect your location</string>
@@ -45,6 +70,8 @@
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="skip_for_now">Skip for now</string>
+    <!-- Accessibility description for partner brands illustration -->
+    <string name="welcome_major_brands">Major Brands</string>
 
     <!-- Auth Screens -->
     <string name="create_account">Create Account</string>
@@ -133,9 +160,10 @@
     <string name="remove">Remove</string>
     <string name="remove_photo">Remove photo</string>
     <string name="edit_profile">Edit profile</string>
-    <string name="user_first_name">Mohamed</string>
-    <string name="user_last_name">Ibrahim</string>
-    <string name="joined_time">Joined 5 weeks ago</string>
+    <!-- Fallback display name on the profile screen when the account has no name set -->
+    <string name="profile_user_fallback">User</string>
+    <!-- Saved-place subtitle: store category followed by a fixed "inside the mall" note -->
+    <string name="saved_category_inside_mall"><xliff:g id="category" example="Fashion">%1$s</xliff:g> · Inside Mall</string>
     <string name="saved_locations">Saved Locations</string>
     <string name="recent_places">Recent Places</string>
     <string name="messages">Messages</string>
@@ -157,6 +185,42 @@
     <string name="search_destination_hint">Search destination…</string>
     <string name="choose_nav_mode">Choose your navigation mode</string>
     <string name="going_to">Going to</string>
+
+    <!-- ================================================================= -->
+    <!-- Ticket 12: Navigation guidance (UnifiedNavigationScreen, StaticMapScreen) -->
+    <!-- ================================================================= -->
+    <!-- Orientation overlay caption while the walker re-orients -->
+    <string name="nav_get_oriented">Get Oriented</string>
+    <!-- Floor-transition sheet title -->
+    <string name="nav_floor_change">Floor Change</string>
+    <!-- Floor-transition instruction, going up. %1$s is a localized floor label e.g. "Floor 2" -->
+    <string name="nav_floor_up">Take the escalator or elevator to <xliff:g id="floor" example="Floor 2">%1$s</xliff:g></string>
+    <!-- Floor-transition instruction, going down. %1$s is a localized floor label -->
+    <string name="nav_floor_down">Go down to <xliff:g id="floor" example="Floor 1">%1$s</xliff:g></string>
+    <!-- Button on the floor-transition sheet. %1$s is a localized floor label -->
+    <string name="nav_continue_on_floor">Continue on <xliff:g id="floor" example="Floor 2">%1$s</xliff:g></string>
+    <!-- HUD walking-time chip, follows the distance. %1$s is a Western-digit minute count -->
+    <plurals name="nav_walk_minutes">
+        <item quantity="one">"  •  "<xliff:g id="count" example="1">%1$s</xliff:g>" min walk"</item>
+        <item quantity="other">"  •  "<xliff:g id="count" example="5">%1$s</xliff:g>" min walk"</item>
+    </plurals>
+    <!-- Route-map start-point label (fallback when the start store has no brand) -->
+    <string name="nav_start">Start</string>
+    <!-- Route-map destination-point label (fallback when the destination has no brand) -->
+    <string name="nav_destination">Destination</string>
+    <!-- Static route-map title. %1$s is a localized floor label e.g. "Floor 1" -->
+    <string name="nav_route_map_title">Route Map · <xliff:g id="floor" example="Floor 1">%1$s</xliff:g></string>
+    <!-- Route-map info row: total distance. %1$s is a Western-digit metre count -->
+    <string name="nav_distance_label">Distance: <xliff:g id="meters" example="120">%1$s</xliff:g>m</string>
+    <!-- Route-map info row: estimated walking time. %1$s is a Western-digit minute count -->
+    <string name="nav_est_time_label">Est. Time: <xliff:g id="minutes" example="3">%1$s</xliff:g> min</string>
+    <!-- Route-map gesture hint at the bottom of the screen -->
+    <string name="nav_map_gesture_hint">Pinch to zoom • Drag to pan</string>
+    <!-- Accessibility description for the navigation-voice toggle, currently unmuted -->
+    <string name="nav_voice_mute">Mute navigation voice</string>
+    <!-- Accessibility description for the navigation-voice toggle, currently muted -->
+    <string name="nav_voice_unmute">Unmute navigation voice</string>
+
     <string name="voice_assistant">Voice Assistant</string>
     <string name="listening">Listening…</string>
     <string name="thinking">Thinking…</string>
@@ -185,7 +249,8 @@
     <string name="toast_valid_phone">Enter a valid phone number</string>
     <string name="toast_verification_completed">Verification Completed</string>
     <string name="toast_code_sent">Code Sent</string>
-    <string name="toast_welcome_user">Welcome, %1$s!</string>
+    <!-- Welcome toast message shown after successful sign up -->
+    <string name="toast_welcome_user">Welcome, <xliff:g id="first_name" example="Sarah">%1$s</xliff:g>!</string>
     <string name="toast_wrong_otp">Wrong OTP</string>
     <string name="toast_login_success">Login Success</string>
     <string name="save_place_desc">Save place</string>
@@ -216,5 +281,273 @@
     <string name="mall_city_centre_almaza_location">Heliopolis, Cairo</string>
     <string name="mall_of_egypt_name">Mall of Egypt</string>
     <string name="mall_of_egypt_location">6th of October, Giza</string>
+
+    <!-- Floor and Canonical Category Labels -->
+    <string name="floor_label">Floor %1$s</string>
+    <string name="category_fashion">Fashion</string>
+    <string name="category_jewellery">Jewellery</string>
+    <string name="category_perfumes_cosmetics">Perfumes &amp; Cosmetics</string>
+    <string name="category_dining">Dining</string>
+    <string name="category_pharmacy">Pharmacy</string>
+
+    <!-- Parking Shared -->
+    <!-- Field label for parking zone (e.g. Zone A) -->
+    <string name="park_field_zone">Zone</string>
+    <!-- Field label for parking slot number (e.g. Slot 12) -->
+    <string name="park_field_slot">Slot</string>
+    <!-- Field label for parking floor level (e.g. Floor P1) -->
+    <string name="park_field_floor">Floor</string>
+    <!-- Accessibility description for car icon -->
+    <string name="park_car_cd">Car</string>
+    <!-- Generic OK button in dialogs -->
+    <string name="dialog_ok">OK</string>
+    <!-- Generic Cancel button in dialogs -->
+    <string name="dialog_cancel">Cancel</string>
+
+    <!-- Parking Home Screen -->
+    <!-- Title of the My Parking home screen -->
+    <string name="park_home_title">My Parking</string>
+    <!-- Banner title on empty parking screen -->
+    <string name="park_home_banner_title">Park &amp; Find Your Car</string>
+    <!-- Banner description explaining AI parking feature -->
+    <string name="park_home_banner_desc">Take a photo of the parking column. AI will automatically read the zone, slot and floor so you can find your way back.</string>
+    <!-- Button to initiate camera capture for saving parking location -->
+    <string name="park_home_btn_save">Save Parking Location</string>
+    <!-- Section header explaining how parking feature works -->
+    <string name="park_home_how_it_works">How It Works</string>
+    <!-- Title for step 1 of parking guide -->
+    <string name="park_home_step1_title">1. Park Your Car</string>
+    <!-- Description for step 1 of parking guide -->
+    <string name="park_home_step1_desc">Find a spot and prepare to scan the nearest column marker.</string>
+    <!-- Title for step 2 of parking guide -->
+    <string name="park_home_step2_title">2. Scan Column</string>
+    <!-- Description for step 2 of parking guide -->
+    <string name="park_home_step2_desc">Point your camera at the column sign (e.g. <xliff:g id="example_slot" example="B-12">B-12</xliff:g>). ML Kit reads it instantly.</string>
+    <!-- Title for step 3 of parking guide -->
+    <string name="park_home_step3_title">3. Navigation Saved</string>
+    <!-- Description for step 3 of parking guide -->
+    <string name="park_home_step3_desc">Your location is stored. Navigate back to it from anywhere in the mall.</string>
+    <!-- Header for saved parking details card -->
+    <string name="park_home_saved_location">Saved Location</string>
+    <!-- Accessibility description for delete parking location button -->
+    <string name="park_home_delete_location_cd">Delete Location</string>
+    <!-- Accessibility description for edit parking location button -->
+    <string name="park_home_edit_location_cd">Edit Location</string>
+    <!-- Label for saved timestamp row in details card -->
+    <string name="park_home_saved_time">Saved Time</string>
+    <!-- Primary button to navigate back to parked car -->
+    <string name="park_home_btn_navigate">NAVIGATE TO CAR</string>
+    <!-- Button to view parked car on 2D map -->
+    <string name="park_home_btn_view_on_map">VIEW ON MAP</string>
+
+    <!-- Parking Camera Screen -->
+    <!-- Title when camera permission has not been granted -->
+    <string name="park_camera_permission_required">Camera Permission Required</string>
+    <!-- Message explaining why camera permission is needed for parking -->
+    <string name="park_camera_permission_desc">This feature needs camera access to take a photo of the parking column marker.</string>
+    <!-- Button to request camera permission -->
+    <string name="park_camera_grant_permission">Grant Permission</string>
+    <!-- Header title on camera scan overlay -->
+    <string name="park_camera_title">Parking Assistant</string>
+    <!-- Framing instruction shown at bottom of camera view -->
+    <string name="park_camera_instruction">Position the code inside the frame\nMake sure it\'s clear and well lit</string>
+    <!-- Accessibility description for pick from gallery button -->
+    <string name="park_camera_gallery_cd">Gallery</string>
+    <!-- Accessibility description for camera flash toggle -->
+    <string name="park_camera_flash_cd">Flash</string>
+
+    <!-- Parking Scan Result Screen -->
+    <!-- Header title on parking scan result screen -->
+    <string name="park_scan_title">Scan Result</string>
+    <!-- Loading text while OCR processes column image -->
+    <string name="park_scan_reading">Reading column text…</string>
+    <!-- Accessibility description for captured column photo -->
+    <string name="park_scan_captured_spot_cd">Captured Spot</string>
+    <!-- Title for raw OCR detected text card -->
+    <string name="park_scan_raw_detected">Raw Detected Text</string>
+    <!-- Badge shown when OCR match confidence is low -->
+    <string name="park_scan_low_confidence">Low Confidence / Partial Match</string>
+    <!-- Title for parsed location card -->
+    <string name="park_scan_detected_location">Detected Location</string>
+    <!-- Placeholder when a field value could not be detected -->
+    <string name="park_scan_not_detected">(not detected)</string>
+    <!-- Accessibility description for edit field button -->
+    <string name="park_scan_edit_cd">Edit</string>
+    <!-- Banner confirming parking location was saved -->
+    <string name="park_scan_location_saved">Parking location saved</string>
+    <!-- Button to confirm and save scanned parking spot -->
+    <string name="park_scan_btn_save">SAVE LOCATION</string>
+    <!-- Dialog title for editing a specific parking field -->
+    <string name="park_scan_edit_field">Edit <xliff:g id="field_name" example="Zone">%1$s</xliff:g></string>
+
+    <!-- Parking Map Screen -->
+    <!-- Header title on 2D parking map screen -->
+    <string name="park_map_title">Parking Map</string>
+    <!-- Header for car location bottom card on map -->
+    <string name="park_map_your_car_location">Your Car Location</string>
+    <!-- Text shown when no parking location has been saved -->
+    <string name="park_map_no_location_saved">No Location Saved</string>
+    <!-- Summary format showing spot code and floor -->
+    <string name="park_map_location_summary"><xliff:g id="spot" example="B-12">%1$s</xliff:g> | <xliff:g id="floor" example="Floor P1">%2$s</xliff:g></string>
+    <!-- Button to stop in-parking navigation route -->
+    <string name="park_map_stop_nav">Stop Navigation</string>
+    <!-- Button to start in-parking navigation route -->
+    <string name="park_map_start_nav">Start Navigation</string>
+    <!-- Road marking label drawn on parking canvas -->
+    <string name="park_map_slow">SLOW</string>
+    <!-- Exit arrow label drawn on parking canvas -->
+    <string name="park_map_exit">EXIT ➔</string>
+    <!-- Pin label drawn at current user location on parking canvas -->
+    <string name="park_map_you_are_here">You are here</string>
+
+    <!-- ================================================================= -->
+    <!-- Ticket 08: Home, Shared, Offers, Voucher, Store Detail, Destination -->
+    <!-- ================================================================= -->
+
+    <!-- Home Screen -->
+    <!-- Greeting on home screen with user name -->
+    <string name="home_greeting">Hello, <xliff:g id="user_name" example="Sarah">%1$s</xliff:g> 👋</string>
+    <!-- Default user name fallback when not logged in -->
+    <string name="home_default_user_name">there</string>
+    <!-- Subtitle on home screen header when no mall is selected -->
+    <string name="home_discover_brands">Discover your favorite brands</string>
+    <!-- Subtitle on home screen header combining mall name and brand tagline -->
+    <string name="home_mall_brands"><xliff:g id="mall_name" example="City Stars">%1$s</xliff:g> · Discover your favorite brands</string>
+    <!-- Accessibility description for notifications icon -->
+    <string name="home_notifications_cd">Notifications</string>
+    <!-- Hero card title for starting navigation -->
+    <string name="home_start_navigation">Start navigation</string>
+    <!-- Hero card subtitle for starting navigation -->
+    <string name="home_start_nav_subtitle">Get walking directions to any store or place</string>
+    <!-- Primary action button to begin navigation -->
+    <string name="home_start_navigation_btn">Start Navigation</string>
+    <!-- Section header for offers and vouchers carousel -->
+    <string name="home_offers_vouchers">Offers &amp; vouchers</string>
+    <!-- Section header for user\'s favorite stores list -->
+    <string name="home_your_favorites">Your favorites</string>
+    <!-- Empty state message when no favorite stores have been saved -->
+    <string name="home_favorites_empty">Tap the heart on any store to save it here.</string>
+    <!-- Overline tag on parking hero card -->
+    <string name="home_park_smart">PARK SMART</string>
+    <!-- Title on parking hero card -->
+    <string name="home_find_parking_title">Find parking\nin seconds.</string>
+    <!-- Subtitle on parking hero card showing saved spot code -->
+    <string name="home_park_spot_saved">Spot saved: <xliff:g id="spot" example="A-12">%1$s</xliff:g></string>
+    <!-- Subtitle on parking hero card when no spot is saved -->
+    <string name="home_park_subtitle">Real-time availability and directions.</string>
+    <!-- Button label on parking hero card when spot is saved -->
+    <string name="home_find_my_car">Find my car</string>
+    <!-- Button label on parking hero card when no spot is saved -->
+    <string name="home_find_parking">Find parking</string>
+    <!-- Header label for parking spaces counter -->
+    <string name="home_park_spaces">SPACES</string>
+    <!-- Subtitle label for parking spaces counter -->
+    <string name="home_park_available">Available</string>
+    <!-- Sample promo discount title for Starbucks offer -->
+    <string name="home_offer_free_upsize">Free Upsize</string>
+    <!-- Sample promo subtitle for Starbucks offer -->
+    <string name="home_offer_on_any_beverage">On any beverage</string>
+    <!-- Sample promo discount title for Zara offer -->
+    <string name="home_offer_15_off">15% OFF</string>
+    <!-- Sample promo subtitle for Zara offer -->
+    <string name="home_offer_on_selected_items">On selected items</string>
+    <!-- Sample promo discount title for Mango offer -->
+    <string name="home_offer_20_off">20% OFF</string>
+    <!-- Sample promo subtitle for Mango offer -->
+    <string name="home_offer_on_all_items">On all items</string>
+    <!-- Label for Ask AI tab in bottom navigation -->
+    <string name="bottom_nav_ask_ai">Ask AI</string>
+
+    <!-- Shared Store & Search Components -->
+    <!-- Placeholder text for glowing search bar -->
+    <string name="home_search_placeholder">Search for stores, places…</string>
+    <!-- Generic fallback label when category is unknown -->
+    <string name="store_fallback">Store</string>
+    <!-- Template combining store category and floor -->
+    <string name="store_category_floor"><xliff:g id="category" example="Fashion">%1$s</xliff:g> · <xliff:g id="floor" example="Floor 1">%2$s</xliff:g></string>
+    <!-- Template combining floor and distance -->
+    <string name="store_floor_distance"><xliff:g id="floor" example="Floor 1">%1$s</xliff:g>  •  <xliff:g id="distance" example="120m">%2$s</xliff:g></string>
+    <!-- Distance formatted in meters with Western digits -->
+    <string name="distance_meters"><xliff:g id="meters" example="120">%1$s</xliff:g>m</string>
+    <!-- Empty state title when store search finds no results -->
+    <string name="home_no_results_found">No results found</string>
+    <!-- Empty state suggestion when store search finds no results -->
+    <string name="home_try_different_keyword">Try a different keyword</string>
+    <!-- Instructions in navigation confirmation sheet -->
+    <string name="home_confirm_scan_desc">To get accurate directions, we\'ll scan a nearby store sign to find your exact spot.</string>
+    <!-- Filter chip label representing all categories -->
+    <string name="category_all">All</string>
+
+    <!-- Offers & Vouchers Screen -->
+    <!-- Header title for offers and vouchers screen -->
+    <string name="offers_title">Offers &amp; Vouchers</string>
+    <!-- Header subtitle for offers and vouchers screen -->
+    <string name="offers_subtitle">Save more on your favorite stores</string>
+    <!-- Search field hint on offers screen -->
+    <string name="offers_search_hint">Search offers or stores</string>
+    <!-- Action button to view and redeem voucher -->
+    <string name="offers_get_voucher">Get Voucher</string>
+    <!-- Empty state title on offers screen -->
+    <string name="offers_no_offers_found">No offers found</string>
+    <!-- Empty state subtitle on offers screen -->
+    <string name="offers_try_different_search">Try a different search or category</string>
+
+    <!-- Store Detail Screen -->
+    <!-- Walking duration in minutes -->
+    <plurals name="duration_minutes">
+        <item quantity="one"><xliff:g id="count" example="1">%1$s</xliff:g> min</item>
+        <item quantity="other"><xliff:g id="count" example="5">%1$s</xliff:g> mins</item>
+    </plurals>
+
+    <!-- Voucher Details Screen -->
+    <!-- Error message when voucher is not found -->
+    <string name="voucher_not_found">Voucher not found</string>
+    <!-- Success description after voucher is redeemed -->
+    <string name="voucher_redeemed_success_desc">Your voucher has been redeemed successfully. Show this QR code at checkout.</string>
+    <!-- Section header for voucher terms and conditions -->
+    <string name="voucher_terms_conditions">Terms &amp; Conditions</string>
+    <!-- Button to redeem voucher offer -->
+    <string name="voucher_redeem_now">Redeem Offer Now</string>
+    <!-- Status text when offer has been redeemed -->
+    <string name="voucher_offer_redeemed">Offer Redeemed</string>
+
+    <!-- Destination Selection Screen -->
+    <!-- Subtitle on destination selection screen -->
+    <string name="dsel_search_subtitle">Search stores, food, fashion &amp; more</string>
+    <!-- Section header for browsing categories -->
+    <string name="dsel_browse_categories">Browse Categories</string>
+    <!-- Section header for popular destinations -->
+    <string name="dsel_popular_destinations">Popular Destinations</string>
+    <!-- Label to collapse expanded popular destinations list -->
+    <string name="dsel_show_less">Show less</string>
+    <!-- Empty state message when no destinations are available -->
+    <string name="dsel_no_destinations">No destinations available yet</string>
+    <!-- Section header for recently visited destinations -->
+    <string name="dsel_recently_visited">Recently Visited</string>
+    <!-- Empty state message when no recent places exist -->
+    <string name="dsel_places_appear_here">Places you visit will appear here</string>
+    <!-- Action label on destination search card -->
+    <string name="dsel_search_action">SEARCH</string>
+
+    <!-- Destination Search Screen -->
+    <!-- Section header for search results list -->
+    <string name="dsearch_title">SEARCH RESULTS</string>
+    <!-- Title for empty search discovery state -->
+    <string name="dsearch_ready_to_discover">Ready to discover?</string>
+    <!-- Subtitle for empty search discovery state -->
+    <string name="dsearch_start_typing">Start typing to find stores, brands, or places in seconds.</string>
+
+    <!-- Destination Category Screen -->
+    <!-- Number of stores in a category -->
+    <plurals name="dcat_store_count">
+        <item quantity="one"><xliff:g id="count" example="1">%1$s</xliff:g> Store</item>
+        <item quantity="other"><xliff:g id="count" example="15">%1$s</xliff:g> Stores</item>
+    </plurals>
+    <!-- Placeholder for search within a specific category -->
+    <string name="dcat_search_in_category">Search in <xliff:g id="category" example="Fashion">%1$s</xliff:g></string>
+    <!-- Header for search results within a category -->
+    <string name="dcat_results_in_category">RESULTS IN <xliff:g id="category" example="FASHION">%1$s</xliff:g></string>
+    <!-- Header for all stores within a category -->
+    <string name="dcat_all_in_category">ALL IN <xliff:g id="category" example="FASHION">%1$s</xliff:g></string>
 
 </resources>

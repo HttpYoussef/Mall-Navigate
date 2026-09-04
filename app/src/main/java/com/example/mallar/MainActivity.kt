@@ -3,7 +3,6 @@ package com.example.mallar
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.os.Bundle
 import android.net.Uri
 import androidx.navigation.NavType
@@ -20,7 +19,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import com.example.mallar.data.PlaceRepository
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +37,7 @@ import com.example.mallar.ui.navigation.*
 import com.example.mallar.ui.splash.SplashScreen
 import com.example.mallar.ui.auth.*
 import com.example.mallar.ui.profile.*
+import com.example.mallar.ui.language.LanguageScreen
 import com.example.mallar.ui.parking.*
 import com.example.mallar.ui.home.*
 import com.example.mallar.ui.destination.DestinationSelectionScreen
@@ -49,24 +49,8 @@ import com.example.mallar.data.Mall
 import com.example.mallar.data.MallSession
 import com.example.mallar.ui.mall.MallSelectionScreen
 import androidx.navigation.compose.currentBackStackEntryAsState
-import java.util.Locale
 
-class MainActivity : ComponentActivity() {
-
-    override fun attachBaseContext(newBase: android.content.Context) {
-        // Apply saved language preference before inflation
-        val prefs = newBase.getSharedPreferences("mallar_app_prefs", android.content.Context.MODE_PRIVATE)
-        val lang = prefs.getString("language", "en") ?: "en"
-        val locale = java.util.Locale(lang)
-        Locale.setDefault(locale)
-        val config = Configuration(newBase.resources.configuration).apply {
-            setLocale(locale)
-            setLayoutDirection(locale)
-        }
-        @Suppress("DEPRECATION")
-        newBase.resources.updateConfiguration(config, newBase.resources.displayMetrics)
-        super.attachBaseContext(newBase.createConfigurationContext(config))
-    }
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // 1. Install System Splash (Dismisses immediately into Compose Splash)
@@ -361,9 +345,9 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
                 animatedVisibilityScope = this@composable,
                 onBackClick = { navController.popBackStack() },
                 onSearchClick = { navController.navigate("destination_search") },
-                onCategoryClick = { key, label -> 
+                onCategoryClick = { key -> 
                     val encodedKey = if (key.isBlank()) "all" else Uri.encode(key)
-                    navController.navigate("destination_category/$encodedKey/${Uri.encode(label)}") 
+                    navController.navigate("destination_category/$encodedKey") 
                 },
                 onDestinationSelected = { place ->
                     NavigationState.selectedPlace = place
@@ -391,19 +375,16 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
         }
 
         composable(
-            route = "destination_category/{categoryKey}/{categoryLabel}",
+            route = "destination_category/{categoryKey}",
             arguments = listOf(
-                navArgument("categoryKey") { type = NavType.StringType },
-                navArgument("categoryLabel") { type = NavType.StringType }
+                navArgument("categoryKey") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val categoryKey = backStackEntry.arguments?.getString("categoryKey").orEmpty()
-            val categoryLabel = backStackEntry.arguments?.getString("categoryLabel").orEmpty()
             val effectiveKey = if (categoryKey == "all") "" else categoryKey
             
             DestinationCategoryScreen(
                 categoryKey = effectiveKey,
-                categoryLabel = categoryLabel,
                 onBackClick = { navController.popBackStack() },
                 onDestinationSelected = { place ->
                     NavigationState.selectedPlace = place
@@ -503,8 +484,9 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
 
         composable("profile") {
             ProfileScreen(
-                onBackClick   = { navController.popBackStack() },
-                onLogoutClick = {
+                onBackClick     = { navController.popBackStack() },
+                onLanguageClick = { navController.navigate("language") },
+                onLogoutClick   = {
                     isFirstLaunch.value = true
                     prefs.edit().putBoolean("is_first_launch", true).apply()
                     StartupCoordinator.reset()
@@ -512,6 +494,12 @@ fun MallARNavGraph(context: Context, startupState: StartupState, initialIntentDa
                         popUpTo(0) { inclusive = true }
                     }
                 }
+            )
+        }
+
+        composable("language") {
+            LanguageScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
 

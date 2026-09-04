@@ -1,10 +1,66 @@
 package com.example.mallar.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.mallar.R
+import com.example.mallar.data.AppLanguage
+
+@OptIn(ExperimentalTextApi::class)
+val CairoFontFamily = FontFamily(
+    Font(
+        resId = R.font.cairo,
+        weight = FontWeight.Normal,
+        variationSettings = FontVariation.Settings(FontVariation.weight(400))
+    ),
+    Font(
+        resId = R.font.cairo,
+        weight = FontWeight.Medium,
+        variationSettings = FontVariation.Settings(FontVariation.weight(500))
+    ),
+    Font(
+        resId = R.font.cairo,
+        weight = FontWeight.SemiBold,
+        variationSettings = FontVariation.Settings(FontVariation.weight(600))
+    ),
+    Font(
+        resId = R.font.cairo,
+        weight = FontWeight.Bold,
+        variationSettings = FontVariation.Settings(FontVariation.weight(700))
+    )
+)
+
+
+fun fontFamilyFor(language: AppLanguage): FontFamily =
+    if (language == AppLanguage.ARABIC) CairoFontFamily else FontFamily.SansSerif
+
+fun typographyFor(fontFamily: FontFamily): Typography {
+    if (fontFamily == FontFamily.SansSerif) {
+        return Typography
+    }
+    return Typography(
+        headlineLarge = Typography.headlineLarge.copy(fontFamily = fontFamily),
+        headlineMedium = Typography.headlineMedium.copy(fontFamily = fontFamily),
+        headlineSmall = Typography.headlineSmall.copy(fontFamily = fontFamily),
+        titleLarge = Typography.titleLarge.copy(fontFamily = fontFamily),
+        titleMedium = Typography.titleMedium.copy(fontFamily = fontFamily),
+        bodyLarge = Typography.bodyLarge.copy(fontFamily = fontFamily),
+        bodyMedium = Typography.bodyMedium.copy(fontFamily = fontFamily),
+        labelLarge = Typography.labelLarge.copy(fontFamily = fontFamily),
+        labelMedium = Typography.labelMedium.copy(fontFamily = fontFamily)
+    )
+}
+
+fun typographyFor(language: AppLanguage): Typography =
+    typographyFor(fontFamilyFor(language))
+
+
+
 
 val Typography = Typography(
     headlineLarge = TextStyle(

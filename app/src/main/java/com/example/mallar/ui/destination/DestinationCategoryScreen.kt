@@ -18,24 +18,32 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mallar.R
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.Place
+import com.example.mallar.data.WesternDigits
+import com.example.mallar.data.categoryDisplayRes
 import com.example.mallar.ui.home.*
 
 @Composable
 fun DestinationCategoryScreen(
     categoryKey: String,
-    categoryLabel: String,
+    categoryLabel: String? = null,
     viewModel: DestinationViewModel = viewModel(),
     onBackClick: () -> Unit,
     onDestinationSelected: (Place) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isDarkMode by AppPreferences.isDarkMode.collectAsState()
+    val displayLabel = categoryLabel
+        ?: categoryDisplayRes(categoryKey)?.let { stringResource(it) }
+        ?: if (categoryKey.isBlank()) stringResource(R.string.all_stores) else categoryKey
 
     val colorScheme = rememberHomeColorScheme(isDarkMode)
     val currentBg       = colorScheme.bg
@@ -80,19 +88,20 @@ fun DestinationCategoryScreen(
                                     .clickable { onBackClick() },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = currentTextMain, modifier = Modifier.size(22.dp))
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = currentTextMain, modifier = Modifier.size(22.dp))
                             }
                             Spacer(Modifier.width(20.dp))
                             Column {
                                 Text(
-                                    text = categoryLabel,
+                                    text = displayLabel,
                                     color = currentTextMain,
                                     fontWeight = FontWeight.Black,
                                     fontSize = 32.sp,
                                     letterSpacing = (-1).sp
                                 )
+                                val storeCount = uiState.displayedPlaces.size
                                 Text(
-                                    text = "${uiState.displayedPlaces.size} Stores",
+                                    text = pluralStringResource(R.plurals.dcat_store_count, storeCount, WesternDigits.format(storeCount)),
                                     color = currentAccent,
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.ExtraBold,
@@ -108,7 +117,7 @@ fun DestinationCategoryScreen(
                     GlowingSearchBar(
                         query = uiState.searchQuery,
                         onQueryChange = { viewModel.onSearchQueryChanged(it) },
-                        placeholder = "Search in $categoryLabel",
+                        placeholder = stringResource(R.string.dcat_search_in_category, displayLabel),
                         isFocused = searchFocused,
                         onFocusChange = { searchFocused = it },
                         focusRequester = searchFocusRequester,
@@ -124,7 +133,11 @@ fun DestinationCategoryScreen(
                 item(key = "list_title") {
                     Spacer(Modifier.height(32.dp))
                     Text(
-                        text = if (uiState.searchQuery.isNotBlank()) "RESULTS IN $categoryLabel" else "ALL IN $categoryLabel",
+                        text = if (uiState.searchQuery.isNotBlank()) {
+                            stringResource(R.string.dcat_results_in_category, displayLabel.uppercase())
+                        } else {
+                            stringResource(R.string.dcat_all_in_category, displayLabel.uppercase())
+                        },
                         color = currentTextMain,
                         fontWeight = FontWeight.Black,
                         fontSize = 13.sp,

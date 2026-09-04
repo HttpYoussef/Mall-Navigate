@@ -1,12 +1,23 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Brand name. Do NOT translate. -->
     <string name="app_name">MallAR</string>
+    <!-- Brand wordmark. Do NOT translate. -->
+    <string name="app_wordmark">MallAR</string>
 
     <!-- Splash -->
     <string name="start">ابدأ</string>
+    <!-- Primary call-to-action on splash screen connection failure -->
+    <string name="splash_retry_connection">إعادة محاولة الاتصال</string>
+    <!-- Hero title line 1 on splash screen -->
+    <string name="splash_navigate">تنقّل</string>
+    <!-- Hero title line 2 on splash screen -->
+    <string name="splash_through_anywhere">في أي مكان</string>
+    <!-- Tagline under app wordmark on splash screen -->
+    <string name="splash_indoor_navigation">ملاحة داخلية</string>
 
     <!-- Permissions -->
-    <string name="permissions_title">مولار يحتاج إذنك</string>
-    <string name="permissions_subtitle">لمساعدتك في التنقل في المول، يحتاج مولار الوصول إلى التالي</string>
+    <string name="permissions_title">MallAR يحتاج إذنك</string>
+    <string name="permissions_subtitle">لمساعدتك في التنقل في المول، يحتاج <xliff:g id="app_name" example="MallAR">MallAR</xliff:g> الوصول إلى التالي</string>
     <string name="enable_camera">تفعيل الكاميرا</string>
     <string name="enable_location">تفعيل الموقع</string>
     <string name="enable_motion">تفعيل الحركة</string>
@@ -14,28 +25,42 @@
     <string name="permission_camera_subtitle">لوضع علامات المسار</string>
     <string name="permission_location_subtitle">لمعرفة الطابق الذي تتواجد فيه</string>
     <string name="permission_motion_subtitle">لتقدير سرعة حركتك</string>
+    <!-- Accessibility description for MallAR logo on permissions screen -->
+    <string name="permissions_logo_cd">شعار MallAR</string>
 
     <!-- Phone Auth -->
     <string name="enter_phone">أدخل رقم هاتفك</string>
-    <string name="phone_subtitle">ستصلك رسالة تحتوي على رمز مكون من ٦ أرقام</string>
+    <string name="phone_subtitle">ستصلك رسالة تحتوي على رمز مكون من 6 أرقام</string>
     <string name="phone_label">رقم الهاتف</string>
     <string name="send">إرسال</string>
     <string name="skip">تخطي</string>
-    <string name="country_code">+٢٠</string>
+    <string name="country_code">+20</string>
     <string name="enter_phone_nl">أدخل\nرقم الهاتف</string>
-    <string name="receive_6_digit">ستصلك رسالة تحتوي على رمز مكون من ٦ أرقام</string>
+    <string name="receive_6_digit">ستصلك رسالة تحتوي على رمز مكون من 6 أرقام</string>
     <string name="phone_placeholder">رقم الهاتف (مثال: 10 123 456 78)</string>
     <string name="send_code">إرسال الرمز</string>
+    <!-- Placeholder sample digits shown before user enters phone number -->
+    <string name="phone_auth_placeholder_number">11 123 456 78</string>
+    <!-- Accessibility description for keypad backspace button -->
+    <string name="phone_auth_backspace_cd">حذف</string>
     <string name="welcome_back">مرحباً بعودتك</string>
     <string name="enter_phone_signin">أدخل رقم هاتفك لتسجيل الدخول</string>
 
     <!-- OTP -->
     <string name="verify_code">تحقق من الرمز</string>
-    <string name="otp_subtitle">أرسلنا رمز مكون من ٦ أرقام إلى رقم هاتفك.</string>
+    <string name="otp_subtitle">أرسلنا رمز مكون من 6 أرقام إلى رقم هاتفك.</string>
     <string name="verify">تحقق</string>
-    <string name="we_sent_code">أرسلنا رمزاً من ٦ أرقام إلى هاتفك</string>
-    <string name="enter_otp">أدخل الرمز المكون من ٦ أرقام</string>
+    <string name="we_sent_code">أرسلنا رمزاً من 6 أرقام إلى هاتفك</string>
+    <string name="enter_otp">أدخل الرمز المكون من 6 أرقام</string>
     <string name="did_not_receive">لم يصلك الرمز؟ أعد الإرسال</string>
+    <!-- Accessibility description for MallAR logo on OTP verification screen -->
+    <string name="otp_logo_cd">شعار MallAR</string>
+    <!-- Message informing user that verification code was sent to their phone -->
+    <string name="otp_sent_code_to_phone">أرسلنا رمزاً من 6 أرقام إلى هاتفك.</string>
+    <!-- Button to resend verification code if not received -->
+    <string name="otp_resend">لم يصلك الرمز؟ أعد الإرسال</string>
+    <!-- Accessibility description for OTP keypad backspace button -->
+    <string name="otp_backspace_cd">حذف</string>
 
     <!-- Logo Scan -->
     <string name="scan_instruction">وجّه الكاميرا نحو شعار متجر لتحديد موقعك</string>
@@ -95,6 +120,31 @@
     <string name="choose_nav_mode">اختر وضع التنقل الخاص بك</string>
     <string name="going_to">الذهاب إلى</string>
 
+    <!-- ================================================================= -->
+    <!-- Ticket 12: Navigation guidance -->
+    <!-- ================================================================= -->
+    <string name="nav_get_oriented">حدّد اتجاهك</string>
+    <string name="nav_floor_change">تغيير الطابق</string>
+    <string name="nav_floor_up">اركب السلم الكهربائي أو الأسانسير لـ<xliff:g id="floor" example="الطابق 2">%1$s</xliff:g></string>
+    <string name="nav_floor_down">انزل لـ<xliff:g id="floor" example="الطابق 1">%1$s</xliff:g></string>
+    <string name="nav_continue_on_floor">كمّل في <xliff:g id="floor" example="الطابق 2">%1$s</xliff:g></string>
+    <plurals name="nav_walk_minutes">
+        <item quantity="zero">"  •  المشي "<xliff:g id="count" example="0">%1$s</xliff:g>" دقيقة"</item>
+        <item quantity="one">"  •  دقيقة مشي"</item>
+        <item quantity="two">"  •  دقيقتين مشي"</item>
+        <item quantity="few">"  •  المشي "<xliff:g id="count" example="3">%1$s</xliff:g>" دقائق"</item>
+        <item quantity="many">"  •  المشي "<xliff:g id="count" example="15">%1$s</xliff:g>" دقيقة"</item>
+        <item quantity="other">"  •  المشي "<xliff:g id="count" example="100">%1$s</xliff:g>" دقيقة"</item>
+    </plurals>
+    <string name="nav_start">البداية</string>
+    <string name="nav_destination">الوجهة</string>
+    <string name="nav_route_map_title">خريطة المسار · <xliff:g id="floor" example="الطابق 1">%1$s</xliff:g></string>
+    <string name="nav_distance_label">المسافة: <xliff:g id="meters" example="120">%1$s</xliff:g> متر</string>
+    <string name="nav_est_time_label">الوقت التقديري: <xliff:g id="minutes" example="3">%1$s</xliff:g> دقيقة</string>
+    <string name="nav_map_gesture_hint">اقرص للتكبير • اسحب للتحريك</string>
+    <string name="nav_voice_mute">كتم صوت التوجيه</string>
+    <string name="nav_voice_unmute">تشغيل صوت التوجيه</string>
+
     <!-- Welcome Screen -->
     <string name="get_started">ابدأ الآن</string>
     <string name="loading">جاري التحميل</string>
@@ -102,6 +152,8 @@
     <string name="sign_in">تسجيل الدخول</string>
     <string name="sign_up">إنشاء حساب</string>
     <string name="skip_for_now">تخطي الآن</string>
+    <!-- Accessibility description for partner brands illustration -->
+    <string name="welcome_major_brands">العلامات التجارية الكبرى</string>
 
     <!-- Auth Screens -->
     <string name="create_account">إنشاء حساب</string>
@@ -124,9 +176,10 @@
     <string name="remove">إزالة</string>
     <string name="remove_photo">إزالة الصورة</string>
     <string name="edit_profile">تعديل الملف الشخصي</string>
-    <string name="user_first_name">محمد</string>
-    <string name="user_last_name">إبراهيم</string>
-    <string name="joined_time">انضم منذ ٥ أسابيع</string>
+    <!-- Fallback display name on the profile screen when the account has no name set -->
+    <string name="profile_user_fallback">مستخدم</string>
+    <!-- Saved-place subtitle: store category followed by a fixed "inside the mall" note -->
+    <string name="saved_category_inside_mall"><xliff:g id="category" example="أزياء">%1$s</xliff:g> · داخل المول</string>
     <string name="saved_locations">الأماكن المحفوظة</string>
     <string name="recent_places">الأماكن الأخيرة</string>
     <string name="messages">الرسائل</string>
@@ -165,6 +218,7 @@
     <string name="remove_saved_desc">إزالة المحفوظ</string>
     <string name="map_unavailable">الخريطة غير متوفرة</string>
     <string name="inside_mall">داخل المول</string>
+    <string name="store_inside_mall">متجر · داخل المول</string>
     <string name="ask_me">اسألني</string>
     <string name="destination_label">الوجهة</string>
 
@@ -199,7 +253,8 @@
     <string name="toast_valid_phone">يرجى إدخال رقم هاتف صحيح</string>
     <string name="toast_verification_completed">اكتمل التحقق</string>
     <string name="toast_code_sent">تم إرسال الرمز</string>
-    <string name="toast_welcome_user">مرحباً بك، %1$s!</string>
+    <!-- Welcome toast message shown after successful sign up -->
+    <string name="toast_welcome_user">مرحباً بك، <xliff:g id="first_name" example="Sarah">%1$s</xliff:g>!</string>
     <string name="toast_wrong_otp">رمز التحقق غير صحيح</string>
     <string name="toast_login_success">تم تسجيل الدخول بنجاح</string>
 
@@ -208,5 +263,295 @@
     <string name="bottom_nav_map">الخريطة</string>
     <string name="bottom_nav_saved">المحفوظة</string>
     <string name="bottom_nav_profile">حسابي</string>
+
+    <!-- Mall Selection Screen -->
+    <string name="mall_select_title">اختار المول</string>
+    <string name="mall_select_subtitle">رايح فين في زيارتك دي؟</string>
+    <string name="mall_coming_soon">قريباً</string>
+    <string name="mall_retry">إعادة المحاولة</string>
+
+    <!-- Mall names and locations -->
+    <string name="mall_city_stars_name">سيتي ستارز</string>
+    <string name="mall_city_stars_location">مدينة نصر، القاهرة</string>
+    <string name="mall_city_centre_almaza_name">سيتي سنتر ألماظة</string>
+    <string name="mall_city_centre_almaza_location">مصر الجديدة، القاهرة</string>
+    <string name="mall_of_egypt_name">مول مصر</string>
+    <string name="mall_of_egypt_location">6 أكتوبر، الجيزة</string>
+
+    <!-- Floor and Canonical Category Labels -->
+    <string name="floor_label">الطابق %1$s</string>
+    <string name="category_fashion">أزياء</string>
+    <string name="category_jewellery">مجوهرات</string>
+    <string name="category_perfumes_cosmetics">عطور ومستحضرات تجميل</string>
+    <string name="category_dining">مطاعم</string>
+    <string name="category_pharmacy">صيدلية</string>
+
+    <!-- Parking Shared -->
+    <!-- Field label for parking zone (e.g. Zone A) -->
+    <string name="park_field_zone">المنطقة</string>
+    <!-- Field label for parking slot number (e.g. Slot 12) -->
+    <string name="park_field_slot">المكان</string>
+    <!-- Field label for parking floor level (e.g. Floor P1) -->
+    <string name="park_field_floor">الطابق</string>
+    <!-- Accessibility description for car icon -->
+    <string name="park_car_cd">سيارة</string>
+    <!-- Generic OK button in dialogs -->
+    <string name="dialog_ok">موافق</string>
+    <!-- Generic Cancel button in dialogs -->
+    <string name="dialog_cancel">إلغاء</string>
+
+    <!-- Parking Home Screen -->
+    <!-- Title of the My Parking home screen -->
+    <string name="park_home_title">موقفي</string>
+    <!-- Banner title on empty parking screen -->
+    <string name="park_home_banner_title">اركن ولاقي عربيتك</string>
+    <!-- Banner description explaining AI parking feature -->
+    <string name="park_home_banner_desc">صوّر عامود الركنة. الذكاء الاصطناعي هيقرأ المنطقة والمكان والدور تلقائياً عشان تعرف ترجع لعربيتك.</string>
+    <!-- Button to initiate camera capture for saving parking location -->
+    <string name="park_home_btn_save">حفظ مكان الركنة</string>
+    <!-- Section header explaining how parking feature works -->
+    <string name="park_home_how_it_works">إزاي بيشتغل</string>
+    <!-- Title for step 1 of parking guide -->
+    <string name="park_home_step1_title">1. اركن عربيتك</string>
+    <!-- Description for step 1 of parking guide -->
+    <string name="park_home_step1_desc">اختار مكان وجهّز تليفونك لمسح أقرب علامة عامود.</string>
+    <!-- Title for step 2 of parking guide -->
+    <string name="park_home_step2_title">2. امسح العامود</string>
+    <!-- Description for step 2 of parking guide -->
+    <string name="park_home_step2_desc">وجّه الكاميرا لعلامة العامود (زي <xliff:g id="example_slot" example="B-12">B-12</xliff:g>). هيتقرأ في لحظتها.</string>
+    <!-- Title for step 3 of parking guide -->
+    <string name="park_home_step3_title">3. تم حفظ المكان</string>
+    <!-- Description for step 3 of parking guide -->
+    <string name="park_home_step3_desc">مكانك اتحفظ. تقدر ترجعله من أي مكان جوه المول.</string>
+    <!-- Header for saved parking details card -->
+    <string name="park_home_saved_location">المكان المحفوظ</string>
+    <!-- Accessibility description for delete parking location button -->
+    <string name="park_home_delete_location_cd">حذف المكان</string>
+    <!-- Accessibility description for edit parking location button -->
+    <string name="park_home_edit_location_cd">تعديل المكان</string>
+    <!-- Label for saved timestamp row in details card -->
+    <string name="park_home_saved_time">وقت الحفظ</string>
+    <!-- Primary button to navigate back to parked car -->
+    <string name="park_home_btn_navigate">التوجه إلى السيارة</string>
+    <!-- Button to view parked car on 2D map -->
+    <string name="park_home_btn_view_on_map">عرض على الخريطة</string>
+
+    <!-- Parking Camera Screen -->
+    <!-- Title when camera permission has not been granted -->
+    <string name="park_camera_permission_required">إذن الكاميرا مطلوب</string>
+    <!-- Message explaining why camera permission is needed for parking -->
+    <string name="park_camera_permission_desc">الميزة دي بتحتاج إذن الوصول للكاميرا عشان تصوّر علامة عامود الركنة.</string>
+    <!-- Button to request camera permission -->
+    <string name="park_camera_grant_permission">منح الإذن</string>
+    <!-- Header title on camera scan overlay -->
+    <string name="park_camera_title">مساعد الركنة</string>
+    <!-- Framing instruction shown at bottom of camera view -->
+    <string name="park_camera_instruction">حط الكود جوه الإطار\nتأكد إنه واضح والإضاءة كويسة</string>
+    <!-- Accessibility description for pick from gallery button -->
+    <string name="park_camera_gallery_cd">المعرض</string>
+    <!-- Accessibility description for camera flash toggle -->
+    <string name="park_camera_flash_cd">الفلاش</string>
+
+    <!-- Parking Scan Result Screen -->
+    <!-- Header title on parking scan result screen -->
+    <string name="park_scan_title">نتيجة المسح</string>
+    <!-- Loading text while OCR processes column image -->
+    <string name="park_scan_reading">جاري قراءة نص العامود…</string>
+    <!-- Accessibility description for captured column photo -->
+    <string name="park_scan_captured_spot_cd">صورة الموقف</string>
+    <!-- Title for raw OCR detected text card -->
+    <string name="park_scan_raw_detected">النص المكتشف</string>
+    <!-- Badge shown when OCR match confidence is low -->
+    <string name="park_scan_low_confidence">دقة منخفضة / تطابق جزئي</string>
+    <!-- Title for parsed location card -->
+    <string name="park_scan_detected_location">الموقع المكتشف</string>
+    <!-- Placeholder when a field value could not be detected -->
+    <string name="park_scan_not_detected">(لم يتم اكتشافه)</string>
+    <!-- Accessibility description for edit field button -->
+    <string name="park_scan_edit_cd">تعديل</string>
+    <!-- Banner confirming parking location was saved -->
+    <string name="park_scan_location_saved">تم حفظ مكان الركنة</string>
+    <!-- Button to confirm and save scanned parking spot -->
+    <string name="park_scan_btn_save">حفظ المكان</string>
+    <!-- Dialog title for editing a specific parking field -->
+    <string name="park_scan_edit_field">تعديل <xliff:g id="field_name" example="المنطقة">%1$s</xliff:g></string>
+
+    <!-- Parking Map Screen -->
+    <!-- Header title on 2D parking map screen -->
+    <string name="park_map_title">خريطة الموقف</string>
+    <!-- Header for car location bottom card on map -->
+    <string name="park_map_your_car_location">مكان عربيتك</string>
+    <!-- Text shown when no parking location has been saved -->
+    <string name="park_map_no_location_saved">لا يوجد مكان محفوظ</string>
+    <!-- Summary format showing spot code and floor -->
+    <string name="park_map_location_summary"><xliff:g id="spot" example="B-12">%1$s</xliff:g> | <xliff:g id="floor" example="الطابق P1">%2$s</xliff:g></string>
+    <!-- Button to stop in-parking navigation route -->
+    <string name="park_map_stop_nav">إيقاف الملاحة</string>
+    <!-- Button to start in-parking navigation route -->
+    <string name="park_map_start_nav">بدء الملاحة</string>
+    <!-- Road marking label drawn on parking canvas -->
+    <string name="park_map_slow">مهل</string>
+    <!-- Exit arrow label drawn on parking canvas -->
+    <string name="park_map_exit">الخروج ➔</string>
+    <!-- Pin label drawn at current user location on parking canvas -->
+    <string name="park_map_you_are_here">أنت هنا</string>
+
+    <!-- ================================================================= -->
+    <!-- Ticket 08: Home, Shared, Offers, Voucher, Store Detail, Destination -->
+    <!-- ================================================================= -->
+
+    <!-- Home Screen -->
+    <!-- Greeting on home screen with user name -->
+    <string name="home_greeting">أهلاً يا <xliff:g id="user_name" example="سارة">%1$s</xliff:g> 👋</string>
+    <!-- Default user name fallback when not logged in -->
+    <string name="home_default_user_name">زائر</string>
+    <!-- Subtitle on home screen header when no mall is selected -->
+    <string name="home_discover_brands">اكتشف ماركاتك المفضلة</string>
+    <!-- Subtitle on home screen header combining mall name and brand tagline -->
+    <string name="home_mall_brands"><xliff:g id="mall_name" example="سيتي ستارز">%1$s</xliff:g> · اكتشف ماركاتك المفضلة</string>
+    <!-- Accessibility description for notifications icon -->
+    <string name="home_notifications_cd">الإشعارات</string>
+    <!-- Hero card title for starting navigation -->
+    <string name="home_start_navigation">ابدأ الملاحة</string>
+    <!-- Hero card subtitle for starting navigation -->
+    <string name="home_start_nav_subtitle">احصل على اتجاهات المشي لأي متجر أو مكان</string>
+    <!-- Primary action button to begin navigation -->
+    <string name="home_start_navigation_btn">بدء الملاحة</string>
+    <!-- Section header for offers and vouchers carousel -->
+    <string name="home_offers_vouchers">العروض والقسائم</string>
+    <!-- Section header for user\'s favorite stores list -->
+    <string name="home_your_favorites">مفضلاتك</string>
+    <!-- Empty state message when no favorite stores have been saved -->
+    <string name="home_favorites_empty">اضغط على القلب في أي متجر لحفظه هنا.</string>
+    <!-- Overline tag on parking hero card -->
+    <string name="home_park_smart">ركن ذكي</string>
+    <!-- Title on parking hero card -->
+    <string name="home_find_parking_title">لاقي ركنة\nفي ثواني.</string>
+    <!-- Subtitle on parking hero card showing saved spot code -->
+    <string name="home_park_spot_saved">المكان المحفوظ: <xliff:g id="spot" example="A-12">%1$s</xliff:g></string>
+    <!-- Subtitle on parking hero card when no spot is saved -->
+    <string name="home_park_subtitle">معلومات وإرشادات الركن في الوقت الفعلي.</string>
+    <!-- Button label on parking hero card when spot is saved -->
+    <string name="home_find_my_car">لاقي عربيتي</string>
+    <!-- Button label on parking hero card when no spot is saved -->
+    <string name="home_find_parking">البحث عن موقف</string>
+    <!-- Header label for parking spaces counter -->
+    <string name="home_park_spaces">أماكن</string>
+    <!-- Subtitle label for parking spaces counter -->
+    <string name="home_park_available">متاح</string>
+    <!-- Sample promo discount title for Starbucks offer -->
+    <string name="home_offer_free_upsize">ترقية مجانية للحجم</string>
+    <!-- Sample promo subtitle for Starbucks offer -->
+    <string name="home_offer_on_any_beverage">على أي مشروب</string>
+    <!-- Sample promo discount title for Zara offer -->
+    <string name="home_offer_15_off">خصم 15%</string>
+    <!-- Sample promo subtitle for Zara offer -->
+    <string name="home_offer_on_selected_items">على منتجات مختارة</string>
+    <!-- Sample promo discount title for Mango offer -->
+    <string name="home_offer_20_off">خصم 20%</string>
+    <!-- Sample promo subtitle for Mango offer -->
+    <string name="home_offer_on_all_items">على جميع المنتجات</string>
+    <!-- Label for Ask AI tab in bottom navigation -->
+    <string name="bottom_nav_ask_ai">اسأل الذكاء الاصطناعي</string>
+
+    <!-- Shared Store & Search Components -->
+    <!-- Placeholder text for glowing search bar -->
+    <string name="home_search_placeholder">ابحث عن متاجر، أماكن…</string>
+    <!-- Generic fallback label when category is unknown -->
+    <string name="store_fallback">متجر</string>
+    <!-- Template combining store category and floor -->
+    <string name="store_category_floor"><xliff:g id="category" example="أزياء">%1$s</xliff:g> · <xliff:g id="floor" example="الطابق 1">%2$s</xliff:g></string>
+    <!-- Template combining floor and distance -->
+    <string name="store_floor_distance"><xliff:g id="floor" example="الطابق 1">%1$s</xliff:g>  •  <xliff:g id="distance" example="120م">%2$s</xliff:g></string>
+    <!-- Distance formatted in meters with Western digits -->
+    <string name="distance_meters"><xliff:g id="meters" example="120">%1$s</xliff:g>م</string>
+    <!-- Empty state title when store search finds no results -->
+    <string name="home_no_results_found">لم يتم العثور على نتائج</string>
+    <!-- Empty state suggestion when store search finds no results -->
+    <string name="home_try_different_keyword">جرب كلمة بحث أخرى</string>
+    <!-- Instructions in navigation confirmation sheet -->
+    <string name="home_confirm_scan_desc">عشان نجيبلك اتجاهات دقيقة، هنمسح علامة متجر قريب لتحديد مكانك بالظبط.</string>
+    <!-- Filter chip label representing all categories -->
+    <string name="category_all">الكل</string>
+
+    <!-- Offers & Vouchers Screen -->
+    <!-- Header title for offers and vouchers screen -->
+    <string name="offers_title">العروض والقسائم</string>
+    <!-- Header subtitle for offers and vouchers screen -->
+    <string name="offers_subtitle">وفّر أكتر في متاجرك المفضلة</string>
+    <!-- Search field hint on offers screen -->
+    <string name="offers_search_hint">ابحث عن عروض أو متاجر</string>
+    <!-- Action button to view and redeem voucher -->
+    <string name="offers_get_voucher">احصل على القسيمة</string>
+    <!-- Empty state title on offers screen -->
+    <string name="offers_no_offers_found">لم يتم العثور على عروض</string>
+    <!-- Empty state subtitle on offers screen -->
+    <string name="offers_try_different_search">جرب بحث أو قسم آخر</string>
+
+    <!-- Store Detail Screen -->
+    <!-- Walking duration in minutes -->
+    <plurals name="duration_minutes">
+        <item quantity="zero"><xliff:g id="count" example="0">%1$s</xliff:g> دقيقة</item>
+        <item quantity="one">دقيقة واحدة</item>
+        <item quantity="two">دقيقتان</item>
+        <item quantity="few"><xliff:g id="count" example="3">%1$s</xliff:g> دقائق</item>
+        <item quantity="many"><xliff:g id="count" example="15">%1$s</xliff:g> دقيقة</item>
+        <item quantity="other"><xliff:g id="count" example="100">%1$s</xliff:g> دقيقة</item>
+    </plurals>
+
+    <!-- Voucher Details Screen -->
+    <!-- Error message when voucher is not found -->
+    <string name="voucher_not_found">لم يتم العثور على القسيمة</string>
+    <!-- Success description after voucher is redeemed -->
+    <string name="voucher_redeemed_success_desc">تم تفعيل قسيمتك بنجاح. أظهر رمز QR هذا عند الدفع.</string>
+    <!-- Section header for voucher terms and conditions -->
+    <string name="voucher_terms_conditions">الشروط والأحكام</string>
+    <!-- Button to redeem voucher offer -->
+    <string name="voucher_redeem_now">فعّل العرض الآن</string>
+    <!-- Status text when offer has been redeemed -->
+    <string name="voucher_offer_redeemed">تم تفعيل العرض</string>
+
+    <!-- Destination Selection Screen -->
+    <!-- Subtitle on destination selection screen -->
+    <string name="dsel_search_subtitle">ابحث عن المتاجر والمطاعم والأزياء والمزيد</string>
+    <!-- Section header for browsing categories -->
+    <string name="dsel_browse_categories">تصفح الأقسام</string>
+    <!-- Section header for popular destinations -->
+    <string name="dsel_popular_destinations">الوجهات الشائعة</string>
+    <!-- Label to collapse expanded popular destinations list -->
+    <string name="dsel_show_less">عرض أقل</string>
+    <!-- Empty state message when no destinations are available -->
+    <string name="dsel_no_destinations">لا توجد وجهات متاحة بعد</string>
+    <!-- Section header for recently visited destinations -->
+    <string name="dsel_recently_visited">تمت زيارتها مؤخراً</string>
+    <!-- Empty state message when no recent places exist -->
+    <string name="dsel_places_appear_here">الأماكن التي تزورها ستظهر هنا</string>
+    <!-- Action label on destination search card -->
+    <string name="dsel_search_action">بحث</string>
+
+    <!-- Destination Search Screen -->
+    <!-- Section header for search results list -->
+    <string name="dsearch_title">نتائج البحث</string>
+    <!-- Title for empty search discovery state -->
+    <string name="dsearch_ready_to_discover">جاهز للاستكشاف؟</string>
+    <!-- Subtitle for empty search discovery state -->
+    <string name="dsearch_start_typing">ابدأ بالكتابة للبحث عن المتاجر والماركات والأماكن في ثوانٍ.</string>
+
+    <!-- Destination Category Screen -->
+    <!-- Number of stores in a category -->
+    <plurals name="dcat_store_count">
+        <item quantity="zero"><xliff:g id="count" example="0">%1$s</xliff:g> متجر</item>
+        <item quantity="one">متجر واحد</item>
+        <item quantity="two">متجران</item>
+        <item quantity="few"><xliff:g id="count" example="3">%1$s</xliff:g> متاجر</item>
+        <item quantity="many"><xliff:g id="count" example="15">%1$s</xliff:g> متجراً</item>
+        <item quantity="other"><xliff:g id="count" example="100">%1$s</xliff:g> متجر</item>
+    </plurals>
+    <!-- Placeholder for search within a specific category -->
+    <string name="dcat_search_in_category">البحث في <xliff:g id="category" example="أزياء">%1$s</xliff:g></string>
+    <!-- Header for search results within a category -->
+    <string name="dcat_results_in_category">النتائج في <xliff:g id="category" example="الأزياء">%1$s</xliff:g></string>
+    <!-- Header for all stores within a category -->
+    <string name="dcat_all_in_category">الكل في <xliff:g id="category" example="الأزياء">%1$s</xliff:g></string>
 
 </resources>
