@@ -160,6 +160,10 @@
     <string name="remove">Remove</string>
     <string name="remove_photo">Remove photo</string>
     <string name="edit_profile">Edit profile</string>
+    <!-- Fallback display name on the profile screen when the account has no name set -->
+    <string name="profile_user_fallback">User</string>
+    <!-- Saved-place subtitle: store category followed by a fixed "inside the mall" note -->
+    <string name="saved_category_inside_mall"><xliff:g id="category" example="Fashion">%1$s</xliff:g> · Inside Mall</string>
     <string name="saved_locations">Saved Locations</string>
     <string name="recent_places">Recent Places</string>
     <string name="messages">Messages</string>

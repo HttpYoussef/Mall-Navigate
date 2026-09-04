@@ -24,9 +24,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.example.mallar.R
 import com.example.mallar.data.FavoritesManager
 import com.example.mallar.data.Place
 import com.example.mallar.data.PlaceRepository
+import com.example.mallar.data.categoryDisplayRes
 import com.example.mallar.ui.components.StoreLogoContainer
 import com.example.mallar.ui.theme.*
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +86,7 @@ fun SavedPlacesScreen(
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.back),
                         tint = currentTextMain,
                         modifier = Modifier.size(20.dp)
                     )
@@ -184,11 +187,16 @@ private fun SavedPlaceRow(
                 maxLines   = 1,
                 overflow   = TextOverflow.Ellipsis
             )
-            val categoryLabel = place.category.orEmpty()
-                .replaceFirstChar { c -> c.uppercaseChar() }
-                .ifBlank { "Store" }
+            val categoryRes = categoryDisplayRes(place.category)
+            val categoryLabel = if (categoryRes != null) {
+                stringResource(categoryRes)
+            } else {
+                place.category.orEmpty()
+                    .replaceFirstChar { c -> c.uppercaseChar() }
+                    .ifBlank { stringResource(R.string.store_fallback) }
+            }
             Text(
-                text = "$categoryLabel · Inside Mall",
+                text = stringResource(R.string.saved_category_inside_mall, categoryLabel),
                 fontSize = 12.sp,
                 color = currentTextSub
             )
@@ -196,7 +204,7 @@ private fun SavedPlaceRow(
         IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
             Icon(
                 Icons.Default.Bookmark,
-                contentDescription = "Remove saved",
+                contentDescription = stringResource(R.string.remove_saved_desc),
                 tint = SavedPrimary,
                 modifier = Modifier.size(20.dp)
             )
@@ -209,7 +217,7 @@ private fun SavedPlaceRow(
         ) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Navigate",
+                contentDescription = stringResource(R.string.navigate_desc),
                 tint = SavedPrimary,
                 modifier = Modifier.size(18.dp)
             )

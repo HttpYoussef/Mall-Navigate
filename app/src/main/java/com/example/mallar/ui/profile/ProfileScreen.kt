@@ -118,7 +118,7 @@ fun ProfileScreen(
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.back),
                         tint = colorScheme.onSurface,
                         modifier = Modifier.size(20.dp)
                     )
@@ -325,7 +325,7 @@ private fun ProfileAvatarCard(
                                 .crossfade(true)
                                 .build()
                         ),
-                        contentDescription = "Profile photo",
+                        contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.profile_photo),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(96.dp)
@@ -355,7 +355,7 @@ private fun ProfileAvatarCard(
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
-                        contentDescription = "Change photo",
+                        contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.change_photo),
                         tint = Teal,
                         modifier = Modifier.size(16.dp)
                     )
@@ -368,7 +368,7 @@ private fun ProfileAvatarCard(
         // Name (from signup)
         if (isLoggedIn) {
             Text(
-                text = displayName.ifEmpty { "User" },
+                text = displayName.ifEmpty { androidx.compose.ui.res.stringResource(com.example.mallar.R.string.profile_user_fallback) },
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.onBackground
@@ -464,7 +464,7 @@ private fun FavoriteStoreRow(
         IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Remove",
+                contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.remove),
                 tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.size(18.dp)
             )
