@@ -360,4 +360,154 @@
     <!-- Pin label drawn at current user location on parking canvas -->
     <string name="park_map_you_are_here">You are here</string>
 
+    <!-- ================================================================= -->
+    <!-- Ticket 08: Home, Shared, Offers, Voucher, Store Detail, Destination -->
+    <!-- ================================================================= -->
+
+    <!-- Home Screen -->
+    <!-- Greeting on home screen with user name -->
+    <string name="home_greeting">Hello, <xliff:g id="user_name" example="Sarah">%1$s</xliff:g> 👋</string>
+    <!-- Default user name fallback when not logged in -->
+    <string name="home_default_user_name">there</string>
+    <!-- Subtitle on home screen header when no mall is selected -->
+    <string name="home_discover_brands">Discover your favorite brands</string>
+    <!-- Subtitle on home screen header combining mall name and brand tagline -->
+    <string name="home_mall_brands"><xliff:g id="mall_name" example="City Stars">%1$s</xliff:g> · Discover your favorite brands</string>
+    <!-- Accessibility description for notifications icon -->
+    <string name="home_notifications_cd">Notifications</string>
+    <!-- Hero card title for starting navigation -->
+    <string name="home_start_navigation">Start navigation</string>
+    <!-- Hero card subtitle for starting navigation -->
+    <string name="home_start_nav_subtitle">Get walking directions to any store or place</string>
+    <!-- Primary action button to begin navigation -->
+    <string name="home_start_navigation_btn">Start Navigation</string>
+    <!-- Section header for offers and vouchers carousel -->
+    <string name="home_offers_vouchers">Offers &amp; vouchers</string>
+    <!-- Section header for user\'s favorite stores list -->
+    <string name="home_your_favorites">Your favorites</string>
+    <!-- Empty state message when no favorite stores have been saved -->
+    <string name="home_favorites_empty">Tap the heart on any store to save it here.</string>
+    <!-- Overline tag on parking hero card -->
+    <string name="home_park_smart">PARK SMART</string>
+    <!-- Title on parking hero card -->
+    <string name="home_find_parking_title">Find parking\nin seconds.</string>
+    <!-- Subtitle on parking hero card showing saved spot code -->
+    <string name="home_park_spot_saved">Spot saved: <xliff:g id="spot" example="A-12">%1$s</xliff:g></string>
+    <!-- Subtitle on parking hero card when no spot is saved -->
+    <string name="home_park_subtitle">Real-time availability and directions.</string>
+    <!-- Button label on parking hero card when spot is saved -->
+    <string name="home_find_my_car">Find my car</string>
+    <!-- Button label on parking hero card when no spot is saved -->
+    <string name="home_find_parking">Find parking</string>
+    <!-- Header label for parking spaces counter -->
+    <string name="home_park_spaces">SPACES</string>
+    <!-- Subtitle label for parking spaces counter -->
+    <string name="home_park_available">Available</string>
+    <!-- Sample promo discount title for Starbucks offer -->
+    <string name="home_offer_free_upsize">Free Upsize</string>
+    <!-- Sample promo subtitle for Starbucks offer -->
+    <string name="home_offer_on_any_beverage">On any beverage</string>
+    <!-- Sample promo discount title for Zara offer -->
+    <string name="home_offer_15_off">15% OFF</string>
+    <!-- Sample promo subtitle for Zara offer -->
+    <string name="home_offer_on_selected_items">On selected items</string>
+    <!-- Sample promo discount title for Mango offer -->
+    <string name="home_offer_20_off">20% OFF</string>
+    <!-- Sample promo subtitle for Mango offer -->
+    <string name="home_offer_on_all_items">On all items</string>
+    <!-- Label for Ask AI tab in bottom navigation -->
+    <string name="bottom_nav_ask_ai">Ask AI</string>
+
+    <!-- Shared Store & Search Components -->
+    <!-- Placeholder text for glowing search bar -->
+    <string name="home_search_placeholder">Search for stores, places…</string>
+    <!-- Generic fallback label when category is unknown -->
+    <string name="store_fallback">Store</string>
+    <!-- Template combining store category and floor -->
+    <string name="store_category_floor"><xliff:g id="category" example="Fashion">%1$s</xliff:g> · <xliff:g id="floor" example="Floor 1">%2$s</xliff:g></string>
+    <!-- Template combining floor and distance -->
+    <string name="store_floor_distance"><xliff:g id="floor" example="Floor 1">%1$s</xliff:g>  •  <xliff:g id="distance" example="120m">%2$s</xliff:g></string>
+    <!-- Distance formatted in meters with Western digits -->
+    <string name="distance_meters"><xliff:g id="meters" example="120">%1$s</xliff:g>m</string>
+    <!-- Empty state title when store search finds no results -->
+    <string name="home_no_results_found">No results found</string>
+    <!-- Empty state suggestion when store search finds no results -->
+    <string name="home_try_different_keyword">Try a different keyword</string>
+    <!-- Instructions in navigation confirmation sheet -->
+    <string name="home_confirm_scan_desc">To get accurate directions, we\'ll scan a nearby store sign to find your exact spot.</string>
+    <!-- Filter chip label representing all categories -->
+    <string name="category_all">All</string>
+
+    <!-- Offers & Vouchers Screen -->
+    <!-- Header title for offers and vouchers screen -->
+    <string name="offers_title">Offers &amp; Vouchers</string>
+    <!-- Header subtitle for offers and vouchers screen -->
+    <string name="offers_subtitle">Save more on your favorite stores</string>
+    <!-- Search field hint on offers screen -->
+    <string name="offers_search_hint">Search offers or stores</string>
+    <!-- Action button to view and redeem voucher -->
+    <string name="offers_get_voucher">Get Voucher</string>
+    <!-- Empty state title on offers screen -->
+    <string name="offers_no_offers_found">No offers found</string>
+    <!-- Empty state subtitle on offers screen -->
+    <string name="offers_try_different_search">Try a different search or category</string>
+
+    <!-- Store Detail Screen -->
+    <!-- Walking duration in minutes -->
+    <plurals name="duration_minutes">
+        <item quantity="one"><xliff:g id="count" example="1">%1$s</xliff:g> min</item>
+        <item quantity="other"><xliff:g id="count" example="5">%1$s</xliff:g> mins</item>
+    </plurals>
+
+    <!-- Voucher Details Screen -->
+    <!-- Error message when voucher is not found -->
+    <string name="voucher_not_found">Voucher not found</string>
+    <!-- Success description after voucher is redeemed -->
+    <string name="voucher_redeemed_success_desc">Your voucher has been redeemed successfully. Show this QR code at checkout.</string>
+    <!-- Section header for voucher terms and conditions -->
+    <string name="voucher_terms_conditions">Terms &amp; Conditions</string>
+    <!-- Button to redeem voucher offer -->
+    <string name="voucher_redeem_now">Redeem Offer Now</string>
+    <!-- Status text when offer has been redeemed -->
+    <string name="voucher_offer_redeemed">Offer Redeemed</string>
+
+    <!-- Destination Selection Screen -->
+    <!-- Subtitle on destination selection screen -->
+    <string name="dsel_search_subtitle">Search stores, food, fashion &amp; more</string>
+    <!-- Section header for browsing categories -->
+    <string name="dsel_browse_categories">Browse Categories</string>
+    <!-- Section header for popular destinations -->
+    <string name="dsel_popular_destinations">Popular Destinations</string>
+    <!-- Label to collapse expanded popular destinations list -->
+    <string name="dsel_show_less">Show less</string>
+    <!-- Empty state message when no destinations are available -->
+    <string name="dsel_no_destinations">No destinations available yet</string>
+    <!-- Section header for recently visited destinations -->
+    <string name="dsel_recently_visited">Recently Visited</string>
+    <!-- Empty state message when no recent places exist -->
+    <string name="dsel_places_appear_here">Places you visit will appear here</string>
+    <!-- Action label on destination search card -->
+    <string name="dsel_search_action">SEARCH</string>
+
+    <!-- Destination Search Screen -->
+    <!-- Section header for search results list -->
+    <string name="dsearch_title">SEARCH RESULTS</string>
+    <!-- Title for empty search discovery state -->
+    <string name="dsearch_ready_to_discover">Ready to discover?</string>
+    <!-- Subtitle for empty search discovery state -->
+    <string name="dsearch_start_typing">Start typing to find stores, brands, or places in seconds.</string>
+
+    <!-- Destination Category Screen -->
+    <!-- Number of stores in a category -->
+    <plurals name="dcat_store_count">
+        <item quantity="one"><xliff:g id="count" example="1">%1$s</xliff:g> Store</item>
+        <item quantity="other"><xliff:g id="count" example="15">%1$s</xliff:g> Stores</item>
+    </plurals>
+    <!-- Placeholder for search within a specific category -->
+    <string name="dcat_search_in_category">Search in <xliff:g id="category" example="Fashion">%1$s</xliff:g></string>
+    <!-- Header for search results within a category -->
+    <string name="dcat_results_in_category">RESULTS IN <xliff:g id="category" example="FASHION">%1$s</xliff:g></string>
+    <!-- Header for all stores within a category -->
+    <string name="dcat_all_in_category">ALL IN <xliff:g id="category" example="FASHION">%1$s</xliff:g></string>
+
 </resources>

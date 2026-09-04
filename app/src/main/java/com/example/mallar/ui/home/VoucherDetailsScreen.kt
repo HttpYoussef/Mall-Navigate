@@ -29,10 +29,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mallar.R
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.Place
 import com.example.mallar.data.PlaceRepository
@@ -92,7 +94,7 @@ fun VoucherDetailsScreen(
 
     if (voucher == null) {
         Box(modifier = Modifier.fillMaxSize().background(currentBg), contentAlignment = Alignment.Center) {
-            Text("Voucher not found", color = currentTextSub, fontSize = 14.sp)
+            Text(stringResource(R.string.voucher_not_found), color = currentTextSub, fontSize = 14.sp)
         }
         return
     }
@@ -118,7 +120,7 @@ fun VoucherDetailsScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(R.string.back),
                                 tint = currentTextMain,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -230,7 +232,7 @@ fun VoucherDetailsScreen(
                             Icon(Icons.Default.CheckCircle, null, tint = SuccessGreen, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                text = "Your voucher has been redeemed successfully. Show this QR code at checkout.",
+                                text = stringResource(R.string.voucher_redeemed_success_desc),
                                 color = SuccessGreen,
                                 fontSize = 13.sp,
                                 lineHeight = 18.sp,
@@ -248,7 +250,7 @@ fun VoucherDetailsScreen(
                     enter = fadeIn(tween(280, delayMillis = 160)) + slideInVertically(tween(280, delayMillis = 160)) { it / 10 }
                 ) {
                     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
-                        Text("Terms & Conditions", color = currentTextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.voucher_terms_conditions), color = currentTextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         Spacer(Modifier.height(8.dp))
                         Text(text = voucher.terms, color = currentTextSub, fontSize = 12.sp, lineHeight = 18.sp)
                     }
@@ -310,7 +312,7 @@ fun VoucherDetailsScreen(
                                 RedemptionState.IDLE -> {
                                     Icon(Icons.Default.Redeem, null, modifier = Modifier.size(20.dp))
                                     Spacer(Modifier.width(10.dp))
-                                    Text("Redeem Offer Now", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.voucher_redeem_now), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 }
                                 RedemptionState.REDEEMING -> {
                                     CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.5.dp)
@@ -318,12 +320,12 @@ fun VoucherDetailsScreen(
                                 RedemptionState.SUCCESS -> {
                                     Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(22.dp))
                                     Spacer(Modifier.width(10.dp))
-                                    Text("Offer Redeemed", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.voucher_offer_redeemed), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 }
                                 RedemptionState.READY -> {
                                     Icon(Icons.Default.Navigation, null, modifier = Modifier.size(20.dp))
                                     Spacer(Modifier.width(10.dp))
-                                    Text("Start Navigation", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.home_start_navigation_btn), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }

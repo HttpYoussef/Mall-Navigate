@@ -367,4 +367,162 @@
     <!-- Pin label drawn at current user location on parking canvas -->
     <string name="park_map_you_are_here">أنت هنا</string>
 
+    <!-- ================================================================= -->
+    <!-- Ticket 08: Home, Shared, Offers, Voucher, Store Detail, Destination -->
+    <!-- ================================================================= -->
+
+    <!-- Home Screen -->
+    <!-- Greeting on home screen with user name -->
+    <string name="home_greeting">أهلاً يا <xliff:g id="user_name" example="سارة">%1$s</xliff:g> 👋</string>
+    <!-- Default user name fallback when not logged in -->
+    <string name="home_default_user_name">زائر</string>
+    <!-- Subtitle on home screen header when no mall is selected -->
+    <string name="home_discover_brands">اكتشف ماركاتك المفضلة</string>
+    <!-- Subtitle on home screen header combining mall name and brand tagline -->
+    <string name="home_mall_brands"><xliff:g id="mall_name" example="سيتي ستارز">%1$s</xliff:g> · اكتشف ماركاتك المفضلة</string>
+    <!-- Accessibility description for notifications icon -->
+    <string name="home_notifications_cd">الإشعارات</string>
+    <!-- Hero card title for starting navigation -->
+    <string name="home_start_navigation">ابدأ الملاحة</string>
+    <!-- Hero card subtitle for starting navigation -->
+    <string name="home_start_nav_subtitle">احصل على اتجاهات المشي لأي متجر أو مكان</string>
+    <!-- Primary action button to begin navigation -->
+    <string name="home_start_navigation_btn">بدء الملاحة</string>
+    <!-- Section header for offers and vouchers carousel -->
+    <string name="home_offers_vouchers">العروض والقسائم</string>
+    <!-- Section header for user\'s favorite stores list -->
+    <string name="home_your_favorites">مفضلاتك</string>
+    <!-- Empty state message when no favorite stores have been saved -->
+    <string name="home_favorites_empty">اضغط على القلب في أي متجر لحفظه هنا.</string>
+    <!-- Overline tag on parking hero card -->
+    <string name="home_park_smart">ركن ذكي</string>
+    <!-- Title on parking hero card -->
+    <string name="home_find_parking_title">لاقي ركنة\nفي ثواني.</string>
+    <!-- Subtitle on parking hero card showing saved spot code -->
+    <string name="home_park_spot_saved">المكان المحفوظ: <xliff:g id="spot" example="A-12">%1$s</xliff:g></string>
+    <!-- Subtitle on parking hero card when no spot is saved -->
+    <string name="home_park_subtitle">معلومات وإرشادات الركن في الوقت الفعلي.</string>
+    <!-- Button label on parking hero card when spot is saved -->
+    <string name="home_find_my_car">لاقي عربيتي</string>
+    <!-- Button label on parking hero card when no spot is saved -->
+    <string name="home_find_parking">البحث عن موقف</string>
+    <!-- Header label for parking spaces counter -->
+    <string name="home_park_spaces">أماكن</string>
+    <!-- Subtitle label for parking spaces counter -->
+    <string name="home_park_available">متاح</string>
+    <!-- Sample promo discount title for Starbucks offer -->
+    <string name="home_offer_free_upsize">ترقية مجانية للحجم</string>
+    <!-- Sample promo subtitle for Starbucks offer -->
+    <string name="home_offer_on_any_beverage">على أي مشروب</string>
+    <!-- Sample promo discount title for Zara offer -->
+    <string name="home_offer_15_off">خصم 15%</string>
+    <!-- Sample promo subtitle for Zara offer -->
+    <string name="home_offer_on_selected_items">على منتجات مختارة</string>
+    <!-- Sample promo discount title for Mango offer -->
+    <string name="home_offer_20_off">خصم 20%</string>
+    <!-- Sample promo subtitle for Mango offer -->
+    <string name="home_offer_on_all_items">على جميع المنتجات</string>
+    <!-- Label for Ask AI tab in bottom navigation -->
+    <string name="bottom_nav_ask_ai">اسأل الذكاء الاصطناعي</string>
+
+    <!-- Shared Store & Search Components -->
+    <!-- Placeholder text for glowing search bar -->
+    <string name="home_search_placeholder">ابحث عن متاجر، أماكن…</string>
+    <!-- Generic fallback label when category is unknown -->
+    <string name="store_fallback">متجر</string>
+    <!-- Template combining store category and floor -->
+    <string name="store_category_floor"><xliff:g id="category" example="أزياء">%1$s</xliff:g> · <xliff:g id="floor" example="الطابق 1">%2$s</xliff:g></string>
+    <!-- Template combining floor and distance -->
+    <string name="store_floor_distance"><xliff:g id="floor" example="الطابق 1">%1$s</xliff:g>  •  <xliff:g id="distance" example="120م">%2$s</xliff:g></string>
+    <!-- Distance formatted in meters with Western digits -->
+    <string name="distance_meters"><xliff:g id="meters" example="120">%1$s</xliff:g>م</string>
+    <!-- Empty state title when store search finds no results -->
+    <string name="home_no_results_found">لم يتم العثور على نتائج</string>
+    <!-- Empty state suggestion when store search finds no results -->
+    <string name="home_try_different_keyword">جرب كلمة بحث أخرى</string>
+    <!-- Instructions in navigation confirmation sheet -->
+    <string name="home_confirm_scan_desc">عشان نجيبلك اتجاهات دقيقة، هنمسح علامة متجر قريب لتحديد مكانك بالظبط.</string>
+    <!-- Filter chip label representing all categories -->
+    <string name="category_all">الكل</string>
+
+    <!-- Offers & Vouchers Screen -->
+    <!-- Header title for offers and vouchers screen -->
+    <string name="offers_title">العروض والقسائم</string>
+    <!-- Header subtitle for offers and vouchers screen -->
+    <string name="offers_subtitle">وفّر أكتر في متاجرك المفضلة</string>
+    <!-- Search field hint on offers screen -->
+    <string name="offers_search_hint">ابحث عن عروض أو متاجر</string>
+    <!-- Action button to view and redeem voucher -->
+    <string name="offers_get_voucher">احصل على القسيمة</string>
+    <!-- Empty state title on offers screen -->
+    <string name="offers_no_offers_found">لم يتم العثور على عروض</string>
+    <!-- Empty state subtitle on offers screen -->
+    <string name="offers_try_different_search">جرب بحث أو قسم آخر</string>
+
+    <!-- Store Detail Screen -->
+    <!-- Walking duration in minutes -->
+    <plurals name="duration_minutes">
+        <item quantity="zero"><xliff:g id="count" example="0">%1$s</xliff:g> دقيقة</item>
+        <item quantity="one">دقيقة واحدة</item>
+        <item quantity="two">دقيقتان</item>
+        <item quantity="few"><xliff:g id="count" example="3">%1$s</xliff:g> دقائق</item>
+        <item quantity="many"><xliff:g id="count" example="15">%1$s</xliff:g> دقيقة</item>
+        <item quantity="other"><xliff:g id="count" example="100">%1$s</xliff:g> دقيقة</item>
+    </plurals>
+
+    <!-- Voucher Details Screen -->
+    <!-- Error message when voucher is not found -->
+    <string name="voucher_not_found">لم يتم العثور على القسيمة</string>
+    <!-- Success description after voucher is redeemed -->
+    <string name="voucher_redeemed_success_desc">تم تفعيل قسيمتك بنجاح. أظهر رمز QR هذا عند الدفع.</string>
+    <!-- Section header for voucher terms and conditions -->
+    <string name="voucher_terms_conditions">الشروط والأحكام</string>
+    <!-- Button to redeem voucher offer -->
+    <string name="voucher_redeem_now">فعّل العرض الآن</string>
+    <!-- Status text when offer has been redeemed -->
+    <string name="voucher_offer_redeemed">تم تفعيل العرض</string>
+
+    <!-- Destination Selection Screen -->
+    <!-- Subtitle on destination selection screen -->
+    <string name="dsel_search_subtitle">ابحث عن المتاجر والمطاعم والأزياء والمزيد</string>
+    <!-- Section header for browsing categories -->
+    <string name="dsel_browse_categories">تصفح الأقسام</string>
+    <!-- Section header for popular destinations -->
+    <string name="dsel_popular_destinations">الوجهات الشائعة</string>
+    <!-- Label to collapse expanded popular destinations list -->
+    <string name="dsel_show_less">عرض أقل</string>
+    <!-- Empty state message when no destinations are available -->
+    <string name="dsel_no_destinations">لا توجد وجهات متاحة بعد</string>
+    <!-- Section header for recently visited destinations -->
+    <string name="dsel_recently_visited">تمت زيارتها مؤخراً</string>
+    <!-- Empty state message when no recent places exist -->
+    <string name="dsel_places_appear_here">الأماكن التي تزورها ستظهر هنا</string>
+    <!-- Action label on destination search card -->
+    <string name="dsel_search_action">بحث</string>
+
+    <!-- Destination Search Screen -->
+    <!-- Section header for search results list -->
+    <string name="dsearch_title">نتائج البحث</string>
+    <!-- Title for empty search discovery state -->
+    <string name="dsearch_ready_to_discover">جاهز للاستكشاف؟</string>
+    <!-- Subtitle for empty search discovery state -->
+    <string name="dsearch_start_typing">ابدأ بالكتابة للبحث عن المتاجر والماركات والأماكن في ثوانٍ.</string>
+
+    <!-- Destination Category Screen -->
+    <!-- Number of stores in a category -->
+    <plurals name="dcat_store_count">
+        <item quantity="zero"><xliff:g id="count" example="0">%1$s</xliff:g> متجر</item>
+        <item quantity="one">متجر واحد</item>
+        <item quantity="two">متجران</item>
+        <item quantity="few"><xliff:g id="count" example="3">%1$s</xliff:g> متاجر</item>
+        <item quantity="many"><xliff:g id="count" example="15">%1$s</xliff:g> متجراً</item>
+        <item quantity="other"><xliff:g id="count" example="100">%1$s</xliff:g> متجر</item>
+    </plurals>
+    <!-- Placeholder for search within a specific category -->
+    <string name="dcat_search_in_category">البحث في <xliff:g id="category" example="أزياء">%1$s</xliff:g></string>
+    <!-- Header for search results within a category -->
+    <string name="dcat_results_in_category">النتائج في <xliff:g id="category" example="الأزياء">%1$s</xliff:g></string>
+    <!-- Header for all stores within a category -->
+    <string name="dcat_all_in_category">الكل في <xliff:g id="category" example="الأزياء">%1$s</xliff:g></string>
+
 </resources>

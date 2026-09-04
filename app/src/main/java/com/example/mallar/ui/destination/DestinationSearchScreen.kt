@@ -18,10 +18,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mallar.R
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.Place
 import com.example.mallar.ui.home.*
@@ -72,7 +74,7 @@ fun DestinationSearchScreen(
                             .clickable { onBackClick() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = currentTextMain, modifier = Modifier.size(20.dp))
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = currentTextMain, modifier = Modifier.size(20.dp))
                     }
                     Spacer(Modifier.width(16.dp))
                     
@@ -99,7 +101,7 @@ fun DestinationSearchScreen(
                 if (uiState.searchQuery.isNotBlank()) {
                     item(key = "search_title") {
                         Text(
-                            text = "SEARCH RESULTS",
+                            text = stringResource(R.string.dsearch_title),
                             color = currentTextMain,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 13.sp,
@@ -125,8 +127,8 @@ fun DestinationSearchScreen(
                 } else {
                     item {
                         SearchEmptyState(
-                            title = "Ready to discover?",
-                            subtitle = "Start typing to find stores, brands, or places in seconds.",
+                            title = stringResource(R.string.dsearch_ready_to_discover),
+                            subtitle = stringResource(R.string.dsearch_start_typing),
                             currentTextSub = currentTextSub
                         )
                     }

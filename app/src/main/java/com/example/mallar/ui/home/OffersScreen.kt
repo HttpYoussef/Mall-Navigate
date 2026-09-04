@@ -22,6 +22,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,11 +39,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.statusBarsPadding
+import com.example.mallar.R
 import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.Voucher
 import com.example.mallar.data.VoucherRepository
@@ -126,8 +130,8 @@ fun OffersScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
                             tint = currentTextMain,
                             modifier = Modifier.size(20.dp)
                         )
@@ -136,7 +140,7 @@ fun OffersScreen(
                     Spacer(Modifier.height(20.dp))
 
                     Text(
-                        text = "Offers & Vouchers",
+                        text = stringResource(R.string.offers_title),
                         color = currentTextMain,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
@@ -144,7 +148,7 @@ fun OffersScreen(
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        text = "Save more on your favorite stores",
+                        text = stringResource(R.string.offers_subtitle),
                         color = currentTextSub,
                         fontSize = 14.sp
                     )
@@ -195,7 +199,7 @@ fun OffersScreen(
                         decorationBox = { inner ->
                             if (searchQuery.isEmpty()) {
                                 Text(
-                                    text = "Search offers or stores",
+                                    text = stringResource(R.string.offers_search_hint),
                                     color = currentTextSub,
                                     fontSize = 14.sp,
                                     maxLines = 1,
@@ -209,7 +213,7 @@ fun OffersScreen(
                         IconButton(onClick = { searchQuery = "" }, modifier = Modifier.size(26.dp)) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Clear",
+                                contentDescription = stringResource(R.string.clear),
                                 tint = currentTextSub,
                                 modifier = Modifier.size(15.dp)
                             )
@@ -230,8 +234,9 @@ fun OffersScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(VoucherRepository.categories) { cat ->
+                        val chipLabel = if (cat == "All") stringResource(R.string.category_all) else (categoryDisplayLabel(cat) ?: cat)
                         OfferFilterChip(
-                            label = categoryDisplayLabel(cat) ?: cat,
+                            label = chipLabel,
                             selected = selectedCategory == cat,
                             isDarkMode = isDarkMode,
                             currentAccent = currentAccent,
@@ -427,14 +432,14 @@ private fun VoucherCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Get Voucher",
+                text = stringResource(R.string.offers_get_voucher),
                 color = if (isDarkMode) DeepNavyBg else Color.White,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.width(6.dp))
             Icon(
-                imageVector = Icons.Default.ArrowForward,
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
                 tint = if (isDarkMode) DeepNavyBg else Color.White,
                 modifier = Modifier.size(15.dp)
@@ -466,9 +471,9 @@ private fun OffersEmptyState(
                 )
             }
             Spacer(Modifier.height(16.dp))
-            Text("No offers found", color = currentTextMain, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.offers_no_offers_found), color = currentTextMain, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(6.dp))
-            Text("Try a different search or category", color = currentTextSub, fontSize = 13.sp)
+            Text(stringResource(R.string.offers_try_different_search), color = currentTextSub, fontSize = 13.sp)
         }
     }
 }

@@ -55,6 +55,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import com.example.mallar.R
 import com.example.mallar.data.StoreCategory
 import com.example.mallar.data.categoryDisplayRes
 import com.example.mallar.data.floorDisplayLabel
@@ -232,13 +233,13 @@ fun DestinationSelectionScreen(
                     ) {
                         DselIconButton(
                             icon = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tokens = tokens,
                             onClick = onBackClick
                         )
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            text = "Where would you like to go?",
+                            text = stringResource(R.string.where_would_you_go),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             color = tokens.textMain,
@@ -249,7 +250,7 @@ fun DestinationSelectionScreen(
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            text = "Search stores, food, fashion & more",
+                            text = stringResource(R.string.dsel_search_subtitle),
                             color = tokens.textSub,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
@@ -267,7 +268,7 @@ fun DestinationSelectionScreen(
                 ) {
                     Column(modifier = Modifier.padding(top = 20.dp)) {
                         SectionOverline(
-                            title = "Browse Categories",
+                            title = stringResource(R.string.dsel_browse_categories),
                             tokens = tokens
                         )
                         Spacer(Modifier.height(16.dp))
@@ -373,10 +374,10 @@ fun DestinationSelectionScreen(
                     ) {
                         Column {
                             SectionOverline(
-                                title = "Popular Destinations",
+                                title = stringResource(R.string.dsel_popular_destinations),
                                 tokens = tokens,
                                 onSeeAll = { showAllPopular = !showAllPopular },
-                                seeAllLabel = if (showAllPopular) "Show less" else "See all",
+                                seeAllLabel = if (showAllPopular) stringResource(R.string.dsel_show_less) else stringResource(R.string.see_all),
                                 chevronRotated = showAllPopular
                             )
                             Spacer(Modifier.height(16.dp))
@@ -392,7 +393,7 @@ fun DestinationSelectionScreen(
                                 slideInVertically(tween(240, delayMillis = 320)) { it / 10 }
                         ) {
                             if (popularPlaces.isEmpty()) {
-                                DselEmptyHint(text = "No destinations available yet", tokens = tokens)
+                                DselEmptyHint(text = stringResource(R.string.dsel_no_destinations), tokens = tokens)
                             } else {
                                 LazyRow(
                                     contentPadding = PaddingValues(horizontal = DselGutter),
@@ -411,7 +412,7 @@ fun DestinationSelectionScreen(
                     }
                 } else if (uiState.allPlaces.isEmpty()) {
                     item(key = "popular_all_empty") {
-                        DselEmptyHint(text = "No destinations available yet", tokens = tokens)
+                        DselEmptyHint(text = stringResource(R.string.dsel_no_destinations), tokens = tokens)
                     }
                 } else {
                     items(
@@ -435,7 +436,7 @@ fun DestinationSelectionScreen(
                     ) {
                         Column(modifier = Modifier.padding(top = DselSectionGap)) {
                             SectionOverline(
-                                title = "Recently Visited",
+                                title = stringResource(R.string.dsel_recently_visited),
                                 tokens = tokens
                             )
                             Spacer(Modifier.height(6.dp))
@@ -445,7 +446,7 @@ fun DestinationSelectionScreen(
 
                 if (recentPlaces.isEmpty()) {
                     item(key = "recent_empty") {
-                        DselEmptyHint(text = "Places you visit will appear here", tokens = tokens)
+                        DselEmptyHint(text = stringResource(R.string.dsel_places_appear_here), tokens = tokens)
                     }
                 } else {
                     itemsIndexed(recentPlaces, key = { _, place -> "recent_${place.id}" }) { _, place ->
@@ -600,7 +601,7 @@ private fun DselSearchPill(
 
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
                 Text(
-                    text = "SEARCH",
+                    text = stringResource(R.string.dsel_search_action),
                     color = tokens.aqua,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
@@ -608,7 +609,7 @@ private fun DselSearchPill(
                 )
                 Spacer(Modifier.height(3.dp))
                 Text(
-                    text = "Where would you like to go?",
+                    text = stringResource(R.string.where_would_you_go),
                     color = tokens.textMain,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -645,7 +646,7 @@ private fun SectionOverline(
     title: String,
     tokens: DselTokens,
     onSeeAll: (() -> Unit)? = null,
-    seeAllLabel: String = "See all",
+    seeAllLabel: String = stringResource(R.string.see_all),
     chevronRotated: Boolean = false
 ) {
     val chevronRotation by animateFloatAsState(
@@ -815,10 +816,10 @@ private fun DselPopularCard(
         )
         Spacer(Modifier.height(3.dp))
         val categoryRes = categoryDisplayRes(place.category)
-        val categoryLabel = if (categoryRes != null) stringResource(categoryRes) else (place.category ?: "Store")
+        val categoryLabel = if (categoryRes != null) stringResource(categoryRes) else (place.category ?: stringResource(R.string.store_fallback))
         val floor = floorDisplayLabel(place.floor)
         Text(
-            text = "$categoryLabel · $floor",
+            text = stringResource(R.string.store_category_floor, categoryLabel, floor),
             color = tokens.textSub,
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium,
@@ -886,10 +887,10 @@ private fun DselStoreRow(
             )
             Spacer(Modifier.height(2.dp))
             val categoryRes = categoryDisplayRes(place.category)
-            val categoryLabel = if (categoryRes != null) stringResource(categoryRes) else (place.category ?: "Store")
+            val categoryLabel = if (categoryRes != null) stringResource(categoryRes) else (place.category ?: stringResource(R.string.store_fallback))
             val floor = floorDisplayLabel(place.floor)
             Text(
-                text = "$categoryLabel · $floor",
+                text = stringResource(R.string.store_category_floor, categoryLabel, floor),
                 color = tokens.textSub,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
