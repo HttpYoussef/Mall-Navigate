@@ -6,7 +6,6 @@ import androidx.compose.ui.graphics.Color
 import com.example.mallar.ar.model.RouteNodeMetadata
 import com.example.mallar.ar.render.FloorPlaneConfidenceMonitor
 import com.example.mallar.ar.render.GuidanceVisualFactory
-import com.example.mallar.ar.render.RenderPoseSmoother
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.Pose
@@ -36,7 +35,6 @@ class ArAnchorRenderer(
     private val context: Context,
     private val config: AnchorWindowConfig = AnchorWindowConfig.forTier(DeviceTier.detect(context)),
     private val planner: AnchorWindowPlanner = AnchorWindowPlanner(config),
-    val poseSmoother: RenderPoseSmoother = RenderPoseSmoother(minCutoffHz = if (config.smoothingAlpha > 0.2f) 1.5 else 1.0),
     val planeConfidenceMonitor: FloorPlaneConfidenceMonitor = FloorPlaneConfidenceMonitor(),
     val visualFactory: GuidanceVisualFactory = GuidanceVisualFactory(context)
 ) {
@@ -323,7 +321,6 @@ class ArAnchorRenderer(
         arrivalAnchorNode = null
         anchors.clear()
         visualFactory.dispose()
-        poseSmoother.reset()
         planeConfidenceMonitor.reset()
         lastPlanGeneration = Long.MIN_VALUE
         lastTransformAcceptedAt = Long.MIN_VALUE
@@ -338,7 +335,6 @@ class ArAnchorRenderer(
         anchors.values.forEach { managed -> managed.anchorNode.destroy() }
         anchors.clear()
         visualFactory.dispose()
-        poseSmoother.reset()
         planeConfidenceMonitor.reset()
         lastPlanGeneration = Long.MIN_VALUE
         lastTransformAcceptedAt = Long.MIN_VALUE
