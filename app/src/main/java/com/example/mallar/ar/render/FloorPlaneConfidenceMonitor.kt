@@ -17,8 +17,13 @@ import com.google.ar.core.TrackingState
  */
 class FloorPlaneConfidenceMonitor(
     private val minConfidenceAreaM2: Float = 0.50f,
-    private val elevationDampingAlpha: Float = 0.05f
+    private val elevationDampingAlpha: Float = 0.05f,
+    private val maxFallbackDistanceMeters: Float = DEFAULT_MAX_FALLBACK_DISTANCE_METERS
 ) {
+    companion object {
+        const val DEFAULT_MAX_FALLBACK_DISTANCE_METERS = 5.0f
+    }
+
     private var rollingFloorElevation: Float? = null
     private var lastConfidenceScore: Float = 0f
 
@@ -44,12 +49,17 @@ class FloorPlaneConfidenceMonitor(
             it.type == Plane.Type.HORIZONTAL_UPWARD_FACING && it.trackingState == TrackingState.TRACKING
         }
 
+        val maxDistanceSq = maxFallbackDistanceMeters * maxFallbackDistanceMeters
         val matchingPlane = horizontalPlanes.firstOrNull { plane ->
             plane.isPoseInPolygon(Pose.makeTranslation(worldX, plane.centerPose.ty(), worldZ))
         } ?: horizontalPlanes.minByOrNull { plane ->
             val dx = plane.centerPose.tx() - worldX
             val dz = plane.centerPose.tz() - worldZ
             dx * dx + dz * dz
+        }?.takeIf { plane ->
+            val dx = plane.centerPose.tx() - worldX
+            val dz = plane.centerPose.tz() - worldZ
+            (dx * dx + dz * dz) <= maxDistanceSq
         }
 
         if (matchingPlane != null) {
@@ -60,9 +70,10 @@ class FloorPlaneConfidenceMonitor(
             
             // Update rolling floor elevation with exponential damping
             val currentRolling = rollingFloorElevation ?: planeY
-            rollingFloorElevation = currentRolling * (1f - elevationDampingAlpha) + planeY * elevationDampingAlpha
+            val dampedElevation = currentRolling * (1f - elevationDampingAlpha) + planeY * elevationDampingAlpha
+            rollingFloorElevation = dampedElevation
             
-            return planeY to matchingPlane
+            return dampedElevation to matchingPlane
         } else {
             lastConfidenceScore = 0.0f
             val fallbackY = rollingFloorElevation ?: fallbackElevation
