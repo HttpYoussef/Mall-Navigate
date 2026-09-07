@@ -123,14 +123,26 @@ class ArAnchorRenderer(
         transformRevision: Long,
         route: List<RouteNodeMetadata>
     ) {
+        val transformCorrectionTriggered = transformRevision != lastTransformAcceptedAt && lastTransformAcceptedAt != Long.MIN_VALUE
         // If in transition mode or arrived, pause regular route chevron reconciliation
         if (!isTransitionMode && !isArrived) {
             val facilityPosition = transform.facilityPosition(localPose, config.pixelsPerMeter)
             val plan = planner.plan(route, facilityPosition.first, facilityPosition.second)
             if (plan.generation != lastPlanGeneration) {
+                val routeIndexRange = if (plan.active.isNotEmpty()) {
+                    "${plan.active.first().routeIndex}..${plan.active.last().routeIndex}"
+                } else {
+                    "empty"
+                }
                 Log.d(TAG, "Anchor plan updated: gen=${plan.generation}, routeSize=${route.size}, " +
-                    "plannedActive=${plan.active.size}, currentAnchors=${anchors.size}, " +
-                    "userFacilityPos=(${facilityPosition.first}, ${facilityPosition.second})")
+                    "cameraPose=(${cameraPose.tx()}, ${cameraPose.ty()}, ${cameraPose.tz()}), " +
+                    "facilityPosition=(${facilityPosition.first}, ${facilityPosition.second}), " +
+                    "transformRevision=$transformRevision, " +
+                    "transformCorrectionTriggered=$transformCorrectionTriggered, " +
+                    "routeIndexRange=$routeIndexRange, " +
+                    "activeAnchorNodeIds=${anchors.keys}, " +
+                    "windowNodeIds=${plan.nodeIds}, " +
+                    "plannedActive=${plan.active.size}, currentAnchors=${anchors.size}")
                 reconcile(sceneView, session, frame, cameraPose, localPose, transform, transformRevision, plan, route)
                 lastPlanGeneration = plan.generation
             }

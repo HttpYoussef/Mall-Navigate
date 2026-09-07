@@ -1,5 +1,6 @@
 package com.example.mallar.ar.render
 
+import android.util.Log
 import com.google.ar.core.Plane
 import com.google.ar.core.Pose
 import com.google.ar.core.Session
@@ -21,11 +22,15 @@ class FloorPlaneConfidenceMonitor(
     private val maxFallbackDistanceMeters: Float = DEFAULT_MAX_FALLBACK_DISTANCE_METERS
 ) {
     companion object {
+        private const val TAG = "FloorPlaneConfidenceMonitor"
         const val DEFAULT_MAX_FALLBACK_DISTANCE_METERS = 5.0f
     }
 
     private var rollingFloorElevation: Float? = null
     private var lastConfidenceScore: Float = 0f
+    private var lastPlaneSelection: String? = null
+    private var lastSelectedPlane: Plane? = null
+    private var lastLoggedConfidenceScore: Float? = null
 
     val confidenceScore: Float get() = lastConfidenceScore
 
@@ -50,18 +55,29 @@ class FloorPlaneConfidenceMonitor(
         }
 
         val maxDistanceSq = maxFallbackDistanceMeters * maxFallbackDistanceMeters
-        val matchingPlane = horizontalPlanes.firstOrNull { plane ->
+        val containedPlane = horizontalPlanes.firstOrNull { plane ->
             plane.isPoseInPolygon(Pose.makeTranslation(worldX, plane.centerPose.ty(), worldZ))
-        } ?: horizontalPlanes.minByOrNull { plane ->
-            val dx = plane.centerPose.tx() - worldX
-            val dz = plane.centerPose.tz() - worldZ
-            dx * dx + dz * dz
-        }?.takeIf { plane ->
-            val dx = plane.centerPose.tx() - worldX
-            val dz = plane.centerPose.tz() - worldZ
-            (dx * dx + dz * dz) <= maxDistanceSq
+        }
+        val (matchingPlane, planeSelection) = if (containedPlane != null) {
+            containedPlane to "contained"
+        } else {
+            val nearestPlane = horizontalPlanes.minByOrNull { plane ->
+                val dx = plane.centerPose.tx() - worldX
+                val dz = plane.centerPose.tz() - worldZ
+                dx * dx + dz * dz
+            }?.takeIf { plane ->
+                val dx = plane.centerPose.tx() - worldX
+                val dz = plane.centerPose.tz() - worldZ
+                (dx * dx + dz * dz) <= maxDistanceSq
+            }
+            if (nearestPlane != null) {
+                nearestPlane to "nearest-fallback"
+            } else {
+                null to "none"
+            }
         }
 
+        val resultElevation: Float
         if (matchingPlane != null) {
             val planeY = matchingPlane.centerPose.ty()
             val planeArea = computeEstimatedPolygonArea(matchingPlane)
@@ -73,12 +89,28 @@ class FloorPlaneConfidenceMonitor(
             val dampedElevation = currentRolling * (1f - elevationDampingAlpha) + planeY * elevationDampingAlpha
             rollingFloorElevation = dampedElevation
             
-            return dampedElevation to matchingPlane
+            resultElevation = dampedElevation
         } else {
             lastConfidenceScore = 0.0f
             val fallbackY = rollingFloorElevation ?: fallbackElevation
-            return fallbackY to null
+            resultElevation = fallbackY
         }
+
+        if (planeSelection != lastPlaneSelection || matchingPlane != lastSelectedPlane || lastConfidenceScore != lastLoggedConfidenceScore) {
+            lastPlaneSelection = planeSelection
+            lastSelectedPlane = matchingPlane
+            lastLoggedConfidenceScore = lastConfidenceScore
+            try {
+                Log.d(
+                    TAG,
+                    "Floor plane resolved: selection=$planeSelection, confidenceScore=$lastConfidenceScore"
+                )
+            } catch (_: Throwable) {
+                // Defensive catch for unit tests where android.util.Log is not mocked
+            }
+        }
+
+        return resultElevation to matchingPlane
     }
 
     private fun computeEstimatedPolygonArea(plane: Plane): Float {
@@ -101,5 +133,8 @@ class FloorPlaneConfidenceMonitor(
     fun reset() {
         rollingFloorElevation = null
         lastConfidenceScore = 0f
+        lastPlaneSelection = null
+        lastSelectedPlane = null
+        lastLoggedConfidenceScore = null
     }
 }
