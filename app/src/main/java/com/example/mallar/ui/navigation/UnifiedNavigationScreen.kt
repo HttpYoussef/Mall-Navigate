@@ -177,6 +177,7 @@ fun UnifiedNavigationScreen(
             routePathLayer = viewModel.routePathLayer,
             initialStartNode = viewModel.initialLocalizationStartNode,
             initialHeadingDeg = viewModel.initialLocalizationHeading,
+            initialLandmarkCount = viewModel.initialLocalizationLandmarkCount,
             active = isCameraMode,
             supervisor = viewModel.driftRecoverySupervisor,
             driftState = viewModel.sessionManager.driftState

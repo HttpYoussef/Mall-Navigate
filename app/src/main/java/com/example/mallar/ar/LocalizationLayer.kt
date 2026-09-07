@@ -142,10 +142,16 @@ class FixValidationGate(
             return reject(FixRejectionReason.TIER_TOLERANCE_EXCEEDED, candidate)
         }
 
+        val reconciledHeadingDeg = if (candidate.headingDeg != null) {
+            candidate.headingDeg - localPose.headingDeg
+        } else {
+            previous?.headingDeg ?: localPose.headingDeg
+        }
+
         val transform = FacilityTransform(
             facilityX = x,
             facilityY = y,
-            headingDeg = candidate.headingDeg ?: previous?.headingDeg ?: localPose.headingDeg,
+            headingDeg = reconciledHeadingDeg,
             localOrigin = localPose,
             tier = candidate.tier,
             acceptedAtMs = nowMs
@@ -239,15 +245,21 @@ class LocalizationLayer(
         startNode: GraphNode,
         initialHeadingDeg: Float?,
         localPose: LocalTrackingPose,
-        nowMs: Long = localPose.timestampMs
+        nowMs: Long = localPose.timestampMs,
+        landmarkCount: Int = 0
     ) {
+        val reconciledHeadingDeg = if (initialHeadingDeg != null) {
+            initialHeadingDeg - localPose.headingDeg
+        } else {
+            localPose.headingDeg
+        }
         gate.seed(
             FacilityTransform(
                 facilityX = startNode.x,
                 facilityY = startNode.y,
-                headingDeg = initialHeadingDeg ?: localPose.headingDeg,
+                headingDeg = reconciledHeadingDeg,
                 localOrigin = localPose,
-                tier = FixConfidenceTier.CONFIRMED,
+                tier = FixConfidenceTier.fromLandmarkCount(landmarkCount),
                 acceptedAtMs = nowMs
             )
         )

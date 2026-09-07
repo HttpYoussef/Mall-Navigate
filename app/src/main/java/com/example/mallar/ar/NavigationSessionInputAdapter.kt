@@ -43,6 +43,7 @@ object NavigationSessionInputAdapter {
             pathNodeIds = path.nodeIds.toList(),
             instructions = path.steps.toList(),
             initialHeadingDeg = NavigationState.estimatedHeadingDeg,
+            initialLandmarkCount = NavigationState.estimatedLandmarkCount,
             startWithAr = NavigationState.startWithAr
         ).also {
             Log.d(TAG, "Module 9: Snapshot captures destination '${it.destinationName}' with ${it.pathNodeIds.size} nodes, startNodeId=${it.startNodeId}.")

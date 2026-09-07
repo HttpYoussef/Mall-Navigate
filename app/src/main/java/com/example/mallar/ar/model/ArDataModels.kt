@@ -21,6 +21,7 @@ data class NavigationSessionSnapshot @JvmOverloads constructor(
     val pathNodeIds: List<Int>,
     val instructions: List<NavInstruction>,
     val initialHeadingDeg: Float? = null,
+    val initialLandmarkCount: Int = 0,
     val startWithAr: Boolean = false
 )
 

@@ -90,6 +90,7 @@ object NavigationState {
     var aStarPath: AStarPath?        = null
     var startWithAr: Boolean         = false
     var estimatedHeadingDeg: Float?  = null
+    var estimatedLandmarkCount: Int  = 0
     fun reset() {
         startPlace            = null
         selectedPlace         = null
@@ -98,6 +99,7 @@ object NavigationState {
         aStarPath             = null
         startWithAr           = false
         estimatedHeadingDeg   = null
+        estimatedLandmarkCount = 0
         currentFloor          = 2 }
 
     /** Voice + live guidance pick Arabic vs English TTS (set from STT when user speaks). */
@@ -436,6 +438,7 @@ fun LogoScanScreen(
                     startPlace = chosenPlace
                     NavigationState.startPlace = chosenPlace
                     NavigationState.estimatedHeadingDeg = locResult.estimatedHeadingDeg
+                    NavigationState.estimatedLandmarkCount = locResult.landmarkCount
                     val dest = NavigationState.selectedPlace
                     if (preselectedDestination && dest != null) {
                         destination = dest

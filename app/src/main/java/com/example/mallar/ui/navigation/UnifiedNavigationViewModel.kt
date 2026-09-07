@@ -52,6 +52,7 @@ class UnifiedNavigationViewModel(application: Application) : AndroidViewModel(ap
         MallGraphRepository.loadedGraph?.nodes?.firstOrNull { it.id == id }
     }
     val initialLocalizationHeading: Float? = navigationSnapshot?.initialHeadingDeg
+    val initialLocalizationLandmarkCount: Int = navigationSnapshot?.initialLandmarkCount ?: 0
 
     val navState: StateFlow<NavSessionState> = sessionManager.sessionState
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NavSessionState())
