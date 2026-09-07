@@ -66,6 +66,8 @@ fun ArSceneViewWrapper(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
+            planeRenderer.isEnabled = false
+            planeRenderer.isVisible = false
         }
     }
 
