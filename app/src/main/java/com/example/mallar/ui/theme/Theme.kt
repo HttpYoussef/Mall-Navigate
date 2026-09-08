@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.example.mallar.data.AppLanguagePlatform
 import com.example.mallar.data.AppPreferences
@@ -45,17 +46,26 @@ fun MallARTheme(
     val isDarkMode by AppPreferences.isDarkMode.collectAsState()
     val colorScheme = if (isDarkMode) MallARDarkScheme else MallARLightScheme
 
+    // The active language only changes on an Activity recreate (AppCompat locale
+    // switch, system per-app-language change), which tears down this composition
+    // anyway — so resolve it once. currentLanguage() hits AppCompat/LocaleManager
+    // (binder calls on API 33+); it must not run on every recomposition.
     val context = LocalContext.current
-    val activeLanguage = AppLanguagePlatform.currentLanguage(context)
-    val activeFontFamily = fontFamilyFor(activeLanguage)
-    val typography = typographyFor(activeFontFamily)
+    val activeFontFamily = remember(context) {
+        fontFamilyFor(AppLanguagePlatform.currentLanguage(context))
+    }
+    val typography = remember(activeFontFamily) { typographyFor(activeFontFamily) }
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = typography
     ) {
+        val baseTextStyle = LocalTextStyle.current
+        val localizedTextStyle = remember(baseTextStyle, activeFontFamily) {
+            baseTextStyle.copy(fontFamily = activeFontFamily)
+        }
         CompositionLocalProvider(
-            LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = activeFontFamily)
+            LocalTextStyle provides localizedTextStyle
         ) {
             content()
         }
