@@ -174,12 +174,12 @@ fun VoucherDetailsScreen(
                                 .border(1.dp, currentAccent.copy(alpha = 0.4f), RoundedCornerShape(50))
                                 .padding(horizontal = 18.dp, vertical = 9.dp)
                         ) {
-                            Text(voucher.discountTitle, color = currentAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(voucher.discountTitleRes), color = currentAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
 
                         Spacer(Modifier.height(14.dp))
                         Text(
-                            text = voucher.description,
+                            text = stringResource(voucher.descriptionRes),
                             color = currentTextSub,
                             fontSize = 14.sp,
                             lineHeight = 20.sp,
@@ -190,7 +190,7 @@ fun VoucherDetailsScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Schedule, contentDescription = null, tint = currentTextSub, modifier = Modifier.size(14.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text(voucher.expirationDate, color = currentTextSub, fontSize = 13.sp)
+                            Text(stringResource(voucher.expirationDateRes), color = currentTextSub, fontSize = 13.sp)
                         }
                     }
                 }
@@ -252,7 +252,7 @@ fun VoucherDetailsScreen(
                     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
                         Text(stringResource(R.string.voucher_terms_conditions), color = currentTextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         Spacer(Modifier.height(8.dp))
-                        Text(text = voucher.terms, color = currentTextSub, fontSize = 12.sp, lineHeight = 18.sp)
+                        Text(text = stringResource(voucher.termsRes), color = currentTextSub, fontSize = 12.sp, lineHeight = 18.sp)
                     }
                 }
                 Spacer(Modifier.height(24.dp))

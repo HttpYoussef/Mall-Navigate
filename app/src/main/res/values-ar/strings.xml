@@ -511,6 +511,28 @@
     <!-- Status text when offer has been redeemed -->
     <string name="voucher_offer_redeemed">تم تفعيل العرض</string>
 
+    <!-- Placeholder Voucher Content -->
+    <string name="voucher_starbucks_upsize_title">كبّر مشروبك ببلاش</string>
+    <string name="voucher_starbucks_upsize_description">كبّر أي مشروب محضّر للحجم الأكبر من غير أي فرق في السعر.</string>
+    <string name="voucher_starbucks_upsize_expiration">ساري لحد 31 أغسطس 2026</string>
+    <string name="voucher_starbucks_upsize_terms">استخدام واحد للعميل في كل زيارة. لا يُجمع مع أي عروض تانية. ساري على المشروبات المحضّرة بس. الإدارة ليها الحق تعدّل العرض أو توقفه في أي وقت.</string>
+    <string name="voucher_mango_20off_title">خصم 20%</string>
+    <string name="voucher_mango_20off_description">استمتع بخصم 20% على كل القطع بسعرها الكامل في المحل كله.</string>
+    <string name="voucher_mango_20off_expiration">ساري لحد 15 سبتمبر 2026</string>
+    <string name="voucher_mango_20off_terms">ما يشملش قطع الأوكازيون وكروت الهدايا. الخصم بيتحسب عند الدفع. لا يُجمع مع عروض تانية. لحد ما الكمية تخلص.</string>
+    <string name="voucher_zara_15off_title">خصم 15%</string>
+    <string name="voucher_zara_15off_description">خصم 15% على تشكيلة مختارة من قطع الموسم الجديد.</string>
+    <string name="voucher_zara_15off_expiration">ساري لحد 20 أغسطس 2026</string>
+    <string name="voucher_zara_15off_terms">ساري على قطع مختارة بس، زي ما هو موضّح في المحل. لا يُجمع مع أي عرض تاني. قسيمة واحدة لكل عملية شراء.</string>
+    <string name="voucher_adidaskids_bogo_title">اشتري 1 وخد 1 هدية</string>
+    <string name="voucher_adidaskids_bogo_description">اشتري أي جزمة أطفال وخد التانية هدية.</string>
+    <string name="voucher_adidaskids_bogo_expiration">ساري لحد 5 سبتمبر 2026</string>
+    <string name="voucher_adidaskids_bogo_terms">الجزمة التانية لازم تكون بنفس السعر أو أقل. ساري على الأحذية بسعرها العادي بس. الحد الأقصى مرتين للعميل الواحد.</string>
+    <string name="voucher_pinkberry_topping_title">إضافة مجانية</string>
+    <string name="voucher_pinkberry_topping_description">خد إضافة على ذوقك ببلاش مع أي كوباية حجم عادي.</string>
+    <string name="voucher_pinkberry_topping_expiration">ساري لحد 25 أغسطس 2026</string>
+    <string name="voucher_pinkberry_topping_terms">إضافة واحدة مجانية لكل كوباية. ساري على الحجم العادي والكبير. لا يسري على الكوبايات الصغيرة أو طلبات الديليفري.</string>
+
     <!-- Destination Selection Screen -->
     <!-- Subtitle on destination selection screen -->
     <string name="dsel_search_subtitle">ابحث عن المتاجر والمطاعم والأزياء والمزيد</string>

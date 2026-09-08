@@ -1,5 +1,8 @@
 package com.example.mallar.data
 
+import androidx.annotation.StringRes
+import com.example.mallar.R
+
 /**
  * STATIC PLACEHOLDER DATA MODEL.
  *
@@ -11,17 +14,21 @@ package com.example.mallar.data
  * [storeBrand] must exactly match a real Place.brand from PlaceRepository so
  * the "Start Navigation" action on the voucher details screen can reuse the
  * app's existing destination-selection flow instead of a separate one.
+ *
+ * [expirationDateRes] points at hand-written per-locale copy ONLY because these
+ * are static demo vouchers; a real backend/domain model should carry a real
+ * date/instant + a localized template, and must not copy this opaque-string approach.
  */
 data class Voucher(
     val id: String,
     val storeBrand: String,
     val logoAssetPath: String,
     val category: String,
-    val discountTitle: String,
-    val description: String,
-    val expirationDate: String,
+    @StringRes val discountTitleRes: Int,
+    @StringRes val descriptionRes: Int,
+    @StringRes val expirationDateRes: Int,
     val floor: Int,
-    val terms: String
+    @StringRes val termsRes: Int
 )
 
 object VoucherRepository {
@@ -49,55 +56,55 @@ object VoucherRepository {
             storeBrand = "Starbucks",
             logoAssetPath = "logos/Starbucks.png",
             category = StoreCategory.DINING,
-            discountTitle = "Free Upsize",
-            description = "Upgrade any handcrafted beverage to the next size at no extra cost.",
-            expirationDate = "Valid until Aug 31, 2026",
+            discountTitleRes = R.string.voucher_starbucks_upsize_title,
+            descriptionRes = R.string.voucher_starbucks_upsize_description,
+            expirationDateRes = R.string.voucher_starbucks_upsize_expiration,
             floor = 2,
-            terms = "One redemption per customer per visit. Cannot be combined with other offers. Valid on handcrafted beverages only. Management reserves the right to modify or withdraw this offer at any time."
+            termsRes = R.string.voucher_starbucks_upsize_terms
         ),
         Voucher(
             id = "v_mango_20off",
             storeBrand = "Mango",
             logoAssetPath = "logos/Mango.png",
             category = StoreCategory.FASHION,
-            discountTitle = "20% OFF",
-            description = "Enjoy 20% off on all full-priced items storewide.",
-            expirationDate = "Valid until Sep 15, 2026",
+            discountTitleRes = R.string.voucher_mango_20off_title,
+            descriptionRes = R.string.voucher_mango_20off_description,
+            expirationDateRes = R.string.voucher_mango_20off_expiration,
             floor = 1,
-            terms = "Excludes sale items and gift cards. Discount applied at checkout. Cannot be combined with other promotions. While stocks last."
+            termsRes = R.string.voucher_mango_20off_terms
         ),
         Voucher(
             id = "v_zara_15off",
             storeBrand = "Zara",
             logoAssetPath = "logos/ZARA.png",
             category = StoreCategory.FASHION,
-            discountTitle = "15% OFF",
-            description = "15% off on a selected range of new-season pieces.",
-            expirationDate = "Valid until Aug 20, 2026",
+            discountTitleRes = R.string.voucher_zara_15off_title,
+            descriptionRes = R.string.voucher_zara_15off_description,
+            expirationDateRes = R.string.voucher_zara_15off_expiration,
             floor = 1,
-            terms = "Valid on selected items only, as marked in-store. Not valid in conjunction with any other offer. One voucher per transaction."
+            termsRes = R.string.voucher_zara_15off_terms
         ),
         Voucher(
             id = "v_adidaskids_bogo",
             storeBrand = "Adidas Kids",
             logoAssetPath = "logos/adidas kids.png",
             category = StoreCategory.FASHION,
-            discountTitle = "Buy 1 Get 1",
-            description = "Buy any pair of kids' shoes and get a second pair free.",
-            expirationDate = "Valid until Sep 5, 2026",
+            discountTitleRes = R.string.voucher_adidaskids_bogo_title,
+            descriptionRes = R.string.voucher_adidaskids_bogo_description,
+            expirationDateRes = R.string.voucher_adidaskids_bogo_expiration,
             floor = 1,
-            terms = "Second pair must be of equal or lesser value. Valid on regular-priced footwear only. Limited to two redemptions per customer."
+            termsRes = R.string.voucher_adidaskids_bogo_terms
         ),
         Voucher(
             id = "v_pinkberry_topping",
             storeBrand = "Pinkberry",
             logoAssetPath = "logos/pinkberry.png",
             category = StoreCategory.DINING,
-            discountTitle = "Free Topping",
-            description = "Get a free topping of your choice with any regular-size cup.",
-            expirationDate = "Valid until Aug 25, 2026",
+            discountTitleRes = R.string.voucher_pinkberry_topping_title,
+            descriptionRes = R.string.voucher_pinkberry_topping_description,
+            expirationDateRes = R.string.voucher_pinkberry_topping_expiration,
             floor = 2,
-            terms = "One free topping per cup purchased. Valid on regular and large sizes. Not valid with mini cups or delivery orders."
+            termsRes = R.string.voucher_pinkberry_topping_terms
         )
     )
 }

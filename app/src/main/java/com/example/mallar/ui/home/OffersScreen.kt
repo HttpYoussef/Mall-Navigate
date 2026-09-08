@@ -83,13 +83,17 @@ fun OffersScreen(
     val currentBorder   = colorScheme.border
 
     val allVouchers = remember { VoucherRepository.loadPlaceholderVouchers() }
+    val context = LocalContext.current
+    val voucherTitles = remember(allVouchers, context) {
+        allVouchers.associate { it.id to context.getString(it.discountTitleRes) }
+    }
     var searchQuery by remember { mutableStateOf("") }
     var searchFocused by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf("All") }
     var contentVisible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { contentVisible = true }
 
-    val displayedVouchers by remember {
+    val displayedVouchers by remember(voucherTitles) {
         derivedStateOf {
             val q = searchQuery.trim()
             allVouchers
@@ -97,7 +101,7 @@ fun OffersScreen(
                 .filter {
                     q.isBlank() ||
                         it.storeBrand.contains(q, ignoreCase = true) ||
-                        it.discountTitle.contains(q, ignoreCase = true)
+                        (voucherTitles[it.id] ?: "").contains(q, ignoreCase = true)
                 }
         }
     }
@@ -385,7 +389,7 @@ private fun VoucherCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(voucher.storeBrand, color = currentTextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(2.dp))
-                Text(voucher.discountTitle, color = currentAccent, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(voucher.discountTitleRes), color = currentAccent, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
             }
 
             Box(
@@ -401,7 +405,7 @@ private fun VoucherCard(
 
         Spacer(Modifier.height(12.dp))
         Text(
-            text = voucher.description,
+            text = stringResource(voucher.descriptionRes),
             color = currentTextSub,
             fontSize = 13.sp,
             lineHeight = 18.sp
@@ -416,7 +420,7 @@ private fun VoucherCard(
                 modifier = Modifier.size(13.dp)
             )
             Spacer(Modifier.width(5.dp))
-            Text(voucher.expirationDate, color = currentTextSub, fontSize = 12.sp)
+            Text(stringResource(voucher.expirationDateRes), color = currentTextSub, fontSize = 12.sp)
         }
 
         Spacer(Modifier.height(16.dp))
