@@ -27,7 +27,21 @@ Branch: **`feat/app-localization`** (off `main` @ `e4ad8b7`). **Pushed to `origi
 | 11 | Externalize: assistant chrome | ✅ committed | `8183083` |
 | 12 | Externalize: navigation-guidance | ✅ committed | `ab4a822` |
 | 01 | AppCompat migration spike | ⬜ **USER on device** — not an agy task | — |
-| 13 | RTL + localization QA sweep | ⬜ **USER on device** | — |
+| 13 | RTL + localization QA sweep | 🔶 in progress — USER testing on device | — |
+
+### Post-QA fixes (found during device testing, on `feat/app-localization`, NOT pushed)
+
+| Fix | State | Commit |
+|-----|-------|--------|
+| Memoize `MallARTheme` language/typography (per-frame binder IPC + Typography rebuild → jank on AR orientation phase) | ✅ committed, **pushed** | `0a09460` |
+| Localize placeholder voucher content (`Voucher` 4 fields → `@StringRes`; 20 keys; search-filter fix) — Codex-debated, agy-implemented | ✅ committed, **not pushed** | `b301c51` |
+
+**Open — needs USER decision:** merge local `main` (6 unpushed `ar:` commits incl. `64775a3`
+"disable ARCore plane-debug visualization") into `feat/app-localization`. The AR-orientation
+"slow on branch, fine on main" report is confounded until this merge lands — the branch was
+cut from `e4ad8b7` and is missing those AR perf commits. Merge was done locally once, then
+reverted per user ("don't merge or push until I say"). Redo with `git merge main` on the
+user's go, then re-test orientation phase + re-run 4 gates.
 
 **ALL agy-implementable tickets (02–12) are DONE.** Remaining: **01** (AppCompat spike) and **13**
 (RTL + pseudolocale QA sweep) — both require the USER on an emulator/device. Nothing is pushed;
