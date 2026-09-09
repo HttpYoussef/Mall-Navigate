@@ -99,17 +99,30 @@ class IndoorPositionTracker(
         // Tier 1: Route Snap
         val routeSnap = findNearestPointOnPath(rawX, rawY, path, currentSegmentIdx)
         if (routeSnap != null && routeSnap.distance <= NavConfig.SNAP_THRESHOLD_PX) {
+            Log.d(
+                TAG,
+                "onStep: raw=($rawX, $rawY), tier=Tier 1 route-snap, distance=${routeSnap.distance}, bestSegmentIdx=${routeSnap.segmentIdx}"
+            )
             return ConstraintResult(routeSnap.x, routeSnap.y, true, routeSnap.distance, routeSnap.segmentIdx)
         }
 
         // Tier 2: Global Snap (with spatial pruning)
         val globalSnap = findNearestPointInGraph(rawX, rawY)
         if (globalSnap != null && globalSnap.distance <= NavConfig.REROUTE_THRESHOLD_PX) {
+            Log.d(
+                TAG,
+                "onStep: raw=($rawX, $rawY), tier=Tier 2 global-graph-snap, distance=${globalSnap.distance}, bestSegmentIdx=$currentSegmentIdx"
+            )
             return ConstraintResult(globalSnap.x, globalSnap.y, false, globalSnap.distance, currentSegmentIdx)
         }
 
         // Tier 3: Deviation (Accept raw pos to show the user they are lost)
-        return ConstraintResult(rawX, rawY, false, globalSnap?.distance ?: 999.0, currentSegmentIdx)
+        val deviation = globalSnap?.distance ?: 999.0
+        Log.d(
+            TAG,
+            "onStep: raw=($rawX, $rawY), tier=Tier 3 raw/deviating, distance=$deviation, bestSegmentIdx=$currentSegmentIdx"
+        )
+        return ConstraintResult(rawX, rawY, false, deviation, currentSegmentIdx)
     }
 
     private data class SnapMatch(val x: Double, val y: Double, val distance: Double, val segmentIdx: Int = 0)

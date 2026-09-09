@@ -63,11 +63,22 @@ class StepTracker(private val context: Context) : SensorEventListener {
         reset()
         val delay = SensorManager.SENSOR_DELAY_GAME
         lastEventTimeMs = SystemClock.elapsedRealtime()
-        when {
-            stepDetectorSensor != null -> sensorManager.registerListener(this, stepDetectorSensor, delay)
-            stepCounterSensor != null -> sensorManager.registerListener(this, stepCounterSensor, delay)
-            accelerometerSensor != null -> sensorManager.registerListener(this, accelerometerSensor, delay)
+        val sensorPath = when {
+            stepDetectorSensor != null -> {
+                sensorManager.registerListener(this, stepDetectorSensor, delay)
+                "hardware step-detector"
+            }
+            stepCounterSensor != null -> {
+                sensorManager.registerListener(this, stepCounterSensor, delay)
+                "hardware step-counter"
+            }
+            accelerometerSensor != null -> {
+                sensorManager.registerListener(this, accelerometerSensor, delay)
+                "software accelerometer fallback"
+            }
+            else -> "none"
         }
+        Log.d(TAG, "Active sensor path: $sensorPath, usingHardwareCounter=$usingHardwareCounter")
     }
 
     fun stop() {
@@ -89,7 +100,7 @@ class StepTracker(private val context: Context) : SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent) {
         when (event.sensor.type) {
-            Sensor.TYPE_STEP_DETECTOR -> if (event.values[0] == 1.0f) registerStep(SystemClock.elapsedRealtime())
+            Sensor.TYPE_STEP_DETECTOR -> if (event.values[0] == 1.0f) registerStep(SystemClock.elapsedRealtime(), "hardware step-detector")
             Sensor.TYPE_STEP_COUNTER  -> handleHardwareCounter(event.values[0].toLong())
             Sensor.TYPE_ACCELEROMETER -> handleAccelerometer(event.values)
         }
@@ -114,7 +125,7 @@ class StepTracker(private val context: Context) : SensorEventListener {
             
             for (i in 1..newStepsInBatch) {
                 val simulatedTimestamp = lastEventTimeMs + (i * interval)
-                registerStep(simulatedTimestamp)
+                registerStep(simulatedTimestamp, "hardware step-counter")
             }
             lastEventTimeMs = now
         }
@@ -130,7 +141,7 @@ class StepTracker(private val context: Context) : SensorEventListener {
                 val now = SystemClock.elapsedRealtime()
                 if (now - lastStepTimeMs >= NavConfig.STEP_DEBOUNCE_MS) {
                     lastStepTimeMs = now
-                    registerStep(now)
+                    registerStep(now, "software accelerometer fallback")
                 }
             }
         } else if (filteredMagnitude < 9.5f) {
@@ -138,7 +149,10 @@ class StepTracker(private val context: Context) : SensorEventListener {
         }
     }
 
-    private fun registerStep(timestampMs: Long) {
+    private fun registerStep(
+        timestampMs: Long,
+        source: String = if (usingHardwareCounter) "hardware" else "software accelerometer fallback"
+    ) {
         // 1. Calculate Cadence (Steps Per Minute)
         stepTimestamps.add(timestampMs)
         if (stepTimestamps.size > WINDOW_SIZE) stepTimestamps.removeAt(0)
@@ -152,6 +166,11 @@ class StepTracker(private val context: Context) : SensorEventListener {
         // 3. Update State
         if (usingHardwareCounter) hardwareStepCount++ else softwareStepCount++
         sessionDistanceMetres += currentStrideLengthM
+
+        Log.d(
+            TAG,
+            "Step registered: timestamp=$timestampMs, source=$source, strideLength=${currentStrideLengthM}m, cadence=$cadence"
+        )
         
         onStep?.invoke(sessionSteps, currentStrideLengthM, sessionDistanceMetres)
     }
