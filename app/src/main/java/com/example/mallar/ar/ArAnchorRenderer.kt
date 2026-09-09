@@ -19,6 +19,7 @@ import io.github.sceneview.math.Rotation
 import io.github.sceneview.node.Node
 import io.github.sceneview.node.RenderableNode
 import dev.romainguy.kotlin.math.Float3
+import kotlin.math.hypot
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -150,6 +151,23 @@ class ArAnchorRenderer(
                     "plannedActive=${plan.active.size}, currentAnchors=${anchors.size}")
                 if (sceneView != null && session != null) {
                     reconcile(sceneView, session, frame, cameraPose, localPose, transform, transformRevision, plan, route)
+                }
+                anchors.forEach { (nodeId, managed) ->
+                    val pose = runCatching { managed.anchorNode.anchor?.pose }.getOrNull()
+                    val (worldX, worldY, worldZ) = if (pose != null) {
+                        Triple(pose.tx(), pose.ty(), pose.tz())
+                    } else {
+                        val (rx, rz) = transform.worldPositionFor(
+                            managed.spec.node.x,
+                            managed.spec.node.y,
+                            config.pixelsPerMeter
+                        )
+                        Triple(rx, runCatching { managed.anchorNode.position.y }.getOrDefault(0f), rz)
+                    }
+                    val dx = worldX - cameraPose.tx()
+                    val dz = worldZ - cameraPose.tz()
+                    val planarDist = hypot(dx, dz)
+                    Log.d(TAG, "Active anchor placed: nodeId=$nodeId, world=($worldX, $worldY, $worldZ), cameraDist=${planarDist}m")
                 }
                 lastPlanGeneration = plan.generation
             }
