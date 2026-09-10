@@ -1,10 +1,10 @@
 # MallAR Theming — Colour Token System
 
-**Status:** spec locked (Ticket 03, 2026-09-10). Migration not started.
-**Scope of this doc:** the palette, the named token list, the colour-model rules, and the
-full Material 3 `ColorScheme` role map. The Compose API surface (`MallColors` data class,
-`LocalMallColors`, `MallTheme.colors` read site) and the component-state matrix
-(ripple / pressed / disabled / elevation / selection) are **Ticket 08**, not here.
+**Status:** spec locked — palette + tokens + M3 role map (Ticket 03), Compose API + component
+matrix (Ticket 08). 2026-09-10. Migration not started.
+**Scope of this doc:** the palette, the named token list, the colour-model rules, the full
+Material 3 `ColorScheme` role map (§1–§6), the Compose API surface (§7), and the
+component-state matrix (§8). The migration batch tickets are Ticket 05.
 
 Planning trail: `.scratch/light-mode/map.md` and its issue tickets.
 
@@ -232,10 +232,111 @@ A single JVM unit test in `app/src/test/java/com/example/mallar/ui/theme/` (runs
    schemes — the machine-checkable "no library default remains".
 3. `brandTeal` is asserted large-text-only (documented threshold, not a silent pass).
 
-## 7. What this unblocks
+## 7. Compose API contract (Ticket 08)
 
-- **Ticket 08** — `MallColors` data class + `LocalMallColors` + `MallARTheme` wrapper +
-  `MallTheme.colors` read site; fate of `rememberHomeColorScheme` (6 call sites, `remember(isDarkMode)`
-  stale-key bug); component-state matrix; `shadow` → elevation levels.
-- **Ticket 04** — the colour-literal lint gate (bans what §2 forbids).
-- **Ticket 05** — the migration batch tickets.
+The code surface every migration ticket targets. The foundation ticket writes it; nothing here
+is a code stub.
+
+### 7.1 `MallColors`
+
+An `@Immutable data class` — one property per §3 token, **names identical to the token names**.
+30 members. `Color` for all except `overlayScrimGradient: Brush`. `shadow` is **not** a member
+(see §8, elevation). Two top-level instances `MallLightColors` / `MallDarkColors`.
+
+```kotlin
+@Immutable
+data class MallColors(
+    val screenBackground: Color, val surface: Color, val surfaceSunken: Color,
+    val textPrimary: Color, val textSecondary: Color, val textDisabled: Color,
+    val brandTeal: Color, val accent: Color, val accentText: Color, val onAccent: Color,
+    val border: Color, val borderStrong: Color, val divider: Color, val focusRing: Color,
+    val success: Color, val onSuccess: Color, val successText: Color,
+    val error: Color, val onError: Color, val errorText: Color, val warningText: Color,
+    val scrimSurface: Color, val scrimCard: Color, val onScrim: Color, val onScrimMuted: Color,
+    val scrim: Color,                    // opaque #000000; the one sanctioned .copy(alpha) target
+    val imagePlaceholder: Color, val imageErrorSurface: Color,
+    val overlayScrimGradient: Brush, val hairlineOverlay: Color,
+)
+```
+
+### 7.2 `LocalMallColors` + `MallTheme`
+
+```kotlin
+val LocalMallColors = staticCompositionLocalOf { MallLightColors }   // non-crashing preview default
+
+object MallTheme {
+    val colors: MallColors
+        @Composable @ReadOnlyComposable get() = LocalMallColors.current
+}
+```
+
+`staticCompositionLocalOf` (not `compositionLocalOf`): the value only changes on a mode flip,
+which tears down the composition anyway. Default is `MallLightColors` so `@Preview` and any
+composable outside `MallARTheme` render in a real palette rather than crashing. Read site is
+**always `MallTheme.colors.<token>`** — never raw `LocalMallColors.current`, never
+`MaterialTheme.colorScheme` for an app-specific slot. (`MaterialTheme.colorScheme` stays correct
+for stock M3 components, which read it internally.)
+
+### 7.3 `MallARTheme` wrapper
+
+Signature stays **`@Composable fun MallARTheme(content: @Composable () -> Unit)`** — single call
+site (`MainActivity`). It must not regress the memoised font/typography resolution (commit
+`0a09460`). It now also:
+
+1. builds the M3 `ColorScheme` from §5 (`isDarkMode ? darkRoleMap : lightRoleMap`),
+2. picks `isDarkMode ? MallDarkColors : MallLightColors`,
+3. provides `LocalMallColors`, a themed `RippleConfiguration` (§8), and
+   `LocalTextSelectionColors` (§8) around `MaterialTheme`,
+4. keeps the `SideEffect` that drives system-bar colours (Ticket 06).
+
+### 7.4 `rememberHomeColorScheme` / `HomeColorScheme` — deleted
+
+Both are removed outright (not adapter-wrapped). The 6 call sites
+(`HomeSharedComponents.kt:68`, `Homescreen.kt:114`, `OffersScreen.kt:77`,
+`VoucherDetailsScreen.kt:71`, `DestinationCategoryScreen.kt:48`, `DestinationSearchScreen.kt:40`)
+are rewritten to `MallTheme.colors.*` in their own migration batches. Field mapping:
+`bg→screenBackground`, `cardBg→surface`, `textMain→textPrimary`, `textSub→textSecondary`,
+`accent→accent`, `border→border`. The codex C6 `remember(isDarkMode)` stale-key bug becomes
+moot — there is no cache to key.
+
+### 7.5 Naming conventions
+
+- token property: the semantic role, camelCase, no mode suffix (`textSecondary`, never
+  `textSecondaryLight`). Mode lives in *which instance* is provided.
+- `on<X>` = content colour for the `X` fill.
+- `<X>Text` = that hue used as a foreground on a neutral surface (AA-tuned), distinct from the
+  `<X>` fill.
+
+## 8. Component-state matrix (Ticket 08)
+
+Goal: two screens using the same semantic token render identically in a given mode.
+
+| Surface / state | Colour source — light | Colour source — dark |
+|---|---|---|
+| **Ripple** (stock M3) | themed `RippleConfiguration(color = accent)` provided in `MallARTheme` | same, `accent` dark |
+| **Custom press** (`indication = null` + `scale()`) | motion kept as-is; any colour drawn (overlay, border) from `MallColors`. Approved pattern — not a Ticket 04 violation | same |
+| **Pressed-state overlay** (custom components) | `accent` @ 8% over base (composited, decorative-exempt) | same |
+| **Disabled text / icon** | `textDisabled` | `textDisabled` |
+| **Disabled fill** (button container) | M3 `ButtonColors.disabledContainerColor` = `#E6EAEE` | `#232C31` |
+| **Elevation — flat** (default surface) | 0dp, no shadow | 0dp |
+| **Elevation — raised** (card / nav bar / sheet) | 4dp, shadow `#0F1F2E` @ 10% | 4dp, shadow `#000000` @ 40% |
+| **Elevation — overlay** (dialog / menu / snackbar) | 8dp, shadow `#0F1F2E` @ 14% | 8dp, shadow `#000000` @ 48% |
+| **M3 tonal elevation** | off — `surfaceTint = Transparent`; step via `surfaceContainer*` | off |
+| **Glow shadow** (`ambientColor = accent…`) | **removed in light mode** (Ticket 01) | kept, `accent`, decorative-exempt |
+| **Text selection** | `LocalTextSelectionColors(handleColor = accent, backgroundColor = accent @ 40%)` | same |
+| **Dialog / sheet scrim** (custom overlay) | `MallTheme.colors.scrim.copy(alpha = 0.4f)` — the one sanctioned `.copy(alpha)` on a token | same |
+| **Dialog / sheet scrim** (stock M3 `Dialog` / `ModalBottomSheet`) | M3 built-in, driven by `scrim` role `#000000` — no hand-rolled overlay added | same |
+| **Focus ring** | `focusRing` (= `accentText`), ≥ 3:1 | same |
+
+Elevation levels are `Dp` + shadow-colour constants owned by the theme package (the foundation
+ticket decides `object Elevation { … }` vs params) — **not** `MallColors` members.
+
+Rules the lint gate (Ticket 04) enforces from this section:
+- no hand-built ripple colour — `RippleConfiguration` or nothing;
+- no `.copy(alpha = …)` to signal disabled — use the disabled tokens;
+- custom scrims go through `MallTheme.colors.scrim`, not `Color.Black.copy(...)`.
+
+## 9. What this unblocks
+
+- **Ticket 04** — the colour-literal lint gate (bans what §2 + §8 forbid).
+- **Ticket 05** — the migration batch tickets; §7 is the foundation ticket's build target.

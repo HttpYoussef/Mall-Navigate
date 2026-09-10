@@ -1,5 +1,6 @@
 Type: grilling
-Status: open
+Status: resolved
+Claimed by: Youssef Ibrahim (orchestrator) — grilling 2026-09-10
 Blocked by: 03
 
 ## Question
@@ -40,3 +41,45 @@ HITL — API naming and the fate of the existing helpers need the user.
 
 **Output**: `docs/Theming/` API + component sections committed (docs only). The answer records
 the API contract + component matrix. Unblocks Ticket 04 and feeds Ticket 05's foundation ticket.
+
+## Answer
+
+Resolved 2026-09-10 via grilling (2 rounds, all "agree with all"). Written to
+`docs/Theming/README.md` §7 (Compose API) + §8 (component-state matrix).
+
+### Round 1 — API surface
+
+- **Q1 `MallColors`**: `@Immutable data class`, 30 members, names identical to the §3 token
+  names, no mode suffix. `Color` for all except `overlayScrimGradient: Brush`. `shadow` is NOT a
+  member (→ elevation contract). Two top-level instances `MallLightColors` / `MallDarkColors`.
+- **Q2 read site**: `object MallTheme { val colors: MallColors @Composable @ReadOnlyComposable }`
+  → call sites use `MallTheme.colors.<token>`. Mirrors `MaterialTheme.colorScheme`; lint-gate
+  whitelistable. Never raw `LocalMallColors.current`.
+- **Q3 wrapper**: `MallARTheme(content)` stays content-only (single call site, must not regress
+  the `0a09460` typography memoisation). `LocalMallColors = staticCompositionLocalOf {
+  MallLightColors }` — non-crashing preview default. Wrapper builds the M3 ColorScheme from
+  T03 §5, picks the `MallColors` instance, provides `LocalMallColors` + themed
+  `RippleConfiguration` + `LocalTextSelectionColors` around `MaterialTheme`.
+- **Q4 `rememberHomeColorScheme` / `HomeColorScheme`**: **deleted outright**, no adapter. 6 call
+  sites rewritten to `MallTheme.colors.*` in their own batches. Field map recorded in §7.4. The
+  codex C6 stale-`remember(isDarkMode)` bug becomes moot (nothing to key).
+
+### Round 2 — component-state matrix (full table in §8)
+
+- **Q5 ripple / indication**: stock ripple → themed `RippleConfiguration(color = accent)`;
+  custom `indication = null` + `scale()` press kept (it's motion), any colour it draws from
+  `MallColors` — approved pattern, NOT a Ticket 04 violation. No hand-built ripple colours.
+- **Q6 elevation**: 3 levels — `flat` (0dp) / `raised` (4dp, shadow `#0F1F2E`@10% light /
+  `#000`@40% dark) / `overlay` (8dp). `Dp` + shadow constants owned by theme package, not
+  `MallColors`. Glow shadows OFF in light (T01), kept dark as decorative-exempt. M3 tonal
+  elevation stays killed (`surfaceTint` transparent).
+- **Q7 pressed/disabled**: disabled text/icon → `textDisabled`; disabled fill → M3
+  `disabledContainerColor` (`#E6EAEE` / `#232C31`); pressed overlay → `accent` @ 8% composited.
+  Ban `.copy(alpha = 0.38f)`-style disabled signalling.
+- **Q8 text selection**: `LocalTextSelectionColors(handleColor = accent, backgroundColor =
+  accent @ 40%)`, both modes.
+- **Q9 scrims**: custom overlays → `MallTheme.colors.scrim.copy(alpha = 0.4f)` (the one
+  sanctioned `.copy(alpha)` on a token; standardises 0.45 → 0.40). Stock `Dialog` /
+  `ModalBottomSheet` keep their built-in scrim (M3 `scrim` role = `#000000`), no added overlay.
+
+**Unblocks Ticket 04.** Feeds Ticket 05's foundation ticket (§7 is its build target).

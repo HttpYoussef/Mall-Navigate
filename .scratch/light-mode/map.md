@@ -47,11 +47,12 @@ changed by this map; the migration tickets are the handoff boundary.
   owed. Charting is done. From here the map is *worked*: one ticket at a time along the critical
   path 02 → 06 → 03 → 08 → 04 → 05 (01, 07 parallel). Re-opening a locked decision needs a fresh
   user call, not an in-session edit.
-- **▶ RESUME POINT (2026-09-10, after a context compaction)**: Tickets **02, 06, 01, 07, 03 are
-  RESOLVED** (see Decisions so far + each issue's `## Answer`). **Next ticket: 08 — Compose API +
-  component-state contract** (grilling, HITL; unblocked by 03). Then 04 → 05. The user is driving
-  this interactively: work the next ticket by claiming it, running `grilling` + `domain-modeling`,
-  and bringing them the decisions one round at a time. `agy` (`gemini-3.8-flash-high`) is the
+- **▶ RESUME POINT (2026-09-10, after a context compaction)**: Tickets **02, 06, 01, 07, 03, 08
+  are RESOLVED** (see Decisions so far + each issue's `## Answer`). **Next ticket: 04 — colour-
+  literal lint gate** (grilling, HITL; unblocked by 08). Then 05 (define the migration batches).
+  The user is driving this interactively: work the next ticket by claiming it, running `grilling`
+  + `domain-modeling`, and bringing them the decisions one round at a time. `agy`
+  (`gemini-3.8-flash-high`) is the
   implementer for AFK/task tickets and the post-05 migration batches; the orchestrator reviews
   every diff, the **user** does per-batch on-device visual sign-off. Nothing is pushed. All work
   committed on `feat/colors-light-modes`.
@@ -158,8 +159,21 @@ changed by this map; the migration tickets are the handoff boundary.
   no per-screen exceptions. Verification: one JVM test asserts every contrast pair + all 36 roles
   `!= Unspecified` + `brandTeal` large-only. **Unblocks Ticket 08.**
 
-_Frontier now: **Ticket 08** (Compose API + component-state contract). Critical path: **08 → 04
-→ 05**. All inputs to 08 are resolved (03 ✓)._
+- [Ticket 08 — Compose API + component-state contract](issues/08-compose-api-and-component-contract.md):
+  resolved via grilling (2 rounds). Written to `docs/Theming/README.md` §7 + §8.
+  `MallColors` = `@Immutable data class`, 30 members named exactly as the tokens; read via
+  `MallTheme.colors.<token>` (accessor object, mirrors `MaterialTheme.colorScheme`).
+  `LocalMallColors = staticCompositionLocalOf { MallLightColors }` (non-crashing preview default).
+  `MallARTheme(content)` stays content-only, must not regress the `0a09460` typography memo.
+  **`rememberHomeColorScheme` + `HomeColorScheme` deleted outright** (no adapter; 6 call sites
+  rewritten per-batch; codex C6 stale-key bug moot). Component matrix: themed
+  `RippleConfiguration(accent)`; 3 elevation levels (`flat`/`raised`/`overlay`) as theme-package
+  `Dp`+shadow constants, not `MallColors`; glow shadows off in light; disabled → `textDisabled` +
+  M3 `disabledContainerColor`, no runtime alpha; `LocalTextSelectionColors` from `accent`; custom
+  scrims → `scrim.copy(alpha = 0.4f)` (the one sanctioned token alpha). **Unblocks Ticket 04.**
+
+_Frontier now: **Ticket 04** (colour-literal lint gate). Critical path: **04 → 05**. All inputs
+to 04 are resolved (02 ✓, 03 ✓, 08 ✓)._
 
 ## Not yet specified
 
