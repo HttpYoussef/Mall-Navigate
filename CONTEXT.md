@@ -56,3 +56,11 @@ The fixed vocabulary of store categories the interface groups Places by:
 Fashion, Jewellery, Perfumes & Cosmetics, Dining, Pharmacy. Taken from the Mall
 graph's `category` field; category names outside this set are not shown.
 _Avoid_: department, section, store type
+
+**Always-dark route**:
+A screen whose surface is dark regardless of the app's light/dark setting —
+camera viewfinders (`LogoScanScreen`, `ParkingCameraScreen`), the AR guidance
+HUD (`UnifiedNavigationScreen`), the 2D map canvas (`StaticMapScreen`), and the
+splash. These opt out of the theme's default system-bar icon colour rather than
+following the app theme.
+_Avoid_: dark screen, camera screen (not all are camera-backed)

@@ -1,5 +1,6 @@
 Type: grilling
-Status: open
+Status: resolved
+Claimed by: Youssef Ibrahim (orchestrator) — grilling 2026-09-10
 Blocked by: 02
 
 ## Question
@@ -59,3 +60,48 @@ token system. Decision only — no code changes from this ticket; the outcome fe
 **Output**: the answer records the XML strategy, the route-aware system-bar contract, the
 authoritative-mode decision, and the bootstrap decision + smallest-change boundary. Feeds
 Ticket 03, Ticket 08, and Ticket 05.
+
+## Answer
+
+Resolved 2026-09-10 via grilling (user sign-off, all 6). Decision only — implementation lands in
+Ticket 05's foundation + XML-layer tickets.
+
+1. **`themes.xml` — runtime-owned.** `MallARTheme` sets `window.statusBarColor` /
+   `navigationBarColor` (and status/nav icon appearance) per mode via a `SideEffect`. `Theme.MallAR`
+   loses its hardcoded `#06131A` window/bar colours — window background becomes a neutral safe
+   value (mid neutral or transparent) so there is nothing for XML to fight. The Compose
+   `isDarkMode` boolean is the single source of truth; the XML layer does not carry a parallel
+   light/dark colour system.
+2. **`colors.xml` — delete the entire file.** All 71 entries are unreferenced; the app is 100%
+   Compose (no layouts/menus/drawable XML colour). If XML colour is ever needed later it is a
+   trivial re-add.
+3. **Splash — one fixed brand background, both modes.** `Theme.App.Starting`'s
+   `windowSplashScreenBackground` becomes a single brand colour (exact value from Ticket 01's
+   prototype; default assumption = the brand dark/teal). No `values-night/` for the splash.
+   Revisit only if Ticket 01 concludes the splash must be light in light mode.
+4. **System bars — route-aware contract.** `MallARTheme` sets the default: light mode → dark
+   icons, dark mode → light icons, both bars. An **always-dark route** opts out with a small
+   composable (working name `DarkSystemBars()`) that forces light icons + dark bar colours while
+   it is in composition; `DisposableEffect { onDispose { restore } }` returns to the theme default
+   on navigation away. Applied to: `LogoScanScreen`, `UnifiedNavigationScreen`, `ParkingCameraScreen`,
+   `StaticMapScreen`, `SplashScreen`, and the embedded `LocalizationConfirmScreen` overlay.
+5. **Edge-to-edge — not adopted.** Window-fitting stays exactly as-is (every screen already calls
+   `statusBarsPadding()` / `navigationBarsPadding()` manually). This effort only fixes bar colour
+   + icon appearance. `enableEdgeToEdge()` is a separate refactor (re-checking insets on 25
+   screens) and explicitly out of scope.
+6. **Authoritative mode source + bootstrap.**
+   - The Compose `isDarkMode` boolean is the **sole** mode source. `Theme.MallAR` may keep its
+     `DayNight` parent, but the app never provides `values-night/` resources and never calls
+     `AppCompatDelegate.setDefaultNightMode` — the XML/AppCompat side is effectively pinned to
+     light. (`setDefaultNightMode` is unused today; `AppCompatDelegate` is only used for locales.)
+   - **First-frame flash fix**: call `AppPreferences.init(this)` synchronously in
+     `MainActivity.onCreate()` *before* `setContent` (cheap SharedPreferences read; the class's
+     own KDoc already says "Initialize in MainActivity before setContent"). `StartupCoordinator`
+     may still re-init it on `Dispatchers.IO` — idempotent.
+   - **Cold-start acceptance test**: saved dark-mode user, cold kill + relaunch → no light frame
+     between the native splash and the first Compose frame.
+   - **Keyboard/IME**: with no `setDefaultNightMode`, the IME follows the *system* theme, not the
+     app's `isDarkMode`. Accepted as known behaviour (matches most apps), not a bug — recorded so
+     Ticket 08's component matrix doesn't chase it.
+
+**New glossary term**: **always-dark route** — added to `CONTEXT.md`.

@@ -112,8 +112,18 @@ changed by this map; the migration tickets are the handoff boundary.
   AA failures found: `CyanGlow` text ≈1.2:1, green `#4CAF50` ≈2.5:1. 13-batch migration grouping
   proposed (Ticket 05 finalises).
 
-_Frontier now: **Tickets 01, 06, 07** (all unblocked, parallel). Critical path continues
-06 → 03 → 08 → 04 → 05._
+- [Ticket 06 — XML theme + system-bar strategy](issues/06-xml-theme-and-system-bar-strategy.md):
+  resolved via grilling. `themes.xml` window/bar colours become **runtime-owned** by `MallARTheme`
+  (Compose `isDarkMode` is the sole mode source; XML pinned to light, no `values-night`, no
+  `setDefaultNightMode`). **`colors.xml` deleted whole** (100% dead). Splash keeps one fixed
+  brand background. **Route-aware system-bar contract**: theme sets the default; an *always-dark
+  route* opts out via a `DarkSystemBars()` composable that restores on navigation away.
+  Edge-to-edge **not** adopted (keep manual `statusBarsPadding`). First-frame flash fixed by a
+  synchronous `AppPreferences.init` in `MainActivity.onCreate` before `setContent`. New glossary
+  term *always-dark route* added to `CONTEXT.md`.
+
+_Frontier now: **Tickets 01, 07** (parallel). Critical path: 01 → 03 → 08 → 04 → 05
+(03 also needs 06 ✓; 07 feeds 05)._
 
 ## Not yet specified
 
