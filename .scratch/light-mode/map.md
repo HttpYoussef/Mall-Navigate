@@ -122,22 +122,29 @@ changed by this map; the migration tickets are the handoff boundary.
   synchronous `AppPreferences.init` in `MainActivity.onCreate` before `setContent`. New glossary
   term *always-dark route* added to `CONTEXT.md`.
 
-_Frontier now: **Tickets 01, 07** (parallel). Critical path: 01 → 03 → 08 → 04 → 05
-(03 also needs 06 ✓; 07 feeds 05)._
+- [Ticket 01 — design light palette + values](issues/01-design-light-palette-and-tokens.md):
+  resolved via an HTML prototype the user reviewed live
+  ([artifact](https://claude.ai/code/artifact/d1ad4154-cb08-4d70-aee4-2942bae2aef5),
+  [asset](assets/01-light-palette-prototype.html)). **~26-token set locked** (full table + light/
+  dark hex + contrast in the ticket answer). Teal splits 3 ways: `brandTeal #1A8C8C` (identity/
+  large only), `accent #107C7A` (fills), `accentText #0A6360` (teal text/links). **Purple + the
+  bespoke indigo `#5847E8` retired.** Light mode = **flat surfaces + one shadow**, glow animations
+  off in light (kept in dark). Splash = `#0F5F5F` deep teal, both modes. `DestinationSelectionScreen`
+  violet **flattened to teal**. Tokens are **opaque** (only `scrim` carries alpha).
+
+_Frontier now: **Ticket 07** (verification). Critical path: **03 → 08 → 04 → 05** — Ticket 03 is
+now unblocked (01 ✓, 02 ✓, 06 ✓)._
 
 ## Not yet specified
 
-- **Light-mode treatment of the "glass / glow" aesthetic.** The Home flow leans hard on dark
-  glassmorphism (translucent cards, animated accent glow). What replaces that on a white surface —
-  solid cards + elevation? a tinted surface? keep a subtle glow? — can't be decided until the
-  palette prototype (Ticket 01) exists. Graduates from 01/03.
-- **Splash screen light/dark.** The visual call is deferred to the palette prototype (brand
-  moment — may stay dark in both modes); the mechanism (`windowSplashScreenBackground` +
-  `values-night`) is Ticket 06. Graduates from 01 + 06.
+_All charted fog has graduated:_
+- _Glass/glow aesthetic → **resolved** by Ticket 01 (flat + elevation; glow off in light)._
+- _Splash → **resolved** by Ticket 01 (`#0F5F5F`) + Ticket 06 (one fixed background)._
+- _Status colours → **Ticket 03 deliverable** (codex C14 — paired fg/bg tokens; see Ticket 01's
+  locked set)._
+- _`DestinationSelectionScreen` violet → **resolved** by Ticket 01 (flatten to teal)._
 
-_(Status colours are no longer fog — codex C14 moved them to a Ticket 03 deliverable: under a
-hard AA bar, `RedAccent` / `GreenArrow` / `SuccessGreen` / `ErrorRed` are visible chrome and need
-resolved foreground/background token pairs before migration.)_
+_Nothing left in the fog — the way to the destination is charted end to end._
 
 ## Out of scope
 

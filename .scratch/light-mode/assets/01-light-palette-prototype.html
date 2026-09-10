@@ -1,0 +1,412 @@
+<title>MallAR Light Palette</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* ============ PAGE TOKENS (this doc dogfoods the proposed palette) ============ */
+  :root{
+    --ground:#F7F9FB; --surface:#FFFFFF; --sunken:#EEF1F4;
+    --ink:#151A1E; --muted:#5A6672; --faint:#9AA5AF;
+    --accent:#107C7A; --accent-text:#0A6360; --brand-teal:#1A8C8C; --on-accent:#FFFFFF;
+    --border:#E2E7EC; --divider:#EAEEF1;
+    --ok:#1E7A3E; --ok-text:#136B32; --warn-text:#8A5A00; --err:#C0362C; --err-text:#B0271F;
+    --shadow: 0 2px 12px -2px rgba(15,31,46,.10), 0 1px 3px rgba(15,31,46,.06);
+    --shadow-lg: 0 12px 32px -8px rgba(15,31,46,.18), 0 2px 8px rgba(15,31,46,.08);
+    --scrim:#0E1A1F; --scrim-card:#182830; --on-scrim:#F2F5F6; --on-scrim-muted:#9BAAB2;
+    --maxw:920px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E1418; --surface:#161D22; --sunken:#10161A;
+      --ink:#E8ECEF; --muted:#9BA8B0; --faint:#6B7780;
+      --accent:#3FB2AC; --accent-text:#5BC9C2; --brand-teal:#2FA3B8; --on-accent:#06201F;
+      --border:#2A343A; --divider:#232C31;
+      --ok:#3EA55F; --ok-text:#6FCB89; --warn-text:#D8A24B; --err:#E06A60; --err-text:#EE9089;
+      --shadow: 0 2px 12px -2px rgba(0,0,0,.5); --shadow-lg: 0 14px 36px -10px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E1418; --surface:#161D22; --sunken:#10161A;
+    --ink:#E8ECEF; --muted:#9BA8B0; --faint:#6B7780;
+    --accent:#3FB2AC; --accent-text:#5BC9C2; --brand-teal:#2FA3B8; --on-accent:#06201F;
+    --border:#2A343A; --divider:#232C31;
+    --ok:#3EA55F; --ok-text:#6FCB89; --warn-text:#D8A24B; --err:#E06A60; --err-text:#EE9089;
+    --shadow: 0 2px 12px -2px rgba(0,0,0,.5); --shadow-lg: 0 14px 36px -10px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--ground); color:var(--ink);
+    font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:48px 24px 96px;}
+  h1,h2,h3{font-family:"Archivo", ui-sans-serif, system-ui, sans-serif; line-height:1.2; text-wrap:balance; margin:0;}
+  h1{font-size:2rem; font-weight:700; letter-spacing:-.02em;}
+  h2{font-size:1.4rem; font-weight:650; letter-spacing:-.01em; margin-bottom:6px;}
+  h3{font-size:1.02rem; font-weight:600;}
+  p{margin:0 0 12px;}
+  a{color:var(--accent-text);}
+  code, .mono{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:.82em;}
+  .eyebrow{font-family:"IBM Plex Mono", monospace; font-size:.72rem; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted); margin-bottom:10px;}
+  header.top{border-bottom:1px solid var(--divider); padding-bottom:28px; margin-bottom:40px;}
+  header.top p{color:var(--muted); max-width:64ch; margin-bottom:0;}
+  section{margin-top:56px;}
+  .lead{color:var(--muted); max-width:66ch;}
+
+  /* decision callout */
+  .decision{background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:22px 24px; box-shadow:var(--shadow); margin-top:18px;}
+  .decision h3{margin-bottom:8px;}
+  .swatch-row{display:flex; flex-wrap:wrap; gap:14px; margin:16px 0 4px;}
+  .chip{display:flex; flex-direction:column; gap:6px; min-width:132px;}
+  .chip .box{height:52px; border-radius:9px; border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:600;}
+  .chip .cap{font-size:.72rem; color:var(--muted);}
+  .chip .cap b{color:var(--ink); font-weight:600;}
+
+  /* token table */
+  .tablewrap{overflow-x:auto; border:1px solid var(--border); border-radius:12px; margin-top:18px; background:var(--surface);}
+  table{border-collapse:collapse; width:100%; font-size:.86rem;}
+  th,td{text-align:left; padding:10px 14px; border-bottom:1px solid var(--divider); white-space:nowrap;}
+  th{font-family:"IBM Plex Mono",monospace; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted); background:var(--sunken); position:sticky; top:0;}
+  tbody tr:last-child td{border-bottom:0;}
+  td.tok{font-family:"IBM Plex Mono",monospace; font-weight:500;}
+  td .dot{display:inline-block; width:13px; height:13px; border-radius:4px; border:1px solid rgba(0,0,0,.15);
+    vertical-align:-2px; margin-right:8px;}
+  .pass{color:var(--ok-text); font-weight:600;} .warnc{color:var(--warn-text); font-weight:600;}
+  .grouprow td{background:var(--sunken); font-family:"IBM Plex Mono",monospace; font-size:.7rem;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:600;}
+
+  /* phone mocks */
+  .mocks{display:flex; flex-wrap:wrap; gap:40px; margin-top:26px; justify-content:center;}
+  .device{width:300px; flex:0 0 auto;}
+  .device .label{text-align:center; font-family:"IBM Plex Mono",monospace; font-size:.72rem;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;}
+  .screen{border:9px solid #11171b; border-radius:34px; overflow:hidden; background:var(--m-ground);
+    box-shadow:var(--shadow-lg); font-size:13px;}
+  /* the mock uses its own fixed light-palette vars so it always shows LIGHT MODE */
+  .screen{
+    --m-ground:#F7F9FB; --m-surface:#FFFFFF; --m-sunken:#EEF1F4;
+    --m-ink:#151A1E; --m-muted:#5A6672; --m-faint:#9AA5AF;
+    --m-accent:#107C7A; --m-accent-text:#0A6360; --m-border:#E2E7EC; --m-divider:#EAEEF1;
+    --m-ok:#1E7A3E; --m-err-text:#B0271F;
+    --m-shadow:0 2px 12px -2px rgba(15,31,46,.12), 0 1px 3px rgba(15,31,46,.07);
+    color:var(--m-ink);
+  }
+  .statusbar{display:flex; justify-content:space-between; padding:7px 16px 3px; font-size:11px;
+    font-weight:600; color:var(--m-ink);}
+  .mbody{padding:4px 14px 0;}
+  .mrow{display:flex; align-items:center; justify-content:space-between;}
+  .greet{font-family:"Archivo",sans-serif; font-weight:700; font-size:19px; letter-spacing:-.02em;}
+  .subtle{color:var(--m-muted); font-size:11.5px;}
+  .iconbtn{width:34px; height:34px; border-radius:50%; background:var(--m-surface);
+    border:1px solid var(--m-border); display:flex; align-items:center; justify-content:center; box-shadow:var(--m-shadow);}
+  .hero{margin:14px 0; border-radius:16px; padding:16px; color:#fff;
+    background:linear-gradient(135deg,#127E7E,#0C6361);
+    box-shadow:0 8px 20px -6px rgba(16,124,122,.45); position:relative; overflow:hidden;}
+  .hero h4{margin:0 0 3px; font-family:"Archivo",sans-serif; font-size:15px;}
+  .hero p{margin:0; font-size:11px; color:rgba(255,255,255,.85);}
+  .hero .go{position:absolute; right:14px; top:50%; transform:translateY(-50%);
+    width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.18);
+    display:flex; align-items:center; justify-content:center; font-size:15px;}
+  .search{margin:12px 0; height:40px; border-radius:12px; background:var(--m-sunken);
+    border:1px solid var(--m-border); display:flex; align-items:center; gap:8px; padding:0 12px;
+    color:var(--m-faint); font-size:12px;}
+  .cats{display:flex; gap:8px; margin:12px 0; overflow:hidden;}
+  .cat{flex:0 0 auto; padding:7px 12px; border-radius:10px; font-size:11px; font-weight:600;
+    background:var(--m-surface); border:1px solid var(--m-border); box-shadow:var(--m-shadow);}
+  .cat.on{background:var(--m-accent); color:#fff; border-color:transparent;}
+  .sectlab{display:flex; justify-content:space-between; align-items:baseline; margin:16px 0 8px;}
+  .sectlab b{font-family:"Archivo",sans-serif; font-size:13px;}
+  .sectlab span{color:var(--m-accent-text); font-size:11px; font-weight:600;}
+  .offer{border-radius:14px; overflow:hidden; border:1px solid var(--m-border); background:var(--m-surface);
+    box-shadow:var(--m-shadow); display:flex;}
+  .offer .tag{width:74px; flex:0 0 auto; background:#1E6E4A; color:#fff; display:flex; align-items:center;
+    justify-content:center; font-weight:700; font-size:12px; text-align:center; padding:6px;}
+  .offer .oc{padding:10px 12px;}
+  .offer .oc b{font-size:12.5px;} .offer .oc div{font-size:10.5px; color:var(--m-muted);}
+  .store{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--m-divider);}
+  .store:last-child{border-bottom:0;}
+  .logo{width:38px; height:38px; border-radius:10px; background:var(--m-surface); border:1px solid var(--m-border);
+    display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--m-accent-text); font-size:12px;
+    box-shadow:var(--m-shadow);}
+  .store .sn{flex:1;} .store .sn b{font-size:12.5px;} .store .sn div{font-size:10.5px; color:var(--m-muted);}
+  .store .dist{font-size:10.5px; color:var(--m-muted); font-variant-numeric:tabular-nums;}
+  .heart{color:var(--m-err-text); font-size:14px;}
+  .bottomnav{display:flex; justify-content:space-around; padding:9px 0 12px; margin-top:12px;
+    background:var(--m-surface); border-top:1px solid var(--m-border);}
+  .bn{display:flex; flex-direction:column; align-items:center; gap:2px; font-size:9.5px; color:var(--m-faint);}
+  .bn.on{color:var(--m-accent);}
+  .bn .i{font-size:16px;}
+
+  /* profile bits */
+  .pbar{display:flex; align-items:center; gap:12px; padding:10px 0 4px;}
+  .pbar .back{width:34px; height:34px; border-radius:50%; background:var(--m-sunken);
+    display:flex; align-items:center; justify-content:center;}
+  .pbar b{font-family:"Archivo",sans-serif; font-size:18px;}
+  .pcard{margin:10px 0 18px; border-radius:16px; background:var(--m-surface); border:1px solid var(--m-border);
+    box-shadow:var(--m-shadow); padding:16px; display:flex; align-items:center; gap:13px;}
+  .pcard .av{width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,#127E7E,#0C6361);
+    color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px;}
+  .pcard .pn b{font-size:14px;} .pcard .pn div{font-size:11px; color:var(--m-muted);}
+  .plist{border-radius:16px; background:var(--m-surface); border:1px solid var(--m-border); box-shadow:var(--m-shadow); overflow:hidden;}
+  .pi{display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:1px solid var(--m-divider); font-size:12.5px;}
+  .pi:last-child{border-bottom:0;}
+  .pi .pic{width:28px; height:28px; border-radius:8px; background:var(--m-sunken); color:var(--m-accent-text);
+    display:flex; align-items:center; justify-content:center; font-size:14px;}
+  .pi .chev{margin-left:auto; color:var(--m-faint);}
+  .pi.danger{color:var(--m-err-text);} .pi.danger .pic{color:var(--m-err-text);}
+  .toggle{margin-left:auto; width:40px; height:23px; border-radius:12px; background:var(--m-accent); position:relative;}
+  .toggle::after{content:""; position:absolute; width:18px; height:18px; border-radius:50%; background:#fff; top:2.5px; right:2.5px;}
+  .seclab2{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--m-muted); margin:16px 2px 8px;}
+
+  /* before/after */
+  .ba{display:flex; flex-wrap:wrap; gap:20px; margin-top:18px;}
+  .ba .col{flex:1 1 300px; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--surface);}
+  .ba .ch{padding:8px 14px; font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--divider);}
+  .ba .cc{padding:18px;}
+  .glass-old{background:#06131A; border-radius:12px; padding:16px;}
+  .glass-old .card{background:rgba(13,30,38,.45); border:1px solid rgba(255,255,255,.08); border-radius:10px;
+    padding:12px; color:#8BA3AD; font-size:12px;}
+  .glass-old .card b{color:#fff;}
+  .glass-new{background:#F7F9FB; border-radius:12px; padding:16px;}
+  .glass-new .card{background:#fff; border:1px solid #E2E7EC; border-radius:10px; padding:12px; color:#5A6672;
+    font-size:12px; box-shadow:0 2px 12px -2px rgba(15,31,46,.12);}
+  .glass-new .card b{color:#151A1E;}
+
+  .note{font-size:.86rem; color:var(--muted); border-left:2px solid var(--accent); padding-left:12px; margin-top:14px;}
+  ul.tight{margin:6px 0 0; padding-left:20px;} ul.tight li{margin:4px 0;}
+  .askrow{margin-top:14px; padding:14px 16px; background:var(--sunken); border-radius:10px; font-size:.9rem;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Ticket 01 · palette prototype · react before it locks</div>
+    <h1>MallAR Light Palette</h1>
+    <p>A proposed semantic colour system for MallAR — one set of tokens, light + dark values, every text/UI
+    pair meeting WCAG&nbsp;AA. Below: the one call that needs your eye (the teal), the full token table, the
+    two busiest screens rendered in it, and what happens to the dark “glass/glow” look. This page itself is
+    painted in the proposed palette.</p>
+  </header>
+
+  <section id="decision">
+    <div class="eyebrow">The one decision</div>
+    <h2>Teal, split into three roles</h2>
+    <p class="lead">The brand teal <code>#1A8C8C</code> is locked as the accent — but as small text or an
+    icon on white it lands at <b>4.1:1</b>, under the 4.5:1 AA bar (the inventory already caught
+    <code>CyanGlow</code> text at ~1.2:1 and green at ~2.5:1). Fix: keep <code>#1A8C8C</code> as the brand
+    mark, and use two AA-tuned teals for anything functional.</p>
+
+    <div class="decision">
+      <div class="swatch-row">
+        <div class="chip">
+          <div class="box" style="background:#1A8C8C;color:#fff">Aa</div>
+          <div class="cap"><b>brandTeal</b> <span class="mono">#1A8C8C</span><br>logo, splash, large decorative fills only · <span class="warnc">4.1:1 — large text only</span></div>
+        </div>
+        <div class="chip">
+          <div class="box" style="background:#107C7A;color:#fff">Aa</div>
+          <div class="cap"><b>accent</b> <span class="mono">#107C7A</span><br>button / toggle / FAB / active-tab fill · white on it <span class="pass">5.1:1 AA</span></div>
+        </div>
+        <div class="chip">
+          <div class="box" style="background:#fff;color:#0A6360;border-color:#E2E7EC">Aa</div>
+          <div class="cap"><b>accentText</b> <span class="mono">#0A6360</span><br>teal as text / icon / link on light surface · <span class="pass">7.0:1 AA</span></div>
+        </div>
+      </div>
+      <p class="note">Purple <code>#9D5CFF</code> (<code>DesignPurple</code>) and the bespoke indigo
+      <code>#5847E8</code> in <code>DestinationSelectionScreen</code> are both retired — everything routes to
+      the teal roles. Gold <code>#C39D51</code> is dropped for now (no confident use; can return as a voucher
+      accent later).</p>
+    </div>
+
+    <div class="askrow">
+      <b>React to:</b> is a three-way teal split acceptable, or would you rather one teal everywhere and accept
+      that teal-coloured <em>text</em> can’t be used on light (only teal fills with white text)? The split is
+      the recommendation — it keeps the brand mark intact and makes “teal link” legal.
+    </div>
+  </section>
+
+  <section id="tokens">
+    <div class="eyebrow">Full token set · ~26 tokens</div>
+    <h2>Semantic tokens</h2>
+    <p class="lead">Every screen colour resolves to one of these. Contrast is measured against the token’s
+    real backdrop, after any compositing. “AA” = ≥4.5:1 for body text / ≥3:1 for large text &amp; UI edges;
+    decorative (glows, faint dividers) is exempt.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Token</th><th>Role</th><th>Light</th><th>Dark</th><th>Contrast (light)</th><th>AA</th></tr></thead>
+        <tbody>
+          <tr class="grouprow"><td colspan="6">Surfaces</td></tr>
+          <tr><td class="tok">screenBackground</td><td>app background</td><td><span class="dot" style="background:#F7F9FB"></span><span class="mono">#F7F9FB</span></td><td><span class="dot" style="background:#0E1418"></span><span class="mono">#0E1418</span></td><td>ground</td><td>—</td></tr>
+          <tr><td class="tok">surface</td><td>cards, sheets, nav bar</td><td><span class="dot" style="background:#FFFFFF"></span><span class="mono">#FFFFFF</span></td><td><span class="dot" style="background:#161D22"></span><span class="mono">#161D22</span></td><td>+ shadow, not border</td><td>—</td></tr>
+          <tr><td class="tok">surfaceSunken</td><td>search field, input well</td><td><span class="dot" style="background:#EEF1F4"></span><span class="mono">#EEF1F4</span></td><td><span class="dot" style="background:#10161A"></span><span class="mono">#10161A</span></td><td>—</td><td>—</td></tr>
+          <tr class="grouprow"><td colspan="6">Text</td></tr>
+          <tr><td class="tok">textPrimary</td><td>headings, body</td><td><span class="dot" style="background:#151A1E"></span><span class="mono">#151A1E</span></td><td><span class="dot" style="background:#E8ECEF"></span><span class="mono">#E8ECEF</span></td><td>16.6:1 on surface</td><td class="pass">AAA</td></tr>
+          <tr><td class="tok">textSecondary</td><td>captions, metadata</td><td><span class="dot" style="background:#5A6672"></span><span class="mono">#5A6672</span></td><td><span class="dot" style="background:#9BA8B0"></span><span class="mono">#9BA8B0</span></td><td>5.9:1 on surface</td><td class="pass">AA</td></tr>
+          <tr><td class="tok">textDisabled</td><td>disabled / placeholder</td><td><span class="dot" style="background:#9AA5AF"></span><span class="mono">#9AA5AF</span></td><td><span class="dot" style="background:#6B7780"></span><span class="mono">#6B7780</span></td><td>2.4:1 — decorative</td><td>exempt</td></tr>
+          <tr class="grouprow"><td colspan="6">Accent (see above)</td></tr>
+          <tr><td class="tok">brandTeal</td><td>logo, splash, big fills</td><td><span class="dot" style="background:#1A8C8C"></span><span class="mono">#1A8C8C</span></td><td><span class="dot" style="background:#2FA3B8"></span><span class="mono">#2FA3B8</span></td><td>white on it 4.1:1</td><td class="warnc">large only</td></tr>
+          <tr><td class="tok">accent</td><td>interactive fill</td><td><span class="dot" style="background:#107C7A"></span><span class="mono">#107C7A</span></td><td><span class="dot" style="background:#3FB2AC"></span><span class="mono">#3FB2AC</span></td><td>white on it 5.1:1</td><td class="pass">AA</td></tr>
+          <tr><td class="tok">accentText</td><td>teal text / icon / link</td><td><span class="dot" style="background:#0A6360"></span><span class="mono">#0A6360</span></td><td><span class="dot" style="background:#5BC9C2"></span><span class="mono">#5BC9C2</span></td><td>7.0:1 on surface</td><td class="pass">AAA</td></tr>
+          <tr><td class="tok">onAccent</td><td>text/icon on accent fill</td><td><span class="dot" style="background:#FFFFFF"></span><span class="mono">#FFFFFF</span></td><td><span class="dot" style="background:#06201F"></span><span class="mono">#06201F</span></td><td>on accent 5.1:1</td><td class="pass">AA</td></tr>
+          <tr class="grouprow"><td colspan="6">Lines</td></tr>
+          <tr><td class="tok">border</td><td>card / input outline</td><td><span class="dot" style="background:#E2E7EC"></span><span class="mono">#E2E7EC</span></td><td><span class="dot" style="background:#2A343A"></span><span class="mono">#2A343A</span></td><td>hairline — decorative</td><td>exempt</td></tr>
+          <tr><td class="tok">borderStrong</td><td>focused input</td><td><span class="dot" style="background:#107C7A"></span><span class="mono">= accent</span></td><td><span class="dot" style="background:#3FB2AC"></span><span class="mono">= accent</span></td><td>3.1:1 on ground</td><td class="pass">AA</td></tr>
+          <tr><td class="tok">divider</td><td>list row separators</td><td><span class="dot" style="background:#EAEEF1"></span><span class="mono">#EAEEF1</span></td><td><span class="dot" style="background:#232C31"></span><span class="mono">#232C31</span></td><td>decorative</td><td>exempt</td></tr>
+          <tr class="grouprow"><td colspan="6">Status — paired fg/bg (codex C14)</td></tr>
+          <tr><td class="tok">success / onSuccess</td><td>parking saved, redeemed</td><td><span class="dot" style="background:#1E7A3E"></span><span class="mono">#1E7A3E</span> / #FFF</td><td><span class="dot" style="background:#3EA55F"></span><span class="mono">#3EA55F</span> / #06201F</td><td>white on it 5.4:1</td><td class="pass">AA</td></tr>
+          <tr><td class="tok">successText</td><td>green as text on surface</td><td><span class="dot" style="background:#136B32"></span><span class="mono">#136B32</span></td><td><span class="dot" style="background:#6FCB89"></span><span class="mono">#6FCB89</span></td><td>5.9:1 on surface</td><td class="pass">AA</td></tr>
+          <tr><td class="tok">error / onError</td><td>failed scan, destructive</td><td><span class="dot" style="background:#C0362C"></span><span class="mono">#C0362C</span> / #FFF</td><td><span class="dot" style="background:#E06A60"></span><span class="mono">#E06A60</span> / #1A0E0D</td><td>white on it 5.5:1</td><td class="pass">AA</td></tr>
+          <tr><td class="tok">errorText</td><td>error text, favourite heart</td><td><span class="dot" style="background:#B0271F"></span><span class="mono">#B0271F</span></td><td><span class="dot" style="background:#EE9089"></span><span class="mono">#EE9089</span></td><td>6.1:1 on surface</td><td class="pass">AA</td></tr>
+          <tr><td class="tok">warningText</td><td>“coming soon”, caution</td><td><span class="dot" style="background:#8A5A00"></span><span class="mono">#8A5A00</span></td><td><span class="dot" style="background:#D8A24B"></span><span class="mono">#D8A24B</span></td><td>5.9:1 on surface</td><td class="pass">AA</td></tr>
+          <tr class="grouprow"><td colspan="6">Always-dark set — identical in both app themes (camera / AR HUD / map / splash)</td></tr>
+          <tr><td class="tok">scrimSurface</td><td>dark chrome over camera</td><td colspan="2"><span class="dot" style="background:#0E1A1F"></span><span class="mono">#0E1A1F</span></td><td>—</td><td>—</td></tr>
+          <tr><td class="tok">scrimCard</td><td>panels on the AR HUD</td><td colspan="2"><span class="dot" style="background:#182830"></span><span class="mono">#182830</span></td><td>—</td><td>—</td></tr>
+          <tr><td class="tok">onScrim / onScrimMuted</td><td>text on scrim</td><td colspan="2"><span class="dot" style="background:#F2F5F6"></span><span class="mono">#F2F5F6</span> / <span class="dot" style="background:#9BAAB2"></span>#9BAAB2</td><td>13:1 / 4.6:1</td><td class="pass">AA</td></tr>
+          <tr><td class="tok">scrim</td><td>dialog / sheet backdrop</td><td colspan="2"><span class="mono">#000000 @ 40%</span></td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>Alpha rule (codex C7):</b> tokens are <em>opaque</em> values. The old code stored
+    alpha in “tokens” (<code>GlassCardBg.copy(0.45f)</code>, <code>Color.White.copy(0.08f)</code>), which
+    makes contrast depend on whatever is behind them. Only <code>scrim</code> and one <code>hairline</code>
+    overlay carry alpha, and both are measured composited.</p>
+  </section>
+
+  <section id="screens">
+    <div class="eyebrow">The two busiest screens, rendered in the palette</div>
+    <h2>Home &amp; Profile — light mode</h2>
+    <p class="lead">Simplified but faithful to the real layouts. The point is the <em>colour</em>: white cards
+    on the cool-grey ground, teal reserved for the one primary action + links, a real soft shadow instead of
+    the dark-mode glass, status-bar icons now dark so they’re visible.</p>
+
+    <div class="mocks">
+      <div class="device">
+        <div class="label">Home</div>
+        <div class="screen">
+          <div class="statusbar"><span>9:41</span><span>&#9679;&#9679;&#9679; &#9887; &#9099;</span></div>
+          <div class="mbody">
+            <div class="mrow" style="margin-top:6px">
+              <div>
+                <div class="greet">Hi, Youssef</div>
+                <div class="subtle">City Stars · discover brands</div>
+              </div>
+              <div class="iconbtn">&#128276;</div>
+            </div>
+            <div class="hero">
+              <h4>Start Navigation</h4>
+              <p>Scan a store logo to place yourself</p>
+              <div class="go">&#8594;</div>
+            </div>
+            <div class="search">&#128269;&nbsp; Search stores, brands, food…</div>
+            <div class="cats">
+              <div class="cat on">All</div><div class="cat">Fashion</div><div class="cat">Dining</div><div class="cat">Jewellery</div>
+            </div>
+            <div class="sectlab"><b>Offers &amp; Vouchers</b><span>See all</span></div>
+            <div class="offer">
+              <div class="tag">FREE UPSIZE</div>
+              <div class="oc"><b>Starbucks</b><div>On any beverage · Floor 2</div></div>
+            </div>
+            <div class="sectlab"><b>Popular stores</b><span>See all</span></div>
+            <div class="store"><div class="logo">ZA</div><div class="sn"><b>Zara</b><div>Fashion · Floor 1</div></div><div class="dist">80&nbsp;m</div><div class="heart">&#9829;</div></div>
+            <div class="store"><div class="logo">MA</div><div class="sn"><b>Mango</b><div>Fashion · Floor 1</div></div><div class="dist">120&nbsp;m</div><div class="heart" style="color:var(--m-faint)">&#9825;</div></div>
+          </div>
+          <div class="bottomnav">
+            <div class="bn on"><span class="i">&#8962;</span>Home</div>
+            <div class="bn"><span class="i">&#128506;</span>Map</div>
+            <div class="bn"><span class="i">&#129302;</span>Ask&nbsp;AI</div>
+            <div class="bn"><span class="i">&#128100;</span>Profile</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="device">
+        <div class="label">Profile</div>
+        <div class="screen">
+          <div class="statusbar"><span>9:41</span><span>&#9679;&#9679;&#9679; &#9887; &#9099;</span></div>
+          <div class="mbody">
+            <div class="pbar"><div class="back">&#8592;</div><b>Profile</b></div>
+            <div class="pcard">
+              <div class="av">Y</div>
+              <div class="pn"><b>Youssef Ibrahim</b><div>+20 •• •• 4471</div></div>
+              <div style="margin-left:auto;color:var(--m-accent-text);font-size:12px">Edit</div>
+            </div>
+            <div class="seclab2">Favourite stores</div>
+            <div class="plist">
+              <div class="pi"><span class="pic">&#9829;</span> Zara <span class="chev">&#8250;</span></div>
+              <div class="pi"><span class="pic">&#9829;</span> Sephora <span class="chev">&#8250;</span></div>
+            </div>
+            <div class="seclab2">Settings</div>
+            <div class="plist">
+              <div class="pi"><span class="pic">&#127760;</span> Language <span style="margin-left:auto;color:var(--m-muted);font-size:11px">English &#8250;</span></div>
+              <div class="pi"><span class="pic">&#127761;</span> Dark mode <span class="toggle"></span></div>
+              <div class="pi"><span class="pic">&#128276;</span> Notifications <span class="chev">&#8250;</span></div>
+              <div class="pi danger"><span class="pic">&#8618;</span> Log out</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note">The three screens that already read <code>MaterialTheme.colorScheme</code> (Profile,
+    Language, Permissions) barely change — they just need the scheme filled in. The other 22 are where the
+    literal-to-token work is.</p>
+  </section>
+
+  <section id="glass">
+    <div class="eyebrow">Recommendation · the “glass / glow” look</div>
+    <h2>Light mode drops the glass</h2>
+    <p class="lead">The Home flow leans on translucent dark cards + an animated accent glow. Neither reads on
+    white — a 45%-opacity card over a white ground is just a slightly grey box, and a soft glow on white is
+    invisible. Recommendation: <b>light mode = flat surfaces + one real shadow + the teal on the primary
+    action.</b> Emphasis comes from elevation and the accent button, not light bloom.</p>
+    <div class="ba">
+      <div class="col"><div class="ch">Dark mode — keep the glass</div><div class="cc">
+        <div class="glass-old"><div class="card"><b>Start Navigation</b><br>translucent card, 1px white-08 border, animated glow</div></div>
+      </div></div>
+      <div class="col"><div class="ch">Light mode — flat + elevation</div><div class="cc">
+        <div class="glass-new"><div class="card"><b>Start Navigation</b><br>solid white surface, hairline border, soft shadow</div></div>
+      </div></div>
+    </div>
+    <ul class="tight">
+      <li>The infinite glow animations (<code>rememberInfiniteTransition</code> on the hero + search) — <b>disabled in light mode</b>, kept in dark. Also respects reduced-motion.</li>
+      <li>The one exception: a <b>static</b> 6% <code>accent</code> radial wash behind the hero card only — reads as a faint tint, not a glow. Optional; drop it if you want fully flat.</li>
+      <li><code>StoreLogoContainer</code> stops forcing a white box in dark mode — it uses <code>surface</code>.</li>
+    </ul>
+    <div class="askrow"><b>React to:</b> flat + elevation for light mode — yes, or do you want to try to
+    preserve a hint of the glow identity?</div>
+  </section>
+
+  <section id="splash">
+    <div class="eyebrow">Recommendation · splash</div>
+    <h2>One brand splash, both modes</h2>
+    <p class="lead">Today the splash is hardcoded navy <code>#06131A</code> — not a brand colour. Ticket 06
+    already decided the splash keeps one fixed background (no <code>values-night</code>). Recommendation:
+    <b><code>#0F5F5F</code></b> — the deep brand teal (<code>DarkTeal</code>), logo in white on top. On-brand,
+    works as a bridge into either mode, sub-second.</p>
+    <div class="swatch-row">
+      <div class="chip"><div class="box" style="background:#06131A;color:#8BA3AD">now</div><div class="cap">#06131A · arbitrary navy</div></div>
+      <div class="chip"><div class="box" style="background:#0F5F5F;color:#fff">proposed</div><div class="cap"><b>#0F5F5F</b> · deep brand teal</div></div>
+      <div class="chip"><div class="box" style="background:#1A8C8C;color:#fff">alt</div><div class="cap">#1A8C8C · full brand teal (brighter)</div></div>
+    </div>
+    <div class="askrow"><b>React to:</b> <code>#0F5F5F</code> deep-teal splash — or the brighter
+    <code>#1A8C8C</code>, or keep it dark?</div>
+  </section>
+
+  <section id="next">
+    <div class="eyebrow">If this locks</div>
+    <h2>What Ticket 01 hands to Ticket 03</h2>
+    <ul class="tight">
+      <li>The ~26 token names + light &amp; dark hex above become the palette table in <code>docs/Theming/</code>.</li>
+      <li>Ticket 03 maps each M3 <code>ColorScheme</code> role to one of these (<code>primary = accent</code>,
+      <code>onPrimary = onAccent</code>, <code>surface</code>, <code>outline = border</code>,
+      <code>error</code>, the <code>surfaceContainer*</code> ladder to <code>surface</code>/<code>sunken</code>,
+      etc. — no Material purple left).</li>
+      <li>Ticket 08 turns the app-specific ones (<code>accentText</code>, <code>scrim*</code>,
+      <code>*Text</code> status variants, shadow) into the <code>MallColors</code> extension.</li>
+      <li>Open sub-question for Ticket 03: does <code>DestinationSelectionScreen</code>’s bespoke violet
+      system get fully flattened to teal, or keep <em>one</em> distinct hue as a wayfinding cue? Prototype
+      says flatten.</li>
+    </ul>
+  </section>
+</div>
