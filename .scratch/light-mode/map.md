@@ -47,6 +47,14 @@ changed by this map; the migration tickets are the handoff boundary.
   owed. Charting is done. From here the map is *worked*: one ticket at a time along the critical
   path 02 → 06 → 03 → 08 → 04 → 05 (01, 07 parallel). Re-opening a locked decision needs a fresh
   user call, not an in-session edit.
+- **▶ RESUME POINT (2026-09-10, after a context compaction)**: Tickets **02, 06, 01, 07 are
+  RESOLVED** (see Decisions so far + each issue's `## Answer`). **Next ticket: 03 — palette +
+  token spec** (grilling, HITL; all inputs ready). Then 08 → 04 → 05. The user is driving this
+  interactively: work the next ticket by claiming it, running `grilling` + `domain-modeling`, and
+  bringing them the decisions one round at a time. `agy` (`gemini-3.8-flash-high`) is the
+  implementer for AFK/task tickets and the post-05 migration batches; the orchestrator reviews
+  every diff, the **user** does per-batch on-device visual sign-off. Nothing is pushed. All work
+  committed on `feat/colors-light-modes`.
 - **Sync mode bootstrap — IN SCOPE** (user sign-off, resolves codex C4): the foundation ticket
   reads the persisted dark-mode preference synchronously before the first themed frame. Ticket 06
   §6 specifies *how*; that it happens is settled.
@@ -132,8 +140,15 @@ changed by this map; the migration tickets are the handoff boundary.
   off in light (kept in dark). Splash = `#0F5F5F` deep teal, both modes. `DestinationSelectionScreen`
   violet **flattened to teal**. Tokens are **opaque** (only `scrim` carries alpha).
 
-_Frontier now: **Ticket 07** (verification). Critical path: **03 → 08 → 04 → 05** — Ticket 03 is
-now unblocked (01 ✓, 02 ✓, 06 ✓)._
+- [Ticket 07 — visual-regression verification](issues/07-visual-regression-verification.md):
+  resolved via grilling. **Manual QA, no screenshot library** (colour-only migration, no CI).
+  One automated guardrail added by the foundation ticket: a JVM contrast/`ColorScheme`-completeness
+  unit test in `testDebugUnitTest`. **Per-batch on-device visual sign-off is the user's** (Q3=b) —
+  orchestrator runs code gates + reviews the diff, user runs the screens on device both modes
+  against a 6-point checklist before the next batch. `before/` baseline captured lazily per batch.
+
+_Frontier now: **Ticket 03** (palette + token spec). Critical path: **03 → 08 → 04 → 05**. All
+inputs to 03 are resolved (01 ✓, 02 ✓, 06 ✓)._
 
 ## Not yet specified
 
