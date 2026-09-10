@@ -381,7 +381,10 @@ does not shrink it is incomplete. **The final batch (Ticket 05 "Lint-gate flip")
 allowlist and switches the task to a plain hard-error.** This gate and the §6 contrast test are
 both green only at migration end — expected, tracked per-batch.
 
-## 10. What this unblocks
+## 10. Migration
 
-- **Ticket 05** — the migration batch tickets; §7 is the foundation ticket's build target,
-  §9 is its lint-gate spec.
+The work is sliced into **13 sequential `agy` batch tickets** in
+[`migration-tickets.md`](migration-tickets.md) — Batch 00 (foundation: §7 API, §6 contrast test,
+§8 elevation, §9 lint task) through Batch 12 (lint-gate hard-error flip), with a core-flow
+milestone at Batch 07. Each batch is one delegate-and-review cycle; the user signs each off on a
+device before the next starts.

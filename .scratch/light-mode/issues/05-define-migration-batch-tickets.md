@@ -1,5 +1,6 @@
 Type: task
-Status: open
+Status: resolved
+Claimed by: Youssef Ibrahim (orchestrator) 2026-09-10
 Blocked by: 02, 03, 04, 06, 07, 08
 
 ## Question
@@ -62,3 +63,35 @@ only if the user wants progress reflected here.
 
 **Output**: the migration ticket set, linked here and from `docs/Theming/`. The answer records the
 final ticket list. This closes the map's charting work.
+
+## Answer
+
+Resolved 2026-09-10. User signed off on the batch slicing (Q1–Q3 "agreed on all").
+
+**Deliverable**: [`docs/Theming/migration-tickets.md`](../../../docs/Theming/migration-tickets.md)
+— execution model, gate set, per-screen QA checklist, master token-mapping table, dependency
+graph, core-flow milestone, **13 full batch tickets (00–12)** each with file list + literal
+counts + special-handling flags + acceptance criteria, and the fog-resolution table.
+
+**Reconciled the agy-proposed grouping (`screen-inventory.md` §4) against the locked tickets:**
+- Batch 01 **deletes `colors.xml`** and creates **no `values-night/`** (Ticket 06 — agy had
+  "repurpose" + "create values-night").
+- Batch 02 **deletes `rememberHomeColorScheme`/`HomeColorScheme` outright**, call sites read
+  `MallTheme.colors.*` not raw `LocalMallColors.current` (Ticket 08 §7.4).
+- Batch 00 also lands the **JVM contrast test** (Ticket 07 §6) and the **`Elevation` constants**
+  (Ticket 08 §8); Batch 12 is the **`checkThemeColors` Gradle regex task** flip, not detekt
+  (Ticket 04).
+
+**Q1 pilots (codex C11)**: Batch 00 pilots = `LanguageScreen` + `ProfileScreen` (both already
+consume M3, zero shared-renderer dependency — prove the token system with no half-migrated dep
+in foundation). Always-dark contract proven in Batch 01 (`SplashScreen` + `DarkSystemBars()`);
+Home-flow proof lands naturally at Batch 04.
+
+**Q2**: the map tracks batch status — "Migration progress" ledger added to `map.md` (13 rows,
+status each).
+
+**Q3**: strictly sequential — one `agy` dispatch, one review, one commit, one device sign-off
+per batch; gating order 00 → {01, 02} → area batches → 12 is a hard dependency.
+
+**This closes the map's charting work.** From here: `agy` executes the batches, orchestrator
+reviews + commits, user signs off each on device. Nothing pushed.

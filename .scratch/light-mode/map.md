@@ -44,18 +44,21 @@ changed by this map; the migration tickets are the handoff boundary.
   before-screenshots; a core-flow milestone added to Ticket 05. Locked decisions were not
   reopened.
 - **MAP LOCKED — 2026-09-10** (user sign-off). Both adversarial rounds complete, nothing else
-  owed. Charting is done. From here the map is *worked*: one ticket at a time along the critical
-  path 02 → 06 → 03 → 08 → 04 → 05 (01, 07 parallel). Re-opening a locked decision needs a fresh
-  user call, not an in-session edit.
-- **▶ RESUME POINT (2026-09-10, after a context compaction)**: Tickets **02, 06, 01, 07, 03, 08,
-  04 are RESOLVED** (see Decisions so far + each issue's `## Answer`). **Next ticket: 05 — define
-  the ~13 migration batch tickets** (task, HITL sign-off on the batch list; the LAST decision
-  ticket). It produces `docs/Theming/migration-tickets.md`. After 05 the map's decision work is
-  done and `agy` runs the batches (orchestrator reviews each diff + gates, user signs off each
-  batch on device). `agy` (`gemini-3.8-flash-high`) is the
-  implementer for AFK/task tickets and the post-05 migration batches; the orchestrator reviews
-  every diff, the **user** does per-batch on-device visual sign-off. Nothing is pushed. All work
-  committed on `feat/colors-light-modes`.
+  owed. Re-opening a locked decision needs a fresh user call, not an in-session edit.
+- **CHARTING COMPLETE — 2026-09-10.** All 8 tickets resolved along 02 → 06 → 03 → 08 → 04 → 05
+  (01, 07 parallel). Spec written: `docs/Theming/README.md` + `palette.md` +
+  `migration-tickets.md`. The map is now in its **execution phase** — see the RESUME POINT and
+  the Migration progress ledger. This map's plan-only mandate is fulfilled; the batch tickets are
+  the handoff boundary and `agy` runs them under orchestrator review.
+- **▶ RESUME POINT (2026-09-10)**: **ALL 8 TICKETS RESOLVED. CHARTING COMPLETE.** The spec is
+  written — `docs/Theming/README.md` (§1–§10) + `palette.md` + `migration-tickets.md` (13 batch
+  tickets 00–12). **Next: execute the migration.** Dispatch **Batch 00 (Foundation)** to `agy`
+  (`gemini-3.8-flash-high`) per the `agy-delegate` skill using
+  `docs/Theming/migration-tickets.md` § "Batch 00" as the brief source. Strictly sequential: one
+  dispatch → orchestrator reviews the diff + runs the gate set → orchestrator commits on
+  `feat/colors-light-modes` → **user runs the affected screens on a device both modes vs the
+  QA checklist and signs off** → next batch. Update the "Migration progress" ledger below after
+  each batch. Nothing is pushed.
 - **Sync mode bootstrap — IN SCOPE** (user sign-off, resolves codex C4): the foundation ticket
   reads the persisted dark-mode preference synchronously before the first themed frame. Ticket 06
   §6 specifies *how*; that it happens is settled.
@@ -182,8 +185,38 @@ changed by this map; the migration tickets are the handoff boundary.
   `config/theme-migration-allowlist.txt` each batch shrinks; **Ticket 05's final "Lint-gate flip"
   batch deletes it + hard-errors.** **Unblocks Ticket 05.**
 
-_Frontier now: **Ticket 05** (define the ~13 migration batch tickets) — the last decision ticket.
-All inputs resolved (02/03/04/06/07/08 ✓). After 05: `agy` runs the batches._
+- [Ticket 05 — define the migration batch tickets](issues/05-define-migration-batch-tickets.md):
+  resolved (user signed off the slicing). Deliverable
+  [`docs/Theming/migration-tickets.md`](../../docs/Theming/migration-tickets.md) — **13 sequential
+  `agy` batch tickets 00–12**, execution model, gate set (`compileDebugKotlin` +
+  `testDebugUnitTest` + `compileDebugAndroidTestKotlin` + `checkThemeColors` + `lintDebug`),
+  per-screen QA checklist, master token-mapping table, dependency graph, core-flow milestone at
+  Batch 07. Reconciled agy's `screen-inventory.md §4` grouping against the locked tickets
+  (colors.xml deleted not repurposed; no values-night; `rememberHomeColorScheme` deleted;
+  contrast test + Elevation constants + `checkThemeColors` land in Batch 00/12). Pilots =
+  `LanguageScreen` + `ProfileScreen` (codex C11 resolution). **Charting complete.**
+
+_Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `agy`. Track below._
+
+## Migration progress
+
+<!-- update after each batch: pending → agy-drafted → in-review → landed → signed-off -->
+
+| Batch | Scope | Status |
+|---|---|---|
+| 00 | Foundation (theme pkg, MallColors, contrast test, checkThemeColors, pilots Language+Profile) | pending |
+| 01 | XML + system-bars + bootstrap (delete colors.xml, sync init, DarkSystemBars) | pending |
+| 02 | Shared renderers (StoreLogo, HomeSharedComponents; delete rememberHomeColorScheme) | pending |
+| 03 | Auth & onboarding (auth/ ×5) | pending |
+| 04 | Core Home (Homescreen.kt) | pending |
+| 05 | Offers & Vouchers | pending |
+| 06 | Destination (flatten Dsel* violet) | pending |
+| 07 | Profile / Settings / Saved — **core-flow milestone** | pending |
+| 08 | Parking suite ×4 (54 literals) | pending |
+| 09 | Localization / first-run / camera ×5 | pending |
+| 10 | Navigation HUD & map chrome ×2 | pending |
+| 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | pending |
+| 12 | Lint-gate hard-error flip | pending |
 
 ## Not yet specified
 
