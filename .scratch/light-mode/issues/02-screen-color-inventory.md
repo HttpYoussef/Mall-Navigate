@@ -1,5 +1,6 @@
 Type: task
-Status: open
+Status: claimed
+Claimed by: Youssef Ibrahim (orchestrator) — delegated to agy 2026-09-10
 Blocked by: none
 
 ## Question

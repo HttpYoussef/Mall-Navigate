@@ -47,13 +47,14 @@ token system. Decision only — no code changes from this ticket; the outcome fe
    .setDefaultNightMode` so they agree. Include a decision + acceptance case for **keyboard/IME
    appearance** (the chatbot opens an `OutlinedTextField` IME — `ChatBottomSheet.kt`) and for
    **Activity recreation** on a night-mode change.
-6. **Synchronous mode bootstrap** (codex C4). `AppPreferences.isDarkMode` starts `false` and
-   loads async on `Dispatchers.IO`; `MainActivity` calls `setContent` immediately, so a saved
-   dark-mode user gets a **light first frame → dark** flash while the native splash stays
-   XML-dark. Decide: does the foundation ticket read the persisted mode **synchronously** before
-   the first themed frame (SharedPreferences blocking read, or `installSplashScreen` keep-condition
-   until loaded)? Requires a cold-start acceptance test. **Flag**: this implies a small startup
-   change — confirm it's wanted before Ticket 05 bakes it into the foundation ticket.
+6. **Synchronous mode bootstrap** — **IN SCOPE** (user sign-off 2026-09-10, resolves codex C4).
+   `AppPreferences.isDarkMode` starts `false` and loads async on `Dispatchers.IO`; `MainActivity`
+   calls `setContent` immediately, so a saved dark-mode user gets a **light first frame → dark**
+   flash while the native splash stays XML-dark. *That* it's fixed is settled; this ticket decides
+   *how*: SharedPreferences blocking read in `MainActivity.onCreate` before `setContent`, vs an
+   `installSplashScreen` keep-condition until the pref loads, vs seeding `AppPreferences` from a
+   synchronous read at construction. Pick one and specify a cold-start acceptance test (saved
+   dark user, no light frame).
 
 **Output**: the answer records the XML strategy, the route-aware system-bar contract, the
 authoritative-mode decision, and the bootstrap decision + smallest-change boundary. Feeds

@@ -42,7 +42,19 @@ changed by this map; the migration tickets are the handoff boundary.
   Ticket 06 gains the route-aware system-bar contract, synchronous mode bootstrap, and
   authoritative-mode decision; Ticket 07 gains the fixture-harness contract and owns the
   before-screenshots; a core-flow milestone added to Ticket 05. Locked decisions were not
-  reopened. **The map is now ready to lock** pending user sign-off.
+  reopened.
+- **MAP LOCKED — 2026-09-10** (user sign-off). Both adversarial rounds complete, nothing else
+  owed. Charting is done. From here the map is *worked*: one ticket at a time along the critical
+  path 02 → 06 → 03 → 08 → 04 → 05 (01, 07 parallel). Re-opening a locked decision needs a fresh
+  user call, not an in-session edit.
+- **Sync mode bootstrap — IN SCOPE** (user sign-off, resolves codex C4): the foundation ticket
+  reads the persisted dark-mode preference synchronously before the first themed frame. Ticket 06
+  §6 specifies *how*; that it happens is settled.
+- **Execution after Ticket 05**: the user wants the migration itself delegated to `agy` and the
+  orchestrator to run the queue to completion. Note this stays a delegate-and-review loop — `agy`
+  writes each batch, the orchestrator reviews the diff and lands it. The *decision* tickets
+  (01, 03, 04, 06, 07, 08) are HITL and still need the user in the loop; only Ticket 02 (AFK) and
+  the post-05 migration batches are `agy` work.
 - Skills each session should consult: `grilling` + `domain-modeling` (for the spec / API ticket),
   `prototype` (for the palette ticket). No research tickets — Material 3 + this codebase are the
   only sources and both are in hand.
