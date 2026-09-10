@@ -10,9 +10,16 @@ can be sliced into implementer-sized batches, no light-mode breakage is missed, 
 
 AFK — this is code reading, no decision. It is the sole frontier ticket; run it first.
 
-**Part A — Compose screens.** For every `*.kt` file under
-`app/src/main/java/com/example/mallar/ui/**` produce a row:
-- File + rough screen/component name.
+**Part A — Compose files.** For every `*.kt` file under
+`app/src/main/java/com/example/mallar/ui/**`, first **classify** it (codex C10):
+- **route screen** — a top-level destination in the nav graph,
+- **shared renderer** — a composable used by 2+ screens (`HomeSharedComponents`, `StoreLogo`,
+  `ChatBottomSheet`, …),
+- **non-rendering support** — ViewModel, state holder, pure helper (no colour surface).
+
+Publish a **route manifest** (nav-graph destination → file) alongside the table. Then per file
+produce a row:
+- File + rough screen/component name + classification.
 - Colour sources used: raw `Color(0x…)` literals (count), `Color.White`/`.Black`/`.Gray`,
   named constants from `Color.kt` / `HomeSharedComponents.kt`, `MaterialTheme.colorScheme.*`,
   `rememberHomeColorScheme`, XML `@color/…` refs, `Brush`/gradient literals, `.copy(alpha=…)`
@@ -33,20 +40,27 @@ AFK — this is code reading, no decision. It is the sole frontier ticket; run i
   `chat_*`, `camera_*`, `home_*`, `auth_gradient_*`, `store_detail_*`, `path_*`).
 - Any `res/layout/`, `res/drawable/`, `res/menu/` files with hardcoded colour.
 
-**Then produce:**
-1. `.scratch/light-mode/screen-inventory.md` — the full Part A table + Part B tables.
-2. **Before-screenshots** of every screen in the current build, both light and dark mode, saved
-   under `.scratch/light-mode/before/` — the regression baseline Tickets 01, 05, 07 rely on.
-   (If a device/emulator build isn't available to this session, say so and list exactly which
-   screens still need capturing.)
-3. A proposed **batch grouping** for migration — by area (Home flow, Auth/onboarding, Parking,
-   Navigation/AR, Profile/Settings, Localization, shared components) **plus separate harder
-   batches** for the bespoke-dark-palette screens (AI assistant, Chatbot sheet, StoreDetail) and
-   the XML layer — with a rough per-batch size (file count, literal count) so each is plausibly
-   one implementer session.
-4. A **surprises list** for the map's fog — anything that isn't a simple literal-to-token swap
-   (status-colour groups, AR material colours, `.copy(alpha=)` faked dark mode, components shared
-   across light + always-dark screens, `DayNight` parent implying `values-night` is expected).
+Screenshot capture is **not** in this ticket — it moved to Ticket 07 (fixture harness + baseline).
 
-**Output**: `screen-inventory.md` + `before/` linked from this ticket; the answer records the
-batch grouping and surprises list. Unblocks Tickets 01, 06, 07; feeds 03 and 05.
+**Then produce:**
+1. `.scratch/light-mode/screen-inventory.md` — the route manifest + full Part A table (grouped
+   by classification) + Part B tables.
+2. A proposed **batch grouping** for migration, sized honestly (codex C10 — expect ~13 implementer
+   sessions once foundation + XML + lint-flip are counted, not ~8):
+   - **route-screen batches** by area (Home flow, Auth/onboarding, Parking, Navigation/AR chrome,
+     Profile/Settings, Localization),
+   - **shared-renderer batch(es)** — called out separately because they gate the screens that use
+     them (codex C11),
+   - **bespoke-dark batches** — AI assistant, Chatbot sheet, StoreDetail (own full dark palettes),
+   - **XML-layer batch**,
+   - non-rendering support files listed as **no-op** (no migration).
+   Give each batch a rough size (file count, literal count) so each is plausibly one session.
+3. A **surprises list** for the map's fog — anything that isn't a simple literal-to-token swap:
+   status-colour groups + their fg/bg pairs (feeds Ticket 03, codex C14), `OfferItem.tint`-style
+   data-owned colours (codex C13), AR scene-material colours vs map-mode Compose indicators
+   (codex C14), `.copy(alpha=)` faked dark mode + alpha-bearing "tokens" (feeds Ticket 03,
+   codex C7), renderers shared across light + always-dark screens, the `DayNight` parent implying
+   `values-night` is expected (codex C15).
+
+**Output**: `screen-inventory.md` + route manifest linked from this ticket; the answer records the
+batch grouping and surprises list. Unblocks Tickets 01, 06, 07; feeds 03, 05, 08.

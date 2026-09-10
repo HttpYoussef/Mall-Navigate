@@ -30,16 +30,31 @@ token system. Decision only — no code changes from this ticket; the outcome fe
    still referenced?
 3. **Splash** — `windowSplashScreenBackground` per mode (needs `values-night`), or accept one
    fixed brand background for the splash moment (coordinate with Ticket 01's splash rec).
-4. **System-bar appearance** — where does `isAppearanceLightStatusBars` / nav-bar icon mode get
-   set once, keyed on `isDarkMode`? (A `SideEffect` in `MallARTheme`, or in `MainActivity`.)
-   Does this effort adopt `enableEdgeToEdge()` / `WindowCompat.setDecorFitsSystemWindows(false)`,
-   or leave window-fitting exactly as-is and only fix the icon colour? Prefer the smallest change
-   that makes light mode correct — no layout-inset refactor unless the inventory shows it's
-   already broken.
-5. **`AppCompatDelegate.setDefaultNightMode`** — is it called anywhere today? If the XML
-   `DayNight` parent is going to keep mattering, the app's `isDarkMode` toggle may need to drive
-   `setDefaultNightMode` too so XML and Compose agree. Decide whether that coupling is in scope
-   or the XML side is simply pinned to one mode.
+4. **System-bar appearance — route/surface-aware, not global** (codex C3). A single
+   `isDarkMode`-keyed `SideEffect` is wrong: in **light mode** the always-dark routes
+   (`LogoScanScreen`, `UnifiedNavigationScreen`, `ParkingCameraScreen`) still render dark
+   surfaces, so global light-mode icons would be dark-on-dark. Decide the **override contract**:
+   how a route declares "my status/nav bar is over a dark surface", where the default lives
+   (`MallARTheme`), how it's **restored on navigation away**, and that it covers **both** the
+   status bar and the navigation bar. Does this effort adopt `enableEdgeToEdge()` /
+   `WindowCompat.setDecorFitsSystemWindows(false)`, or leave window-fitting as-is and only fix
+   icon colour? Prefer the smallest change — no layout-inset refactor unless the inventory shows
+   it's already broken.
+5. **One authoritative mode source** (codex C15). The XML theme inherits
+   `Theme.AppCompat.DayNight`; Compose uses the manual `isDarkMode` boolean — two sources that
+   can disagree. The boolean is **locked** (map Notes); decide what the XML/AppCompat side does:
+   pin it to one mode, or have the `isDarkMode` toggle also drive `AppCompatDelegate
+   .setDefaultNightMode` so they agree. Include a decision + acceptance case for **keyboard/IME
+   appearance** (the chatbot opens an `OutlinedTextField` IME — `ChatBottomSheet.kt`) and for
+   **Activity recreation** on a night-mode change.
+6. **Synchronous mode bootstrap** (codex C4). `AppPreferences.isDarkMode` starts `false` and
+   loads async on `Dispatchers.IO`; `MainActivity` calls `setContent` immediately, so a saved
+   dark-mode user gets a **light first frame → dark** flash while the native splash stays
+   XML-dark. Decide: does the foundation ticket read the persisted mode **synchronously** before
+   the first themed frame (SharedPreferences blocking read, or `installSplashScreen` keep-condition
+   until loaded)? Requires a cold-start acceptance test. **Flag**: this implies a small startup
+   change — confirm it's wanted before Ticket 05 bakes it into the foundation ticket.
 
-**Output**: the answer records the XML strategy + the system-bar strategy + the smallest-change
-boundary. Feeds Ticket 03 (§6) and Ticket 05 (the XML-layer ticket).
+**Output**: the answer records the XML strategy, the route-aware system-bar contract, the
+authoritative-mode decision, and the bootstrap decision + smallest-change boundary. Feeds
+Ticket 03, Ticket 08, and Ticket 05.

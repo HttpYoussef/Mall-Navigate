@@ -13,20 +13,30 @@ vs the pre-migration screenshot", but the repo has **no screenshot-test infrastr
 nothing was capturing those screenshots. 30 screens × 2 modes × hand-checking on a device is
 where regressions slip through.
 
+This ticket also **owns the before-screenshot baseline** (moved out of Ticket 02): capturing
+`.scratch/light-mode/before/` — every route screen, both modes — is only meaningful once the
+fixture approach below is decided.
+
 **Decide:**
 1. **Automated vs manual.** Adopt a screenshot-test library for the migrated screens
-   (**Roborazzi** — JVM/Robolectric, or **Paparazzi** — no device, no Compose-preview coupling
-   issues to check), or rely on a **mandated manual QA checklist** per screen with before/after
-   captures from `.scratch/light-mode/before/` (Ticket 02).
-2. If automated: does the foundation ticket set it up (adds the dependency, a base test, CI
-   wiring), and do batch tickets each add golden images for their screens? What's the CI cost /
-   flakiness risk on this project's existing gate set?
-3. If manual: the exact checklist (per screen: both modes, AA contrast pairs measured, diff
-   against the before/ image, sign-off recorded where?).
-4. **Coverage bar** — every migrated screen, or only the core-flow screens, with the rest on
-   manual spot-check?
-5. Who runs the check for an `agy`-executed batch — `agy` produces the captures, the
-   orchestrator diffs them at review time?
+   (**Roborazzi** — JVM/Robolectric, or **Paparazzi** — no device), or rely on a **mandated
+   manual QA checklist** per screen with before/after captures.
+2. **Fixture / harness contract** (codex C9) — the blocker for *any* automated approach, and for
+   consistent manual captures. The real screens depend on: Firebase auth state
+   (`SignInScreen.kt:67`), camera + provider lifecycle (`LogoScanScreen.kt:257`), runtime
+   permissions, `PlaceRepository` / `MallGraphRepository` data, async Coil loads, active locale,
+   and infinite glow animations. There are **no `@Preview` providers or fixture builders** in the
+   repo. Decide the foundation-owned harness: fake repositories + auth, a fixed route list,
+   permission/camera stand-ins, fixed viewport + locale, animations disabled, and an **explicit
+   list of screens that cannot be captured on the JVM** (and how those are verified instead).
+3. If automated: does the foundation ticket set up the dependency + base test + CI wiring, and do
+   batch tickets each add golden images? CI cost / flakiness on the existing gate set?
+4. If manual: the exact checklist (per screen: both modes, AA contrast pairs measured, diff
+   against `before/`, sign-off recorded where?).
+5. **Coverage bar** — every migrated screen, or core-flow screens automated + the long tail on
+   manual spot-check (ties to the core-flow milestone — codex C10)?
+6. Who runs the check for an `agy`-executed batch — `agy` produces the captures, the orchestrator
+   diffs at review time?
 
-**Output**: the answer records the verification method + who owns it + the coverage bar. Feeds
-Ticket 03 (§8) and Ticket 05 (batch acceptance criteria).
+**Output**: the answer records the verification method + the fixture harness + who owns it + the
+coverage bar; `before/` captured (or the can't-capture list). Feeds Ticket 08 and Ticket 05.

@@ -28,7 +28,8 @@ locked hybrid architecture were folded in.
 
 Nothing was rejected as wrong; nothing required a business-logic / callback / architecture change.
 
-## Still owed
+## Done
 
-An independent codex adversarial debate on the **whole** revised map (all 7 tickets), once the
-router budget is restored. Until then the map stays unlocked.
+The independent codex adversarial debate ran 2026-09-10 on all 7 tickets —
+[codex-debate-findings.md](codex-debate-findings.md). 15 further findings, all folded in.
+Ticket 03 was split into 03 + 08 as a result (now 8 tickets).

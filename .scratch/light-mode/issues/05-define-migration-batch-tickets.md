@@ -1,24 +1,29 @@
 Type: task
 Status: open
-Blocked by: 02, 03, 04, 06, 07
+Blocked by: 02, 03, 04, 06, 07, 08
 
 ## Question
 
-Turn the inventory (02), the spec + API contract (03), the lint gate (04), the XML/system-bar
-strategy (06) and the verification mechanism (07) into the actual implementer ticket set — the
-handoff boundary this map exists to reach. After this ticket the way is clear: nothing left to
-decide, `agy` executes.
+Turn the inventory (02), the palette/token spec (03), the API + component contract (08), the lint
+gate (04), the XML/system-bar strategy (06) and the verification mechanism (07) into the actual
+implementer ticket set — the handoff boundary this map exists to reach. After this ticket the way
+is clear: nothing left to decide, `agy` executes.
 
 HITL — the user signs off on the ticket slicing before handoff.
 
 **Produce `docs/Theming/migration-tickets.md` (or new `.scratch/light-mode/issues/` entries) with:**
 
-1. **Foundation ticket** — create `ui/theme/` : the palette definition, `MallColors` +
-   `LocalMallColors`, the `MallARTheme` wrapper providing M3 + `MallColors`, the token accessor,
-   the centralised system-bar control from Ticket 06, wire the lint gate (per 04's rollout plan),
-   migrate 2-3 pilot screens (one Home-flow, one text-heavy, one always-dark) as the reference
-   implementation. Acceptance: pilots verified per Ticket 07's method in both modes, AA verified,
-   existing build gates green, lint gate active (baseline or on).
+1. **Foundation ticket** — create `ui/theme/` : the palette definition + full M3 role map
+   (Ticket 03), `MallColors` + `LocalMallColors`, the `MallARTheme` wrapper, the token accessor,
+   the route-aware system-bar contract + synchronous mode bootstrap (Ticket 06), the verification
+   fixture harness (Ticket 07), wire the lint gate (Ticket 04). **Pilot-screen ordering fix**
+   (codex C11): the Home pilot depends on `HomeSharedComponents` + `StoreLogo` (hardcoded
+   `Color.White`), and Ticket 5§4 also says shared renderers migrate before their screens — so
+   the foundation ticket **either** migrates the shared primitives it needs as part of itself,
+   **or** the Home pilot moves to the first post-shared-batch ticket. Pick one; the foundation
+   can't be acceptance-complete with a half-migrated shared dependency. Pilots: one Home-flow,
+   one text-heavy, one always-dark. Acceptance: pilots verified per Ticket 07 in both modes, AA
+   verified, cold-start flash test passes, existing build gates green, lint gate active.
 
 2. **XML-layer ticket** — `themes.xml`, `colors.xml`, `values-night` (per Ticket 06's decision),
    splash theme, dead-colour deletion. Sized as its own session.
@@ -35,13 +40,21 @@ HITL — the user signs off on the ticket slicing before handoff.
      baseline, existing build gates green,
    - sized to one implementer session.
 
-4. **Ordering + dependency notes** — foundation first; shared-components batch before the screens
-   that use them; XML-layer and always-dark screens can go anytime after foundation; a final
-   ticket that flips the lint gate to hard-error once the baseline is empty.
+4. **Ordering + dependency notes** — foundation first; shared-renderer batch(es) before the
+   screens that use them; XML-layer and always-dark screens anytime after foundation; a final
+   ticket flips the lint gate to hard-error once the baseline is empty.
 
-5. **Fog resolution** — fold the map's "Not yet specified" items (glass/glow treatment, splash,
+5. **Honest sizing + core-flow milestone** (codex C10). Ticket 02's grouping is expected to come
+   out around **~13 implementer sessions** (foundation + shared + ~6 route-area + ~3 bespoke-dark
+   + XML + lint-flip), not ~8. Define an explicit **core-flow milestone**: foundation + shared +
+   Home-flow + Profile/Settings + XML + system-bars = "light mode correct on the screens users
+   actually see", with the long tail (Parking, Localization, Navigation chrome, bespoke-dark)
+   sequenced after and allowed to land later. The all-screen destination stays; the milestone is
+   the checkpoint where the effort is *usable* if it pauses.
+
+6. **Fog resolution** — fold the map's "Not yet specified" items (glass/glow treatment, splash,
    status colours, AR materials) into either a batch ticket or an explicit out-of-scope note,
-   based on what 01/02/06 concluded.
+   based on what 01/02/03/06 concluded.
 
 **Execution model**: the resulting tickets are run as ordinary `agy` delegate-and-review cycles
 (orchestrator reviews each diff), **not** wayfinder decision tickets. The map tracks their status

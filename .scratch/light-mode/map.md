@@ -33,15 +33,24 @@ changed by this map; the migration tickets are the handoff boundary.
   **not** wayfinder decision tickets — they run as ordinary `agy` delegate-and-review cycles
   (orchestrator reviews each diff), and this map only tracks their status if the user wants
   progress reflected here.
-- **Adversarial debate status** (2026-09-09): codex (router budget exhausted), grok (free-tier
-  limit), gemini (client deprecated), kimi (not logged in) are all unavailable. A self-review
-  adversarial pass was run instead and its non-architectural findings folded in (new Tickets 06
-  + 07; Ticket 01 narrowed; scope language tightened) — see
-  [self-review-findings.md](self-review-findings.md). **The map is deliberately left UNLOCKED**
-  — a real independent debate (codex, on everything) still owed once access is restored.
+- **Adversarial debate — done** (2026-09-10). Round 1 (2026-09-09): all external CLIs were down,
+  so a self-review pass ran — [self-review-findings.md](self-review-findings.md) — folding in
+  Tickets 06 + 07, narrowing Ticket 01, tightening scope language. Round 2 (2026-09-10): `codex`
+  ran the full independent debate on all 7 tickets — [codex-debate-findings.md](codex-debate-findings.md)
+  — 15 findings, all folded in as ticket refinements: **Ticket 03 split into 03 (palette/tokens)
+  + 08 (Compose API + component matrix)**; Ticket 02 outputs a route manifest + classification;
+  Ticket 06 gains the route-aware system-bar contract, synchronous mode bootstrap, and
+  authoritative-mode decision; Ticket 07 gains the fixture-harness contract and owns the
+  before-screenshots; a core-flow milestone added to Ticket 05. Locked decisions were not
+  reopened. **The map is now ready to lock** pending user sign-off.
 - Skills each session should consult: `grilling` + `domain-modeling` (for the spec / API ticket),
   `prototype` (for the palette ticket). No research tickets — Material 3 + this codebase are the
   only sources and both are in hand.
+- **Core-flow milestone** (codex C10): the migration is ~13 implementer sessions, not ~8.
+  Ticket 05 defines a checkpoint — foundation + shared renderers + Home-flow + Profile/Settings +
+  XML + system-bars = "light mode correct on the screens users actually see". The long tail
+  (Parking, Localization, Navigation chrome, bespoke-dark screens) lands after. The all-screen
+  destination stays; the milestone is where the effort is usable if it pauses.
 
 ### Settled while charting (the frame every ticket inherits)
 
@@ -81,8 +90,9 @@ changed by this map; the migration tickets are the handoff boundary.
 
 <!-- one line per closed ticket; zoom the link for detail -->
 
-_(none yet — charting complete. Frontier is **Ticket 02** (screen + XML colour inventory);
-Tickets 01, 06, 07 unblock once 02 is resolved.)_
+_(none yet — charting complete + both adversarial rounds done. Frontier is **Ticket 02** (screen
++ XML colour inventory); Tickets 01, 06, 07 unblock once 02 resolves; then 03 → 08 → 04, and
+05 last. 8 tickets total.)_
 
 ## Not yet specified
 
@@ -93,12 +103,10 @@ Tickets 01, 06, 07 unblock once 02 is resolved.)_
 - **Splash screen light/dark.** The visual call is deferred to the palette prototype (brand
   moment — may stay dark in both modes); the mechanism (`windowSplashScreenBackground` +
   `values-night`) is Ticket 06. Graduates from 01 + 06.
-- **Semantic status colours.** `RedAccent` / `GreenArrow` / `SuccessGreen` / `ErrorRed` — whether
-  they need light-mode-specific variants and their own token group surfaces during the screen
-  inventory (Ticket 02).
-- **AR in-world render colours.** The actual 3D arrow / marker material colours in the AR scene
-  (not Compose chrome) — whether they're touched at all. Tentatively out of scope; confirm after
-  the inventory.
+
+_(Status colours are no longer fog — codex C14 moved them to a Ticket 03 deliverable: under a
+hard AA bar, `RedAccent` / `GreenArrow` / `SuccessGreen` / `ErrorRed` are visible chrome and need
+resolved foreground/background token pairs before migration.)_
 
 ## Out of scope
 
@@ -112,3 +120,7 @@ Tickets 01, 06, 07 unblock once 02 is resolved.)_
   conflict is in scope (see Notes); actually re-designing the dark theme's look is not.
 - **Follow-system theme switching**, **notification / widget colours** (the app has neither a
   live widget nor themed notifications today).
+- **AR scene-material colours** (codex C14): the 3D arrow / marker material colours rendered in
+  the ARCore scene stay out of scope — camera-only rendering. This does **not** exempt Compose
+  chrome or the 2D map-mode position/route indicators drawn over the navigation screen; those are
+  in scope as normal screen colour.

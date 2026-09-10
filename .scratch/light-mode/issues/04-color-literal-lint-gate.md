@@ -1,6 +1,6 @@
 Type: grilling
 Status: open
-Blocked by: 03
+Blocked by: 08
 
 ## Question
 
@@ -21,6 +21,11 @@ HITL — tooling choice + strictness is the user's call. Small ticket.
 3. **What's exempt** — the `ui/theme/` package, `@Preview` code, genuinely non-themeable colour
    (a fixed brand-logo tint on data), test code. How exemptions are marked (`@Suppress`, path
    allowlist, an annotation).
+   - **`OfferItem.tint` and similar data-owned colours** (codex C13) — `OfferItem.tint`
+     (`Homescreen.kt:65-79`) is an arbitrary UI colour composited into offer gradients, **not** a
+     logo tint, so the "brand-logo tint" exemption above does not cover it. Decide: does it stay a
+     data-owned colour with its own contrast constraint (and how is that enforced), or become a
+     semantic theme role? The lint rule's exemption wording depends on this answer.
 4. **Severity + CI** — error (build fails) vs warning; which Gradle task; whether it blocks the
    existing gates (`compileDebugKotlin`, `lintDebug`, `testDebugUnitTest`).
 5. **Rollout** — the gate can't go green until every screen is migrated. The answer must name a
