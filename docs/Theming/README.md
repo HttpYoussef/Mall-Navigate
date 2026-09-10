@@ -3,8 +3,9 @@
 **Status:** spec locked — palette + tokens + M3 role map (Ticket 03), Compose API + component
 matrix (Ticket 08). 2026-09-10. Migration not started.
 **Scope of this doc:** the palette, the named token list, the colour-model rules, the full
-Material 3 `ColorScheme` role map (§1–§6), the Compose API surface (§7), and the
-component-state matrix (§8). The migration batch tickets are Ticket 05.
+Material 3 `ColorScheme` role map (§1–§6), the Compose API surface (§7), the
+component-state matrix (§8), and the colour-literal lint gate (§9). The migration batch tickets
+are Ticket 05.
 
 Planning trail: `.scratch/light-mode/map.md` and its issue tickets.
 
@@ -336,7 +337,51 @@ Rules the lint gate (Ticket 04) enforces from this section:
 - no `.copy(alpha = …)` to signal disabled — use the disabled tokens;
 - custom scrims go through `MallTheme.colors.scrim`, not `Color.Black.copy(...)`.
 
-## 9. What this unblocks
+## 9. Colour-literal lint gate (Ticket 04)
 
-- **Ticket 04** — the colour-literal lint gate (bans what §2 + §8 forbid).
-- **Ticket 05** — the migration batch tickets; §7 is the foundation ticket's build target.
+Stops raw colour literals creeping back into `ui/` after the migration.
+
+**Tool:** a Gradle verification task `checkThemeColors` (regex scan, `buildSrc` or
+`build.gradle.kts`), `dependsOn` from `check`. No new plugin. Joins the gate set as an explicit
+command — `:app:compileDebugKotlin :app:testDebugUnitTest :app:compileDebugAndroidTestKotlin
+:app:checkThemeColors` (+ `lintDebug`). Does not hook `compileDebugKotlin`/`lintDebug` (keeps
+compile fast).
+
+**Scope:** `app/src/main/java/com/example/mallar/ui/**`, excluding `ui/theme/**`.
+
+**Banned:**
+
+1. `androidx.compose.ui.graphics.Color(...)` with literal args — `Color(0x……)`, `Color(red = …)`
+2. `Color.White` `Color.Black` `Color.Gray` `Color.LightGray` `Color.DarkGray` `Color.Red`
+   `Color.Green` `Color.Blue` `Color.Cyan` `Color.Magenta` `Color.Yellow`
+3. colour literals inside `Brush.*Gradient(listOf(...))` / `listOf<Color>(...)`
+4. `.copy(alpha = …)` where the receiver is a literal **or** a `MallColors` token
+   (only `MallTheme.colors.scrim.copy(alpha = …)` is allowed — README §8)
+5. hardcoded hex in XML read from Kotlin, and **`@color/…` references from Kotlin** — banned
+   entirely (`colors.xml` is deleted; no approved token-backed XML set)
+
+**Allowed:** `Color.Transparent` (it is "no paint", not a colour value).
+
+**Exempt:** `ui/theme/**`, `**/test/**`, `**/androidTest/**`, and any line carrying a trailing
+`// theme-lint:allow <reason>` marker (greppable for review — not `@Suppress`, the scan is not
+AST-aware). `@Preview` code is **not** blanket-exempt — previews wrap `MallARTheme` and use
+tokens; a one-off literal takes the marker.
+
+**`OfferItem.tint` (codex C13):** per-brand colour on *placeholder* sample data — not a theme
+role, not a logo tint. Stays data-owned, exempt via the marker, with one spec constraint: text
+rendered over a `tint`-derived gradient sits on a token scrim (`overlayScrimGradient` /
+`scrimCard`), never directly on `tint`. When offers get real data, `tint` moves to the data
+layer (out of `ui/`) and the exemption disappears.
+
+**Rollout:** a checked-in `config/theme-migration-allowlist.txt` — one `path:linecount` per file
+still holding literals (the ~30 files from Ticket 02's inventory), generated at foundation time.
+The task fails if a non-allowlisted file has a literal, or a file exceeds its allowlisted count.
+**Each migration batch deletes its files' lines** as part of that batch's diff — a batch that
+does not shrink it is incomplete. **The final batch (Ticket 05 "Lint-gate flip") deletes the
+allowlist and switches the task to a plain hard-error.** This gate and the §6 contrast test are
+both green only at migration end — expected, tracked per-batch.
+
+## 10. What this unblocks
+
+- **Ticket 05** — the migration batch tickets; §7 is the foundation ticket's build target,
+  §9 is its lint-gate spec.

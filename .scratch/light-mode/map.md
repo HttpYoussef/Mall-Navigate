@@ -47,12 +47,12 @@ changed by this map; the migration tickets are the handoff boundary.
   owed. Charting is done. From here the map is *worked*: one ticket at a time along the critical
   path 02 → 06 → 03 → 08 → 04 → 05 (01, 07 parallel). Re-opening a locked decision needs a fresh
   user call, not an in-session edit.
-- **▶ RESUME POINT (2026-09-10, after a context compaction)**: Tickets **02, 06, 01, 07, 03, 08
-  are RESOLVED** (see Decisions so far + each issue's `## Answer`). **Next ticket: 04 — colour-
-  literal lint gate** (grilling, HITL; unblocked by 08). Then 05 (define the migration batches).
-  The user is driving this interactively: work the next ticket by claiming it, running `grilling`
-  + `domain-modeling`, and bringing them the decisions one round at a time. `agy`
-  (`gemini-3.8-flash-high`) is the
+- **▶ RESUME POINT (2026-09-10, after a context compaction)**: Tickets **02, 06, 01, 07, 03, 08,
+  04 are RESOLVED** (see Decisions so far + each issue's `## Answer`). **Next ticket: 05 — define
+  the ~13 migration batch tickets** (task, HITL sign-off on the batch list; the LAST decision
+  ticket). It produces `docs/Theming/migration-tickets.md`. After 05 the map's decision work is
+  done and `agy` runs the batches (orchestrator reviews each diff + gates, user signs off each
+  batch on device). `agy` (`gemini-3.8-flash-high`) is the
   implementer for AFK/task tickets and the post-05 migration batches; the orchestrator reviews
   every diff, the **user** does per-batch on-device visual sign-off. Nothing is pushed. All work
   committed on `feat/colors-light-modes`.
@@ -172,8 +172,18 @@ changed by this map; the migration tickets are the handoff boundary.
   M3 `disabledContainerColor`, no runtime alpha; `LocalTextSelectionColors` from `accent`; custom
   scrims → `scrim.copy(alpha = 0.4f)` (the one sanctioned token alpha). **Unblocks Ticket 04.**
 
-_Frontier now: **Ticket 04** (colour-literal lint gate). Critical path: **04 → 05**. All inputs
-to 04 are resolved (02 ✓, 03 ✓, 08 ✓)._
+- [Ticket 04 — colour-literal lint gate](issues/04-color-literal-lint-gate.md): resolved via
+  grilling (1 round). Spec in `docs/Theming/README.md` §9. **Tool = a Gradle regex task
+  `checkThemeColors`** (no new plugin), `dependsOn check`, new explicit gate command. Bans literal
+  `Color(...)`, named `Color.*` constants, gradient-list literals, `.copy(alpha=)` on literals **or
+  tokens** (only `scrim` exempt), Kotlin `@color/` refs. `Color.Transparent` allowed. Exempt:
+  `ui/theme/**`, tests, `// theme-lint:allow` marker. `OfferItem.tint` stays data-owned + exempt
+  (text over it must sit on a token scrim). Rollout = checked-in
+  `config/theme-migration-allowlist.txt` each batch shrinks; **Ticket 05's final "Lint-gate flip"
+  batch deletes it + hard-errors.** **Unblocks Ticket 05.**
+
+_Frontier now: **Ticket 05** (define the ~13 migration batch tickets) — the last decision ticket.
+All inputs resolved (02/03/04/06/07/08 ✓). After 05: `agy` runs the batches._
 
 ## Not yet specified
 
