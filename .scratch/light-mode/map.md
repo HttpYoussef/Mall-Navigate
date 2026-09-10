@@ -47,11 +47,11 @@ changed by this map; the migration tickets are the handoff boundary.
   owed. Charting is done. From here the map is *worked*: one ticket at a time along the critical
   path 02 → 06 → 03 → 08 → 04 → 05 (01, 07 parallel). Re-opening a locked decision needs a fresh
   user call, not an in-session edit.
-- **▶ RESUME POINT (2026-09-10, after a context compaction)**: Tickets **02, 06, 01, 07 are
-  RESOLVED** (see Decisions so far + each issue's `## Answer`). **Next ticket: 03 — palette +
-  token spec** (grilling, HITL; all inputs ready). Then 08 → 04 → 05. The user is driving this
-  interactively: work the next ticket by claiming it, running `grilling` + `domain-modeling`, and
-  bringing them the decisions one round at a time. `agy` (`gemini-3.8-flash-high`) is the
+- **▶ RESUME POINT (2026-09-10, after a context compaction)**: Tickets **02, 06, 01, 07, 03 are
+  RESOLVED** (see Decisions so far + each issue's `## Answer`). **Next ticket: 08 — Compose API +
+  component-state contract** (grilling, HITL; unblocked by 03). Then 04 → 05. The user is driving
+  this interactively: work the next ticket by claiming it, running `grilling` + `domain-modeling`,
+  and bringing them the decisions one round at a time. `agy` (`gemini-3.8-flash-high`) is the
   implementer for AFK/task tickets and the post-05 migration batches; the orchestrator reviews
   every diff, the **user** does per-batch on-device visual sign-off. Nothing is pushed. All work
   committed on `feat/colors-light-modes`.
@@ -147,16 +147,26 @@ changed by this map; the migration tickets are the handoff boundary.
   orchestrator runs code gates + reviews the diff, user runs the screens on device both modes
   against a 6-point checklist before the next batch. `before/` baseline captured lazily per batch.
 
-_Frontier now: **Ticket 03** (palette + token spec). Critical path: **03 → 08 → 04 → 05**. All
-inputs to 03 are resolved (01 ✓, 02 ✓, 06 ✓)._
+- [Ticket 03 — palette + token spec](issues/03-palette-and-token-spec.md): resolved via grilling
+  (2 rounds). Spec written to **`docs/Theming/README.md` + `docs/Theming/palette.md`**.
+  **30 `MallColors` tokens** (Ticket 01's 26 + `imagePlaceholder`, `imageErrorSurface`,
+  `overlayScrimGradient`, `focusRing`). **Full 36-role M3 `ColorScheme` map** — `primary =
+  accentText` (AA-safe dark teal), `primaryContainer = accent` (vibrant, for FAB), pale-teal
+  `secondaryContainer` nav pill, `tertiary` folded onto teal, M3 `outline` = a dedicated 3:1
+  grey (≠ decorative `border` → `outlineVariant`), `surfaceTint` transparent (no tonal
+  elevation). `.copy(alpha=)` on tokens banned in feature code. Dark consolidation: 4 winners,
+  no per-screen exceptions. Verification: one JVM test asserts every contrast pair + all 36 roles
+  `!= Unspecified` + `brandTeal` large-only. **Unblocks Ticket 08.**
+
+_Frontier now: **Ticket 08** (Compose API + component-state contract). Critical path: **08 → 04
+→ 05**. All inputs to 08 are resolved (03 ✓)._
 
 ## Not yet specified
 
 _All charted fog has graduated:_
 - _Glass/glow aesthetic → **resolved** by Ticket 01 (flat + elevation; glow off in light)._
 - _Splash → **resolved** by Ticket 01 (`#0F5F5F`) + Ticket 06 (one fixed background)._
-- _Status colours → **Ticket 03 deliverable** (codex C14 — paired fg/bg tokens; see Ticket 01's
-  locked set)._
+- _Status colours → **resolved** by Ticket 03 (paired fg/bg tokens in `docs/Theming/README.md` §3)._
 - _`DestinationSelectionScreen` violet → **resolved** by Ticket 01 (flatten to teal)._
 
 _Nothing left in the fog — the way to the destination is charted end to end._

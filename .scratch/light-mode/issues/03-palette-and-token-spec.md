@@ -1,5 +1,6 @@
 Type: grilling
-Status: open
+Status: resolved
+Claimed by: Youssef Ibrahim (orchestrator) — grilling 2026-09-10
 Blocked by: 01, 02, 06
 
 ## Question
@@ -52,3 +53,59 @@ HITL — the token list and the M3-role decisions need the user.
 
 **Output**: `docs/Theming/README.md` + palette files committed on the branch (docs only). The
 answer records the token list + the M3-role and alpha decisions. Unblocks Ticket 08.
+
+## Answer
+
+Resolved 2026-09-10 via grilling (2 rounds, all answers "agree with all"). Spec written to
+`docs/Theming/README.md` + `docs/Theming/palette.md`.
+
+### Round 1 — token list, primary teal, alpha, dark consolidation
+
+- **Q1 token list**: accept Ticket 01's 26 + **4 additions** = **30 tokens**. Added:
+  `imagePlaceholder` (`#FFFFFF` / `#F0F2F4` — logo plate, stays near-white both modes; the one
+  that unblocks touching `StoreLogo`), `imageErrorSurface` (= `surfaceSunken`),
+  `overlayScrimGradient` (`surface` 0→90%, composited), `focusRing` (= `accentText`, distinct
+  from `borderStrong` for a11y).
+- **Q2 M3 `primary`** = `accentText #0A6360 / #5BC9C2` (the AA-safe dark teal). M3 routes
+  `primary` into text/icon/outline/tab/switch far more than fills; our vibrant CTAs bind
+  `MallColors.accent` directly so lose nothing.
+- **Q3 `.copy(alpha=)` policy**: tokens opaque (except `scrim`, `overlayScrimGradient`,
+  `hairlineOverlay`); `.copy(alpha=)` on a token/literal banned in feature code — a real
+  translucent need becomes a named composited token; contrast measured post-composite. This is
+  what makes Ticket 04's lint rule non-arbitrary.
+- **Q4 dark consolidation**: 4 winners confirmed (bg `#0E1418`, card `#161D22`, secondary text
+  `#9BA8B0`, divider `#232C31`). No per-screen exceptions. Dark shifts slightly cooler + uniform.
+- **Q5 third bespoke teal**: retire `LogoPrimary #258799` (StoreLogo monogram) → `accentText`.
+
+### Round 2 — full M3 `ColorScheme` role map (36 roles)
+
+- **Q6** `primaryContainer` = `accent` (vibrant) so stock `FAB`/`FilledTonalButton` stay vibrant.
+- **Q7** `secondaryContainer` (NavigationBar selected-pill) = pale-teal internal pair
+  `#DCEBEA` / `#123B39` + `accentText` icon.
+- **Q8** `tertiary` family folded onto teal + neutral (no third brand hue).
+- **Q9** M3 `outline` = dedicated 3:1 boundary grey `#8A939C` / `#6B7780` (verified 3.11:1 /
+  3.72:1) — **not** the decorative `border` token, which maps to `outlineVariant`.
+- **Q10** `surfaceTint = Color.Transparent` both modes — elevation is shadow-only.
+- **Q11** `background` (`screenBackground`) vs `surface` kept distinct in the M3 map.
+- Full 36-role table + stock-component outcomes: `docs/Theming/README.md` §5.
+
+### Verification contract (feeds Ticket 07 / 08)
+
+One JVM test in `app/src/test/.../ui/theme/`: (1) every fg/bg pair in `palette.md` meets its
+target; decorative tokens explicitly exempt; (2) all 36 M3 roles `!= Color.Unspecified` and
+equal the §5 table for both schemes ("no library default remains"); (3) `brandTeal` asserted
+large-text-only.
+
+### Deliverables — where they landed
+
+| # | Deliverable | Location |
+|---|---|---|
+| 1 | Named token list (30) | README §3 |
+| 2 | Full M3 role map (36) | README §5 + palette.md |
+| 3 | `primary` vs `accentText` + stock-component variants | README §5 (Q2/Q6) + outcomes table |
+| 4 | Alpha / compositing rules | README §2 + §3 "Alpha-bearing" + palette.md "Composited values" |
+| 5 | Palette table w/ contrast | `docs/Theming/palette.md` |
+| 6 | Image-surface tokens | README §3 "Image surfaces" (Q1) |
+| 7 | Dark consolidation | README §4 (Q4) |
+
+**Unblocks Ticket 08.**
