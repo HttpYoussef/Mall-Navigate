@@ -102,9 +102,18 @@ changed by this map; the migration tickets are the handoff boundary.
 
 <!-- one line per closed ticket; zoom the link for detail -->
 
-_(none yet — charting complete + both adversarial rounds done. Frontier is **Ticket 02** (screen
-+ XML colour inventory); Tickets 01, 06, 07 unblock once 02 resolves; then 03 → 08 → 04, and
-05 last. 8 tickets total.)_
+- [Ticket 02 — screen + XML colour inventory](issues/02-screen-color-inventory.md): resolved
+  (delegated to `agy`, orchestrator-verified). Deliverable
+  [screen-inventory.md](screen-inventory.md). Real literal count is **198** in `ui/**` (214
+  app-wide), not ~567. **`res/values/colors.xml` (71 colours) is 100% dead — delete, don't
+  migrate.** `themes.xml` hardcodes `#06131A`, no `values-night/`. Only 3 files use
+  `MaterialTheme.colorScheme`; only 2 touch `isAppearanceLightStatusBars`. Scope +1:
+  `voice/VoiceAssistantOverlay.kt` is in; `ar/render/GuidanceVisualFactory.kt` (3D) is out. Live
+  AA failures found: `CyanGlow` text ≈1.2:1, green `#4CAF50` ≈2.5:1. 13-batch migration grouping
+  proposed (Ticket 05 finalises).
+
+_Frontier now: **Tickets 01, 06, 07** (all unblocked, parallel). Critical path continues
+06 → 03 → 08 → 04 → 05._
 
 ## Not yet specified
 
