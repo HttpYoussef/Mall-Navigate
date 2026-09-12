@@ -35,13 +35,6 @@ import com.example.mallar.ui.theme.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-private val SavedPrimary      = Color(0xFF258799)
-private val SavedPrimaryLight = Color(0xFF2fa3b8)
-private val SavedSurface      = Color(0xFFF7F9FA)
-private val SavedCard         = Color(0xFFFFFFFF)
-private val SavedTextMain     = Color(0xFF1A1A2E)
-private val SavedTextSub      = Color(0xFF888EA8)
-
 @Composable
 fun SavedPlacesScreen(
     onBackClick: () -> Unit,
@@ -51,10 +44,10 @@ fun SavedPlacesScreen(
     val isDarkMode by com.example.mallar.data.AppPreferences.isDarkMode.collectAsState()
     val favoriteIds by FavoritesManager.favorites.collectAsState()
 
-    val currentSurface  = if (isDarkMode) DarkBackground else SavedSurface
-    val currentCard     = if (isDarkMode) DarkCard else SavedCard
-    val currentTextMain = if (isDarkMode) DarkTextPrimary else SavedTextMain
-    val currentTextSub  = if (isDarkMode) DarkTextSecondary else SavedTextSub
+    val currentSurface  = MallTheme.colors.screenBackground
+    val currentCard     = MallTheme.colors.surface
+    val currentTextMain = MallTheme.colors.textPrimary
+    val currentTextSub  = MallTheme.colors.textSecondary
 
     var allPlaces by remember { mutableStateOf<List<Place>>(emptyList()) }
     LaunchedEffect(Unit) {
@@ -81,7 +74,7 @@ fun SavedPlacesScreen(
                 onClick = onBackClick,
                 modifier = Modifier.size(44.dp),
                 shape = CircleShape,
-                color = if (isDarkMode) DarkCard else SavedCard
+                color = currentCard
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
@@ -110,7 +103,7 @@ fun SavedPlacesScreen(
                     Icon(
                         Icons.Default.SearchOff,
                         contentDescription = null,
-                        tint = SavedPrimaryLight.copy(0.5f),
+                        tint = MallTheme.colors.accentText.copy(alpha = 0.5f), // theme-lint:allow decorative empty-state icon tint
                         modifier = Modifier.size(48.dp)
                     )
                     Spacer(Modifier.height(10.dp))
@@ -122,7 +115,7 @@ fun SavedPlacesScreen(
                     )
                     Text(
                         text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.bookmark_hint),
-                        color = currentTextSub.copy(0.7f),
+                        color = currentTextSub.copy(alpha = 0.7f), // theme-lint:allow decorative empty-state de-emphasis
                         fontSize = 13.sp,
                         modifier = Modifier.padding(top = 4.dp, start = 32.dp, end = 32.dp)
                     )
@@ -205,20 +198,20 @@ private fun SavedPlaceRow(
             Icon(
                 Icons.Default.Bookmark,
                 contentDescription = stringResource(R.string.remove_saved_desc),
-                tint = SavedPrimary,
+                tint = MallTheme.colors.accentText,
                 modifier = Modifier.size(20.dp)
             )
         }
         Box(
             modifier = Modifier
                 .size(38.dp)
-                .background(SavedPrimary.copy(0.1f), CircleShape),
+                .background(MallTheme.colors.accent.copy(alpha = 0.1f), CircleShape), // theme-lint:allow decorative icon-badge tint
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = stringResource(R.string.navigate_desc),
-                tint = SavedPrimary,
+                tint = MallTheme.colors.accent,
                 modifier = Modifier.size(18.dp)
             )
         }
