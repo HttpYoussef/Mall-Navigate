@@ -41,12 +41,6 @@ import com.example.mallar.data.bidiIsolated
 import com.example.mallar.ml.ParkingOcrEngine
 import com.example.mallar.ui.theme.*
 
-private val HomePrimary      = Color(0xFF258799)
-private val HomeSurface      = Color(0xFFF7F9FA)
-private val HomeCard         = Color(0xFFFFFFFF)
-private val HomeTextMain     = Color(0xFF1A1A2E)
-private val HomeTextSub      = Color(0xFF888EA8)
-
 @Composable
 fun ParkingScanResultScreen(
     onBackClick: () -> Unit,
@@ -55,10 +49,10 @@ fun ParkingScanResultScreen(
     val isDarkMode by com.example.mallar.data.AppPreferences.isDarkMode.collectAsState()
     val capturedBitmap = remember { ParkingCameraState.capturedBitmap }
 
-    val currentSurface  = if (isDarkMode) DarkBackground else HomeSurface
-    val currentCard     = if (isDarkMode) DarkCard       else HomeCard
-    val currentTextMain = if (isDarkMode) DarkTextPrimary   else HomeTextMain
-    val currentTextSub  = if (isDarkMode) DarkTextSecondary else HomeTextSub
+    val currentSurface  = MallTheme.colors.screenBackground
+    val currentCard     = MallTheme.colors.surface
+    val currentTextMain = MallTheme.colors.textPrimary
+    val currentTextSub  = MallTheme.colors.textSecondary
 
     var isProcessing by remember { mutableStateOf(true) }
     var zoneVal by remember { mutableStateOf("") }
@@ -105,8 +99,8 @@ fun ParkingScanResultScreen(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = currentTextMain,
                         unfocusedTextColor = currentTextMain,
-                        focusedBorderColor = HomePrimary,
-                        unfocusedBorderColor = currentTextSub.copy(alpha = 0.5f)
+                        focusedBorderColor = MallTheme.colors.focusRing,
+                        unfocusedBorderColor = MallTheme.colors.border
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -121,14 +115,14 @@ fun ParkingScanResultScreen(
                         }
                         showEditDialog = false
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = HomePrimary)
+                    colors = ButtonDefaults.buttonColors(containerColor = MallTheme.colors.accent)
                 ) {
-                    Text(stringResource(R.string.dialog_ok), color = White)
+                    Text(stringResource(R.string.dialog_ok), color = MallTheme.colors.onAccent)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showEditDialog = false }) {
-                    Text(stringResource(R.string.dialog_cancel), color = HomePrimary)
+                    Text(stringResource(R.string.dialog_cancel), color = MallTheme.colors.accentText)
                 }
             }
         )
@@ -155,13 +149,13 @@ fun ParkingScanResultScreen(
                     onClick = onBackClick,
                     modifier = Modifier.size(40.dp),
                     shape = CircleShape,
-                    color = if (isDarkMode) DarkSurface else Color.Black.copy(0.05f)
+                    color = MallTheme.colors.surface
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = if (isDarkMode) White else TextPrimary
+                            tint = MallTheme.colors.textPrimary
                         )
                     }
                 }
@@ -181,7 +175,7 @@ fun ParkingScanResultScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(color = HomePrimary, modifier = Modifier.size(52.dp))
+                        CircularProgressIndicator(color = MallTheme.colors.accent, modifier = Modifier.size(52.dp))
                         Spacer(Modifier.height(16.dp))
                         Text(
                             text = stringResource(R.string.park_scan_reading),
@@ -199,13 +193,14 @@ fun ParkingScanResultScreen(
                         .padding(horizontal = 20.dp, vertical = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    val reticleColor = MallTheme.colors.accentText
                     // Snapped Photo Display with targeting brackets overlay
                     capturedBitmap?.let {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp)
-                                .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(20.dp)),
+                                .border(1.dp, MallTheme.colors.hairlineOverlay, RoundedCornerShape(20.dp)),
                             shape = RoundedCornerShape(20.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
@@ -223,11 +218,10 @@ fun ParkingScanResultScreen(
                                     val r = s * 0.48f
                                     val arm = s * 0.20f
                                     val gap = s * 0.08f
-                                    val col = Color(0xFF00BCD4) // Teal cyan
                                     listOf(-1f to -1f, 1f to -1f, -1f to 1f, 1f to 1f).forEach { (sx, sy) ->
-                                        drawLine(col, Offset(c.x + sx * gap, c.y + sy * r),
+                                        drawLine(reticleColor, Offset(c.x + sx * gap, c.y + sy * r),
                                             Offset(c.x + sx * (gap + arm), c.y + sy * r), strokeWidth = 3f, cap = StrokeCap.Round)
-                                        drawLine(col, Offset(c.x + sx * r, c.y + sy * gap),
+                                        drawLine(reticleColor, Offset(c.x + sx * r, c.y + sy * gap),
                                             Offset(c.x + sx * r, c.y + sy * (gap + arm)), strokeWidth = 3f, cap = StrokeCap.Round)
                                     }
                                 }
@@ -240,7 +234,7 @@ fun ParkingScanResultScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .border(if (isDarkMode) 1.dp else 0.dp, Color.White.copy(0.05f), RoundedCornerShape(16.dp)),
+                                .border(if (isDarkMode) 1.dp else 0.dp, MallTheme.colors.hairlineOverlay, RoundedCornerShape(16.dp)),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = currentCard),
                             elevation = CardDefaults.cardElevation(defaultElevation = if (isDarkMode) 0.dp else 2.dp)
@@ -259,12 +253,12 @@ fun ParkingScanResultScreen(
                                     )
                                     if (isLowConfidence) {
                                         Surface(
-                                            color = Color(0xFFFF9800).copy(alpha = 0.15f),
+                                            color = MallTheme.colors.warningText.copy(alpha = 0.15f), // theme-lint:allow decorative low-confidence badge tint
                                             shape = RoundedCornerShape(8.dp)
                                         ) {
                                             Text(
                                                 text = stringResource(R.string.park_scan_low_confidence),
-                                                color = Color(0xFFFF9800),
+                                                color = MallTheme.colors.warningText,
                                                 fontSize = 11.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -291,9 +285,9 @@ fun ParkingScanResultScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .border(1.dp, Color.White.copy(0.08f), RoundedCornerShape(20.dp)),
+                            .border(1.dp, MallTheme.colors.border, RoundedCornerShape(20.dp)),
                         shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF151B26)),
+                        colors = CardDefaults.cardColors(containerColor = currentCard),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(
@@ -303,7 +297,7 @@ fun ParkingScanResultScreen(
                         ) {
                             Text(
                                 text = stringResource(R.string.park_scan_detected_location),
-                                color = Color(0xFF00BCD4),
+                                color = MallTheme.colors.accentText,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -322,19 +316,19 @@ fun ParkingScanResultScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(stringResource(R.string.park_field_zone), color = Color.White.copy(0.6f), fontSize = 14.sp)
+                                Text(stringResource(R.string.park_field_zone), color = currentTextSub, fontSize = 14.sp)
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = if (zoneVal.isBlank()) stringResource(R.string.park_scan_not_detected) else zoneVal.bidiIsolated(),
-                                        color = if (zoneVal.isBlank()) Color.White.copy(0.3f) else Color.White,
+                                        color = if (zoneVal.isBlank()) MallTheme.colors.textDisabled else currentTextMain,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Spacer(Modifier.width(8.dp))
-                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.park_scan_edit_cd), tint = Color(0xFF00BCD4), modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.park_scan_edit_cd), tint = MallTheme.colors.accentText, modifier = Modifier.size(16.dp))
                                 }
                             }
-                            HorizontalDivider(color = Color.White.copy(0.08f), modifier = Modifier.padding(vertical = 4.dp))
+                            HorizontalDivider(color = MallTheme.colors.divider, modifier = Modifier.padding(vertical = 4.dp))
 
                             // Slot Row
                             Row(
@@ -349,19 +343,19 @@ fun ParkingScanResultScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(stringResource(R.string.park_field_slot), color = Color.White.copy(0.6f), fontSize = 14.sp)
+                                Text(stringResource(R.string.park_field_slot), color = currentTextSub, fontSize = 14.sp)
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = if (slotVal.isBlank()) stringResource(R.string.park_scan_not_detected) else slotVal.bidiIsolated(),
-                                        color = if (slotVal.isBlank()) Color.White.copy(0.3f) else Color.White,
+                                        color = if (slotVal.isBlank()) MallTheme.colors.textDisabled else currentTextMain,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Spacer(Modifier.width(8.dp))
-                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.park_scan_edit_cd), tint = Color(0xFF00BCD4), modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.park_scan_edit_cd), tint = MallTheme.colors.accentText, modifier = Modifier.size(16.dp))
                                 }
                             }
-                            HorizontalDivider(color = Color.White.copy(0.08f), modifier = Modifier.padding(vertical = 4.dp))
+                            HorizontalDivider(color = MallTheme.colors.divider, modifier = Modifier.padding(vertical = 4.dp))
 
                             // Floor Row
                             Row(
@@ -376,16 +370,16 @@ fun ParkingScanResultScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(stringResource(R.string.park_field_floor), color = Color.White.copy(0.6f), fontSize = 14.sp)
+                                Text(stringResource(R.string.park_field_floor), color = currentTextSub, fontSize = 14.sp)
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = if (floorVal.isBlank()) stringResource(R.string.park_scan_not_detected) else floorVal.bidiIsolated(),
-                                        color = if (floorVal.isBlank()) Color.White.copy(0.3f) else Color.White,
+                                        color = if (floorVal.isBlank()) MallTheme.colors.textDisabled else currentTextMain,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Spacer(Modifier.width(8.dp))
-                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.park_scan_edit_cd), tint = Color(0xFF00BCD4), modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.park_scan_edit_cd), tint = MallTheme.colors.accentText, modifier = Modifier.size(16.dp))
                                 }
                             }
                         }
@@ -397,9 +391,9 @@ fun ParkingScanResultScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .border(1.dp, Color(0xFF1B5E20).copy(0.3f), RoundedCornerShape(16.dp)),
+                            .border(1.dp, MallTheme.colors.success.copy(alpha = 0.3f), RoundedCornerShape(16.dp)), // theme-lint:allow decorative success-status border
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF0F261B))
+                        colors = CardDefaults.cardColors(containerColor = currentCard)
                     ) {
                         Row(
                             modifier = Modifier.padding(16.dp),
@@ -408,14 +402,14 @@ fun ParkingScanResultScreen(
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = null,
-                                tint = Color(0xFF00E676),
+                                tint = MallTheme.colors.successText,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(Modifier.width(12.dp))
                             Column {
                                 Text(
                                     text = stringResource(R.string.park_scan_location_saved),
-                                    color = Color.White,
+                                    color = currentTextMain,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -424,7 +418,7 @@ fun ParkingScanResultScreen(
                                 }
                                 Text(
                                     text = dateString,
-                                    color = Color.White.copy(alpha = 0.6f),
+                                    color = currentTextSub,
                                     fontSize = 12.sp
                                 )
                             }
@@ -449,13 +443,13 @@ fun ParkingScanResultScreen(
                             .fillMaxWidth()
                             .height(54.dp),
                         shape = RoundedCornerShape(27.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4)) // cyan
+                        colors = ButtonDefaults.buttonColors(containerColor = MallTheme.colors.accent)
                     ) {
                         Text(
                             text = stringResource(R.string.park_scan_btn_save),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = MallTheme.colors.onAccent
                         )
                     }
                     Spacer(Modifier.height(20.dp))

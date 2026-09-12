@@ -31,14 +31,11 @@ import com.example.mallar.data.Timestamps
 import com.example.mallar.data.bidiIsolated
 import com.example.mallar.ui.theme.*
 
-// Brand colors matching Homescreen.kt
-private val HomePrimary      = Color(0xFF258799)
-private val HomePrimaryLight = Color(0xFF2fa3b8)
-private val HomePrimaryDark  = Color(0xFF1a6b78)
-private val HomeSurface      = Color(0xFFF7F9FA)
-private val HomeCard         = Color(0xFFFFFFFF)
-private val HomeTextMain     = Color(0xFF1A1A2E)
-private val HomeTextSub      = Color(0xFF888EA8)
+// Bespoke promo banner illustration fills (Ticket 01 precedent)
+private val ParkingBannerDeepTeal   = Color(0xFF0F5F5F) // theme-lint:allow bespoke illustration fill (locked splash teal, Ticket 01)
+private val ParkingBannerDarkMid    = Color(0xFF0A3D42) // theme-lint:allow bespoke illustration fill
+private val ParkingBannerLightPale1 = Color(0xFF9dd8e2) // theme-lint:allow bespoke illustration fill
+private val ParkingBannerLightPale2 = Color(0xFFe8f6f8) // theme-lint:allow bespoke illustration fill
 
 @Composable
 fun ParkingHomeScreen(
@@ -50,10 +47,10 @@ fun ParkingHomeScreen(
     val isDarkMode by com.example.mallar.data.AppPreferences.isDarkMode.collectAsState()
     val parkingLocation by ParkingManager.parkingLocation.collectAsState()
 
-    val currentSurface  = if (isDarkMode) DarkBackground else HomeSurface
-    val currentCard     = if (isDarkMode) DarkCard       else HomeCard
-    val currentTextMain = if (isDarkMode) DarkTextPrimary   else HomeTextMain
-    val currentTextSub  = if (isDarkMode) DarkTextSecondary else HomeTextSub
+    val currentSurface  = MallTheme.colors.screenBackground
+    val currentCard     = MallTheme.colors.surface
+    val currentTextMain = MallTheme.colors.textPrimary
+    val currentTextSub  = MallTheme.colors.textSecondary
 
     Box(
         modifier = Modifier
@@ -76,13 +73,13 @@ fun ParkingHomeScreen(
                     onClick = onBackClick,
                     modifier = Modifier.size(40.dp),
                     shape = CircleShape,
-                    color = if (isDarkMode) DarkSurface else Color.Black.copy(0.05f)
+                    color = MallTheme.colors.surface
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = if (isDarkMode) White else TextPrimary
+                            tint = MallTheme.colors.textPrimary
                         )
                     }
                 }
@@ -97,13 +94,13 @@ fun ParkingHomeScreen(
                 Surface(
                     modifier = Modifier.size(40.dp),
                     shape = CircleShape,
-                    color = if (isDarkMode) DarkSurface else Color.Black.copy(0.05f)
+                    color = MallTheme.colors.surface
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             Icons.Default.DirectionsCar,
                             contentDescription = stringResource(R.string.park_car_cd),
-                            tint = if (isDarkMode) White else TextPrimary,
+                            tint = MallTheme.colors.textPrimary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -124,7 +121,6 @@ fun ParkingHomeScreen(
                 } else {
                     SavedParkingState(
                         location = loc,
-                        isDarkMode = isDarkMode,
                         currentCard = currentCard,
                         currentTextMain = currentTextMain,
                         currentTextSub = currentTextSub,
@@ -155,26 +151,26 @@ private fun EmptyParkingState(
             .background(
                 Brush.verticalGradient(
                     colors = if (isDarkMode)
-                        listOf(Color(0xFF0F5F5F), Color(0xFF0A3D42), DarkBackground)
+                        listOf(ParkingBannerDeepTeal, ParkingBannerDarkMid, DarkBackground)
                     else
-                        listOf(HomePrimary, HomePrimaryLight, Color(0xFF9dd8e2), Color(0xFFe8f6f8))
+                        listOf(MallTheme.colors.accent, MallTheme.colors.brandTeal, ParkingBannerLightPale1, ParkingBannerLightPale2)
                 )
             )
-            .border(1.dp, if (isDarkMode) Color.White.copy(0.1f) else Color.Transparent, RoundedCornerShape(24.dp))
+            .border(1.dp, if (isDarkMode) MallTheme.colors.hairlineOverlay else Color.Transparent, RoundedCornerShape(24.dp))
             .padding(24.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Column {
             Text(
                 text = stringResource(R.string.park_home_banner_title),
-                color = if (isDarkMode) White else Color.White,
+                color = MallTheme.colors.onAccent,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(6.dp))
             Text(
                 text = stringResource(R.string.park_home_banner_desc),
-                color = if (isDarkMode) White.copy(0.8f) else Color.White.copy(0.85f),
+                color = MallTheme.colors.onAccent.copy(alpha = 0.85f), // theme-lint:allow decorative banner subtitle
                 fontSize = 13.sp,
                 lineHeight = 18.sp
             )
@@ -191,15 +187,15 @@ private fun EmptyParkingState(
             .height(54.dp)
             .shadow(if (isDarkMode) 0.dp else 6.dp, RoundedCornerShape(27.dp)),
         shape = RoundedCornerShape(27.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = HomePrimary)
+        colors = ButtonDefaults.buttonColors(containerColor = MallTheme.colors.accent)
     ) {
-        Icon(Icons.Default.CameraAlt, contentDescription = null, tint = White)
+        Icon(Icons.Default.CameraAlt, contentDescription = null, tint = MallTheme.colors.onAccent)
         Spacer(Modifier.width(8.dp))
         Text(
             text = stringResource(R.string.park_home_btn_save),
             fontSize = 16.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = White
+            color = MallTheme.colors.onAccent
         )
     }
 
@@ -258,10 +254,10 @@ private fun ParkingStepItem(
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .background(HomePrimary.copy(0.1f), CircleShape),
+                .background(MallTheme.colors.accent.copy(alpha = 0.1f), CircleShape), // theme-lint:allow decorative icon-badge tint
             contentAlignment = Alignment.Center
         ) {
-            Icon(icon, contentDescription = null, tint = HomePrimary, modifier = Modifier.size(20.dp))
+            Icon(icon, contentDescription = null, tint = MallTheme.colors.accent, modifier = Modifier.size(20.dp))
         }
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
@@ -275,7 +271,6 @@ private fun ParkingStepItem(
 @Composable
 private fun SavedParkingState(
     location: ParkingLocation,
-    isDarkMode: Boolean,
     currentCard: Color,
     currentTextMain: Color,
     currentTextSub: Color,
@@ -287,9 +282,9 @@ private fun SavedParkingState(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, Color.White.copy(0.08f), RoundedCornerShape(24.dp)),
+            .border(1.dp, MallTheme.colors.border, RoundedCornerShape(24.dp)),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF151B26)),
+        colors = CardDefaults.cardColors(containerColor = currentCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -304,7 +299,7 @@ private fun SavedParkingState(
             ) {
                 Text(
                     text = stringResource(R.string.park_home_saved_location),
-                    color = Color(0xFF00BCD4),
+                    color = MallTheme.colors.accentText,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -316,7 +311,7 @@ private fun SavedParkingState(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = stringResource(R.string.park_home_delete_location_cd),
-                        tint = RedAccent.copy(0.7f),
+                        tint = MallTheme.colors.errorText.copy(alpha = 0.7f), // theme-lint:allow decorative delete-icon de-emphasis
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -334,7 +329,7 @@ private fun SavedParkingState(
             ) {
                 Text(
                     text = "${location.zone}-${location.slot}".bidiIsolated(),
-                    color = Color.White,
+                    color = currentTextMain,
                     fontSize = 44.sp,
                     fontWeight = FontWeight.Black,
                     letterSpacing = (-0.5).sp
@@ -343,14 +338,14 @@ private fun SavedParkingState(
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = stringResource(R.string.park_home_edit_location_cd),
-                    tint = Color(0xFF00BCD4),
+                    tint = MallTheme.colors.accentText,
                     modifier = Modifier.size(20.dp)
                 )
             }
             Spacer(Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.floor_label, location.floor.bidiIsolated()),
-                color = Color.White.copy(alpha = 0.8f),
+                color = currentTextSub,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.fillMaxWidth(),
@@ -358,21 +353,21 @@ private fun SavedParkingState(
             )
             
             Spacer(Modifier.height(20.dp))
-            HorizontalDivider(color = Color.White.copy(0.08f))
+            HorizontalDivider(color = MallTheme.colors.divider)
             Spacer(Modifier.height(20.dp))
 
             // Detail rows inside the card
-            DetailRow(label = stringResource(R.string.park_field_zone), value = location.zone.bidiIsolated(), Color.White, Color.White.copy(0.6f))
-            HorizontalDivider(color = Color.White.copy(0.05f), modifier = Modifier.padding(vertical = 10.dp))
+            DetailRow(label = stringResource(R.string.park_field_zone), value = location.zone.bidiIsolated(), currentTextMain, currentTextSub)
+            HorizontalDivider(color = MallTheme.colors.divider, modifier = Modifier.padding(vertical = 10.dp))
             
-            DetailRow(label = stringResource(R.string.park_field_slot), value = location.slot.bidiIsolated(), Color.White, Color.White.copy(0.6f))
-            HorizontalDivider(color = Color.White.copy(0.05f), modifier = Modifier.padding(vertical = 10.dp))
+            DetailRow(label = stringResource(R.string.park_field_slot), value = location.slot.bidiIsolated(), currentTextMain, currentTextSub)
+            HorizontalDivider(color = MallTheme.colors.divider, modifier = Modifier.padding(vertical = 10.dp))
             
-            DetailRow(label = stringResource(R.string.park_field_floor), value = location.floor.bidiIsolated(), Color.White, Color.White.copy(0.6f))
-            HorizontalDivider(color = Color.White.copy(0.05f), modifier = Modifier.padding(vertical = 10.dp))
+            DetailRow(label = stringResource(R.string.park_field_floor), value = location.floor.bidiIsolated(), currentTextMain, currentTextSub)
+            HorizontalDivider(color = MallTheme.colors.divider, modifier = Modifier.padding(vertical = 10.dp))
             
             val dateString = Timestamps.format(location.savedAt).bidiIsolated()
-            DetailRow(label = stringResource(R.string.park_home_saved_time), value = dateString, Color.White, Color.White.copy(0.6f))
+            DetailRow(label = stringResource(R.string.park_home_saved_time), value = dateString, currentTextMain, currentTextSub)
         }
     }
 
@@ -386,15 +381,15 @@ private fun SavedParkingState(
             .fillMaxWidth()
             .height(54.dp),
         shape = RoundedCornerShape(27.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BCD4))
+        colors = ButtonDefaults.buttonColors(containerColor = MallTheme.colors.accent)
     ) {
-        Icon(Icons.Default.NearMe, contentDescription = null, tint = White)
+        Icon(Icons.Default.NearMe, contentDescription = null, tint = MallTheme.colors.onAccent)
         Spacer(Modifier.width(8.dp))
         Text(
             text = stringResource(R.string.park_home_btn_navigate),
             fontSize = 16.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = White
+            color = MallTheme.colors.onAccent
         )
     }
 
@@ -407,16 +402,16 @@ private fun SavedParkingState(
             .fillMaxWidth()
             .height(52.dp),
         shape = RoundedCornerShape(26.dp),
-        border = BorderStroke(2.dp, Color(0xFF00BCD4)),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF00BCD4))
+        border = BorderStroke(2.dp, MallTheme.colors.accentText),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MallTheme.colors.accentText)
     ) {
-        Icon(Icons.Default.Map, contentDescription = null, tint = Color(0xFF00BCD4))
+        Icon(Icons.Default.Map, contentDescription = null, tint = MallTheme.colors.accentText)
         Spacer(Modifier.width(8.dp))
         Text(
             text = stringResource(R.string.park_home_btn_view_on_map),
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF00BCD4)
+            color = MallTheme.colors.accentText
         )
     }
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
@@ -40,13 +41,6 @@ import com.example.mallar.data.ParkingManager
 import com.example.mallar.data.bidiIsolated
 import com.example.mallar.ui.theme.*
 
-private val HomePrimary      = Color(0xFF258799)
-private val HomePrimaryLight = Color(0xFF2fa3b8)
-private val HomeSurface      = Color(0xFFF7F9FA)
-private val HomeCard         = Color(0xFFFFFFFF)
-private val HomeTextMain     = Color(0xFF1A1A2E)
-private val HomeTextSub      = Color(0xFF888EA8)
-
 data class ParkingSlot(
     val name: String,
     val zone: String,
@@ -59,13 +53,21 @@ data class ParkingSlot(
 fun ParkingMapScreen(
     onBackClick: () -> Unit
 ) {
-    val isDarkMode by com.example.mallar.data.AppPreferences.isDarkMode.collectAsState()
     val parkingLocation by ParkingManager.parkingLocation.collectAsState()
 
-    val currentSurface  = if (isDarkMode) DarkBackground else HomeSurface
-    val currentCard     = if (isDarkMode) DarkCard       else HomeCard
-    val currentTextMain = if (isDarkMode) DarkTextPrimary   else HomeTextMain
-    val currentTextSub  = if (isDarkMode) DarkTextSecondary else HomeTextSub
+    DarkSystemBars()
+    val mapBg = MallTheme.colors.scrimSurface
+    val gridLineColor = MallTheme.colors.hairlineOverlay
+    val laneColor = MallTheme.colors.surfaceSunken
+    val roadTextColor = MallTheme.colors.textDisabled
+    val accentColor = MallTheme.colors.accent
+    val slotBorderColor = MallTheme.colors.border
+    val onScrimColor = MallTheme.colors.onScrim
+    val onScrimMutedColor = MallTheme.colors.onScrimMuted
+    val pathHighlightColor = MallTheme.colors.accentText
+    val pathOutlineColor = MallTheme.colors.brandTeal
+    val pinColor = MallTheme.colors.error
+    val scrimColor = MallTheme.colors.scrim
 
     var scale by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
@@ -116,7 +118,7 @@ fun ParkingMapScreen(
 
     // Auto-center on saved slot or entire grid
     val density = LocalDensity.current
-    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(currentSurface)) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(mapBg)) {
         val canvasWidth = with(density) { maxWidth.toPx() }
         val canvasHeight = with(density) { maxHeight.toPx() }
 
@@ -165,18 +167,17 @@ fun ParkingMapScreen(
             }) {
                 // Draw grid lines for visual depth
                 val gridPaint = Paint().apply {
-                    color = if (isDarkMode) android.graphics.Color.parseColor("#1A1A2E") else android.graphics.Color.parseColor("#E1E5E4")
+                    color = gridLineColor.toArgb()
                     strokeWidth = 1f
                 }
                 var g = 0f
                 while (g < 600f) {
-                    drawLine(Color(gridPaint.color), Offset(g, 0f), Offset(g, 700f), 1f)
-                    drawLine(Color(gridPaint.color), Offset(0f, g), Offset(600f, g), 1f)
+                    drawLine(gridLineColor, Offset(g, 0f), Offset(g, 700f), 1f)
+                    drawLine(gridLineColor, Offset(0f, g), Offset(600f, g), 1f)
                     g += 50f
                 }
 
                 // Draw driving corridors/lanes
-                val laneColor = if (isDarkMode) Color(0xFF1E1E2A) else Color(0xFFE8F6F8)
                 // Draw horizontal road lane
                 drawRect(
                     color = laneColor,
@@ -201,7 +202,7 @@ fun ParkingMapScreen(
                 // Write road markings ("DRIVE", arrows)
                 drawContext.canvas.nativeCanvas.apply {
                     val roadPaint = Paint().apply {
-                        color = if (isDarkMode) android.graphics.Color.parseColor("#363648") else android.graphics.Color.parseColor("#9898A8")
+                        color = roadTextColor.toArgb()
                         textSize = 14f
                         isAntiAlias = true
                         isFakeBoldText = true
@@ -224,7 +225,7 @@ fun ParkingMapScreen(
                     if (isSaved) {
                         // Teal highlight
                         drawRoundRect(
-                            color = HomePrimary.copy(alpha = 0.25f),
+                            color = accentColor.copy(alpha = 0.25f), // theme-lint:allow decorative map highlight fill
                             topLeft = Offset(left, top),
                             size = Size(slotWidth, slotHeight),
                             cornerRadius = CornerRadius(6f),
@@ -232,7 +233,7 @@ fun ParkingMapScreen(
                         )
                         // Glowing borders
                         drawRoundRect(
-                            color = HomePrimary,
+                            color = accentColor,
                             topLeft = Offset(left, top),
                             size = Size(slotWidth, slotHeight),
                             cornerRadius = CornerRadius(6f),
@@ -241,7 +242,7 @@ fun ParkingMapScreen(
                     } else {
                         // Standard slot border
                         drawRoundRect(
-                            color = if (isDarkMode) Color(0xFF363648) else Color(0xFFB0B0B0),
+                            color = slotBorderColor,
                             topLeft = Offset(left, top),
                             size = Size(slotWidth, slotHeight),
                             cornerRadius = CornerRadius(6f),
@@ -252,12 +253,7 @@ fun ParkingMapScreen(
                     // Spot text label
                     drawContext.canvas.nativeCanvas.apply {
                         val textPaint = Paint().apply {
-                            color = if (isSaved) {
-                                android.graphics.Color.parseColor("#258799")
-                            } else {
-                                if (isDarkMode) android.graphics.Color.parseColor("#9898A8")
-                                else android.graphics.Color.parseColor("#666666")
-                            }
+                            color = if (isSaved) accentColor.toArgb() else onScrimMutedColor.toArgb()
                             textSize = 10f
                             isAntiAlias = true
                             isFakeBoldText = isSaved
@@ -275,9 +271,6 @@ fun ParkingMapScreen(
 
                 // --- Draw Navigation Route Path (if active) ---
                 if (isNavigating && savedSlot != null && selectedFloor == floorLabel) {
-                    val pathColor = Color(0xFF00E5CC) // Glowing teal path line
-                    val pathOutlineColor = Color(0xFF0F5F5F)
-                    
                     // Route coordinates
                     val startPt = Offset(250f, 590f) // "You are here" bottom middle
                     val turnPt = Offset(250f, savedSlot.y)
@@ -300,14 +293,14 @@ fun ParkingMapScreen(
                     )
 
                     drawLine(
-                        color = pathColor,
+                        color = pathHighlightColor,
                         start = startPt,
                         end = turnPt,
                         strokeWidth = 4f / scale,
                         cap = StrokeCap.Round
                     )
                     drawLine(
-                        color = pathColor,
+                        color = pathHighlightColor,
                         start = turnPt,
                         end = endPt,
                         strokeWidth = 4f / scale,
@@ -316,12 +309,12 @@ fun ParkingMapScreen(
 
                     // Start Point (Blue Pulse Dot)
                     drawCircle(
-                        color = Color.White,
+                        color = onScrimColor,
                         radius = 8f / scale,
                         center = startPt
                     )
                     drawCircle(
-                        color = Color(0xFF00E5CC),
+                        color = pathHighlightColor,
                         radius = 5f / scale,
                         center = startPt
                     )
@@ -329,7 +322,7 @@ fun ParkingMapScreen(
                     // "You are here" text
                     drawContext.canvas.nativeCanvas.apply {
                         val paint = Paint().apply {
-                            color = android.graphics.Color.WHITE
+                            color = onScrimColor.toArgb()
                             textSize = 11f / scale
                             isAntiAlias = true
                             isFakeBoldText = true
@@ -348,7 +341,7 @@ fun ParkingMapScreen(
 
                     // Glow circle at base
                     drawCircle(
-                        color = HomePrimary.copy(alpha = 0.4f),
+                        color = accentColor.copy(alpha = 0.4f), // theme-lint:allow decorative map pin glow
                         radius = 8f / scale,
                         center = Offset(px, savedSlot.y)
                     )
@@ -362,12 +355,12 @@ fun ParkingMapScreen(
                     }
                     drawPath(
                         path = pinPath,
-                        color = Color(0xFFE53935)
+                        color = pinColor
                     )
 
                     // Inner white dot in pin
                     drawCircle(
-                        color = Color.White,
+                        color = onScrimColor,
                         radius = 3f / scale,
                         center = Offset(px, py - 16f)
                     )
@@ -387,20 +380,20 @@ fun ParkingMapScreen(
                 onClick = onBackClick,
                 modifier = Modifier.size(44.dp),
                 shape = CircleShape,
-                color = Color.Black.copy(alpha = 0.6f)
+                color = scrimColor.copy(alpha = 0.6f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = White)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = onScrimColor)
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
             Surface(
                 shape = RoundedCornerShape(24.dp),
-                color = Color.Black.copy(alpha = 0.6f)
+                color = scrimColor.copy(alpha = 0.6f)
             ) {
                 Text(
                     text = stringResource(R.string.park_map_title),
-                    color = White,
+                    color = onScrimColor,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
@@ -413,10 +406,10 @@ fun ParkingMapScreen(
                 onClick = { reCenterTrigger++ },
                 modifier = Modifier.size(44.dp),
                 shape = CircleShape,
-                color = Color.Black.copy(alpha = 0.6f)
+                color = scrimColor.copy(alpha = 0.6f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.CenterFocusStrong, contentDescription = stringResource(R.string.re_center), tint = White)
+                    Icon(Icons.Default.CenterFocusStrong, contentDescription = stringResource(R.string.re_center), tint = onScrimColor)
                 }
             }
         }
@@ -435,7 +428,7 @@ fun ParkingMapScreen(
                 Surface(
                     onClick = { selectedFloor = f },
                     shape = RoundedCornerShape(12.dp),
-                    color = if (active) HomePrimary else Color.Black.copy(alpha = 0.6f),
+                    color = if (active) accentColor else scrimColor.copy(alpha = 0.6f),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(44.dp)
@@ -443,7 +436,7 @@ fun ParkingMapScreen(
                     Box(contentAlignment = Alignment.Center) {
                         Text(
                             text = f,
-                            color = White,
+                            color = onScrimColor,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -463,21 +456,21 @@ fun ParkingMapScreen(
             Surface(
                 onClick = { scale = (scale + 0.3f).coerceAtMost(3.5f) },
                 shape = CircleShape,
-                color = Color.Black.copy(alpha = 0.6f),
+                color = scrimColor.copy(alpha = 0.6f),
                 modifier = Modifier.size(44.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text("+", color = White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text("+", color = onScrimColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
             }
             Surface(
                 onClick = { scale = (scale - 0.3f).coerceAtLeast(0.5f) },
                 shape = CircleShape,
-                color = Color.Black.copy(alpha = 0.6f),
+                color = scrimColor.copy(alpha = 0.6f),
                 modifier = Modifier.size(44.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text("-", color = White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text("-", color = onScrimColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -490,24 +483,24 @@ fun ParkingMapScreen(
                 .fillMaxWidth()
                 .navigationBarsPadding(),
             shape = RoundedCornerShape(24.dp),
-            color = Color.Black.copy(alpha = 0.85f),
-            border = BorderStroke(1.dp, White.copy(alpha = 0.1f))
+            color = scrimColor.copy(alpha = 0.85f),
+            border = BorderStroke(1.dp, MallTheme.colors.hairlineOverlay)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
                             .size(38.dp)
-                            .background(HomePrimary.copy(0.12f), CircleShape),
+                            .background(accentColor.copy(alpha = 0.12f), CircleShape), // theme-lint:allow decorative icon-badge tint
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.DirectionsCar, contentDescription = null, tint = HomePrimary, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.DirectionsCar, contentDescription = null, tint = accentColor, modifier = Modifier.size(18.dp))
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
                             text = stringResource(R.string.park_map_your_car_location),
-                            color = White,
+                            color = onScrimColor,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -519,7 +512,7 @@ fun ParkingMapScreen(
                         }
                         Text(
                             text = locationSummary,
-                            color = White.copy(alpha = 0.7f),
+                            color = onScrimMutedColor,
                             fontSize = 12.sp
                         )
                     }
@@ -534,15 +527,15 @@ fun ParkingMapScreen(
                         .fillMaxWidth()
                         .height(48.dp),
                     shape = RoundedCornerShape(24.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = HomePrimary)
+                    colors = ButtonDefaults.buttonColors(containerColor = accentColor)
                 ) {
-                    Icon(Icons.Default.Navigation, contentDescription = null, tint = White, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Navigation, contentDescription = null, tint = onScrimColor, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = if (isNavigating) stringResource(R.string.park_map_stop_nav) else stringResource(R.string.park_map_start_nav),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = White
+                        color = onScrimColor
                     )
                 }
             }

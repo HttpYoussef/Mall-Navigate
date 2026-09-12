@@ -61,7 +61,6 @@ fun ParkingCameraScreen(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val isDarkMode by com.example.mallar.data.AppPreferences.isDarkMode.collectAsState()
 
     var hasPermission by remember {
         mutableStateOf(
@@ -82,13 +81,13 @@ fun ParkingCameraScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(if (isDarkMode) DarkBackground else White),
+                .background(MallTheme.colors.screenBackground),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
                 Text(
                     text = stringResource(R.string.park_camera_permission_required),
-                    color = if (isDarkMode) DarkTextPrimary else TextPrimary,
+                    color = MallTheme.colors.textPrimary,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
@@ -96,22 +95,28 @@ fun ParkingCameraScreen(
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.park_camera_permission_desc),
-                    color = if (isDarkMode) DarkTextSecondary else TextSecondary,
+                    color = MallTheme.colors.textSecondary,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(24.dp))
                 Button(
                     onClick = { launcher.launch(Manifest.permission.CAMERA) },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF258799)),
+                    colors = ButtonDefaults.buttonColors(containerColor = MallTheme.colors.accent),
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    Text(stringResource(R.string.park_camera_grant_permission), color = White)
+                    Text(stringResource(R.string.park_camera_grant_permission), color = MallTheme.colors.onAccent)
                 }
             }
         }
         return
     }
+
+    DarkSystemBars()
+    val scrimSurfaceColor = MallTheme.colors.scrimSurface
+    val scrimColor = MallTheme.colors.scrim
+    val onScrimColor = MallTheme.colors.onScrim
+    val reticleColor = MallTheme.colors.accentText
 
     var flashEnabled by remember { mutableStateOf(false) }
     var isCapturing by remember { mutableStateOf(false) }
@@ -185,7 +190,7 @@ fun ParkingCameraScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+    Box(modifier = Modifier.fillMaxSize().background(scrimSurfaceColor)) {
         // Camera view
         AndroidView(factory = { previewView }, modifier = Modifier.fillMaxSize())
 
@@ -202,31 +207,31 @@ fun ParkingCameraScreen(
                 onClick = onBackClick,
                 modifier = Modifier.size(44.dp),
                 shape = CircleShape,
-                color = Color.Black.copy(alpha = 0.5f)
+                color = scrimColor.copy(alpha = 0.5f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = White)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = onScrimColor)
                 }
             }
             Text(
                 text = stringResource(R.string.park_camera_title),
-                color = White,
+                color = onScrimColor,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                    .background(scrimColor.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                     .padding(horizontal = 14.dp, vertical = 6.dp)
             )
             Surface(
                 modifier = Modifier.size(44.dp),
                 shape = CircleShape,
-                color = Color.Black.copy(alpha = 0.5f)
+                color = scrimColor.copy(alpha = 0.5f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.DirectionsCar,
                         contentDescription = stringResource(R.string.park_car_cd),
-                        tint = White,
+                        tint = onScrimColor,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -244,11 +249,10 @@ fun ParkingCameraScreen(
                 val r = s * 0.48f
                 val arm = s * 0.18f
                 val gap = s * 0.08f
-                val col = Color(0xFF00BCD4) // Teal cyan target color
                 listOf(-1f to -1f, 1f to -1f, -1f to 1f, 1f to 1f).forEach { (sx, sy) ->
-                    drawLine(col, Offset(c.x + sx * gap, c.y + sy * r),
+                    drawLine(reticleColor, Offset(c.x + sx * gap, c.y + sy * r),
                         Offset(c.x + sx * (gap + arm), c.y + sy * r), strokeWidth = 4f, cap = StrokeCap.Round)
-                    drawLine(col, Offset(c.x + sx * r, c.y + sy * gap),
+                    drawLine(reticleColor, Offset(c.x + sx * r, c.y + sy * gap),
                         Offset(c.x + sx * r, c.y + sy * (gap + arm)), strokeWidth = 4f, cap = StrokeCap.Round)
                 }
             }
@@ -265,8 +269,8 @@ fun ParkingCameraScreen(
         ) {
             Surface(
                 shape = RoundedCornerShape(28.dp),
-                color = Color.Black.copy(alpha = 0.7f),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+                color = scrimColor.copy(alpha = 0.7f),
+                border = BorderStroke(1.dp, MallTheme.colors.hairlineOverlay),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
@@ -275,7 +279,7 @@ fun ParkingCameraScreen(
                 ) {
                     Text(
                         text = stringResource(R.string.park_camera_instruction),
-                        color = Color.White,
+                        color = onScrimColor,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Center
@@ -292,13 +296,13 @@ fun ParkingCameraScreen(
                             onClick = { galleryLauncher.launch("image/*") },
                             modifier = Modifier.size(52.dp),
                             shape = CircleShape,
-                            color = Color.White.copy(alpha = 0.15f)
+                            color = onScrimColor.copy(alpha = 0.15f) // theme-lint:allow decorative always-dark camera control chrome
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = Icons.Default.Photo,
                                     contentDescription = stringResource(R.string.park_camera_gallery_cd),
-                                    tint = Color.White,
+                                    tint = onScrimColor,
                                     modifier = Modifier.size(22.dp)
                                 )
                             }
@@ -306,14 +310,14 @@ fun ParkingCameraScreen(
 
                         // Center: Glowing capture shutter button
                         if (isCapturing) {
-                            CircularProgressIndicator(color = Color(0xFF00BCD4), modifier = Modifier.size(64.dp))
+                            CircularProgressIndicator(color = reticleColor, modifier = Modifier.size(64.dp))
                         } else {
                             Box(
                                 modifier = Modifier
                                     .size(76.dp)
-                                    .border(3.dp, Color(0xFF00BCD4), CircleShape) // glowing cyan outer ring
+                                    .border(3.dp, reticleColor, CircleShape) // glowing cyan outer ring
                                     .padding(5.dp)
-                                    .background(Color.White.copy(alpha = 0.1f), CircleShape)
+                                    .background(onScrimColor.copy(alpha = 0.1f), CircleShape) // theme-lint:allow decorative always-dark camera control chrome
                                     .clickable {
                                         isCapturing = true
                                         imageCapture.takePicture(
@@ -365,7 +369,7 @@ fun ParkingCameraScreen(
                                 Box(
                                     modifier = Modifier
                                         .size(52.dp)
-                                        .background(Color.White, CircleShape)
+                                        .background(onScrimColor, CircleShape)
                                 )
                             }
                         }
@@ -375,13 +379,13 @@ fun ParkingCameraScreen(
                             onClick = { flashEnabled = !flashEnabled },
                             modifier = Modifier.size(52.dp),
                             shape = CircleShape,
-                            color = Color.White.copy(alpha = 0.15f)
+                            color = onScrimColor.copy(alpha = 0.15f) // theme-lint:allow decorative always-dark camera control chrome
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = if (flashEnabled) Icons.Default.FlashOn else Icons.Default.FlashOff,
                                     contentDescription = stringResource(R.string.park_camera_flash_cd),
-                                    tint = Color.White,
+                                    tint = onScrimColor,
                                     modifier = Modifier.size(22.dp)
                                 )
                             }

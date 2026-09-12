@@ -1,9 +1,5 @@
 app/src/main/java/com/example/mallar/ui/components/StoreLogo.kt:4
 app/src/main/java/com/example/mallar/ui/home/HomeSharedComponents.kt:56
-app/src/main/java/com/example/mallar/ui/parking/ParkingHomeScreen.kt:40
-app/src/main/java/com/example/mallar/ui/parking/ParkingCameraScreen.kt:25
-app/src/main/java/com/example/mallar/ui/parking/ParkingScanResultScreen.kt:38
-app/src/main/java/com/example/mallar/ui/parking/ParkingMapScreen.kt:34
 app/src/main/java/com/example/mallar/ui/localization/PermissionsScreen.kt:6
 app/src/main/java/com/example/mallar/ui/localization/LogoScanScreen.kt:14
 app/src/main/java/com/example/mallar/ui/localization/LocalizationConfirmScreen.kt:25
