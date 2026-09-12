@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -23,10 +23,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.mallar.data.Place
-
-private val LogoPrimary      = Color(0xFF258799)
-@Suppress("unused")
-private val LogoPrimaryLight = Color(0xFF2fa3b8)
+import com.example.mallar.ui.theme.MallTheme
 
 @Composable
 fun StoreLogo(
@@ -53,9 +50,15 @@ fun StoreLogo(
                     .memoryCacheKey(logoPath)
                     .build()
             }
+            val errorColor = MallTheme.colors.imageErrorSurface
+            val errorPainter = remember(errorColor) {
+                ColorPainter(errorColor)
+            }
             AsyncImage(
                 model              = request,
                 contentDescription = place.brand,
+                placeholder        = errorPainter,
+                error              = errorPainter,
                 // Fit keeps full logo inside the circle — never crops
                 contentScale       = ContentScale.Fit,
                 modifier = Modifier
@@ -65,7 +68,7 @@ fun StoreLogo(
         } else {
             Text(
                 text       = place.brand.orEmpty().take(2).uppercase(),
-                color      = LogoPrimary,
+                color      = MallTheme.colors.accentText,
                 fontWeight = FontWeight.Bold,
                 fontSize   = fallbackTextSize
             )
@@ -84,8 +87,8 @@ fun StoreLogoContainer(
 ) {
     Box(
         modifier = modifier
-            .background(Color.White, RoundedCornerShape(cornerRadius))
-            .border(1.dp, LogoPrimary.copy(alpha = 0.15f), RoundedCornerShape(cornerRadius)),
+            .background(MallTheme.colors.imagePlaceholder, RoundedCornerShape(cornerRadius))
+            .border(1.dp, MallTheme.colors.border, RoundedCornerShape(cornerRadius)),
         contentAlignment = Alignment.Center
     ) {
         StoreLogo(

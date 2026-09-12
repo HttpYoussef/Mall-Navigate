@@ -1,5 +1,6 @@
 package com.example.mallar.ui.home
 
+import com.example.mallar.ui.theme.MallTheme
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -74,13 +75,12 @@ fun OffersScreen(
 ) {
     val isDarkMode by AppPreferences.isDarkMode.collectAsState()
 
-    val colorScheme = rememberHomeColorScheme(isDarkMode)
-    val currentBg       = colorScheme.bg
-    val currentCardBg   = colorScheme.cardBg
-    val currentTextMain = colorScheme.textMain
-    val currentTextSub  = colorScheme.textSub
-    val currentAccent   = colorScheme.accent
-    val currentBorder   = colorScheme.border
+    val currentBg       = MallTheme.colors.screenBackground
+    val currentCardBg   = MallTheme.colors.surface
+    val currentTextMain = MallTheme.colors.textPrimary
+    val currentTextSub  = MallTheme.colors.textSecondary
+    val currentAccent   = MallTheme.colors.accent
+    val currentBorder   = MallTheme.colors.border
 
     val allVouchers = remember { VoucherRepository.loadPlaceholderVouchers() }
     val context = LocalContext.current

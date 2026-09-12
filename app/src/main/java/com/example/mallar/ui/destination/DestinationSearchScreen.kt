@@ -1,5 +1,6 @@
 package com.example.mallar.ui.destination
 
+import com.example.mallar.ui.theme.MallTheme
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -37,12 +38,11 @@ fun DestinationSearchScreen(
     val uiState by viewModel.uiState.collectAsState()
     val isDarkMode by AppPreferences.isDarkMode.collectAsState()
 
-    val colorScheme = rememberHomeColorScheme(isDarkMode)
-    val currentBg       = colorScheme.bg
-    val currentTextMain = colorScheme.textMain
-    val currentTextSub  = colorScheme.textSub
-    val currentAccent   = colorScheme.accent
-    val currentBorder   = colorScheme.border
+    val currentBg       = MallTheme.colors.screenBackground
+    val currentTextMain = MallTheme.colors.textPrimary
+    val currentTextSub  = MallTheme.colors.textSecondary
+    val currentAccent   = MallTheme.colors.accent
+    val currentBorder   = MallTheme.colors.border
 
     var searchFocused by remember { mutableStateOf(value = false) }
     val searchFocusRequester = remember { FocusRequester() }

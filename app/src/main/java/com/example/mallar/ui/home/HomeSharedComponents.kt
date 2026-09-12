@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,6 +38,7 @@ import com.example.mallar.data.categoryDisplayLabel
 import com.example.mallar.data.categoryDisplayRes
 import com.example.mallar.data.floorDisplayLabel
 import com.example.mallar.ui.components.StoreLogo
+import com.example.mallar.ui.theme.MallTheme
 import java.util.Locale
 
 // ── Design Specification Tokens ──────────────────────────────────────────────
@@ -55,30 +57,23 @@ internal val LightBg          = Color(0xFFF7F9FA)
 internal val LightCardBg      = Color(0xFFFFFFFF)
 internal val MutedTextSubLight = Color(0xFF888EA8)
 
-internal data class HomeColorScheme(
-    val bg: Color,
-    val cardBg: Color,
-    val textMain: Color,
-    val textSub: Color,
-    val accent: Color,
-    val border: Color
-)
+// ── Helper Utilities ─────────────────────────────────────────────────────────
 
 @Composable
-internal fun rememberHomeColorScheme(isDarkMode: Boolean): HomeColorScheme {
-    return remember(isDarkMode) {
-        HomeColorScheme(
-            bg       = if (isDarkMode) DeepNavyBg else LightBg,
-            cardBg   = if (isDarkMode) GlassCardBg.copy(alpha = 0.45f) else LightCardBg,
-            textMain = if (isDarkMode) Color.White else Color(0xFF1A1A2E),
-            textSub  = if (isDarkMode) MutedTextSubDark else MutedTextSubLight,
-            accent   = DesignPurple,
-            border   = if (isDarkMode) Color.White.copy(0.08f) else Color.Black.copy(0.05f)
-        )
+private fun isReduceMotionEnabled(): Boolean {
+    val context = LocalContext.current
+    return remember(context) {
+        try {
+            android.provider.Settings.Global.getFloat(
+                context.contentResolver,
+                android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
+                1f
+            ) == 0f
+        } catch (_: Exception) {
+            false
+        }
     }
 }
-
-// ── Helper Utilities ─────────────────────────────────────────────────────────
 
 @Composable
 internal fun rememberPlaceMetadata(place: Place): Pair<String, String> {
@@ -101,22 +96,29 @@ internal fun GlowingSearchBar(
     isFocused: Boolean = false,
     onFocusChange: (Boolean) -> Unit = {},
     focusRequester: FocusRequester = remember { FocusRequester() },
-    currentAccent: Color = DesignPurple,
+    currentAccent: Color = MallTheme.colors.accent,
     isDarkMode: Boolean = true,
-    currentTextMain: Color = Color.White,
-    currentTextSub: Color = MutedTextSubDark,
+    currentTextMain: Color = MallTheme.colors.textPrimary,
+    currentTextSub: Color = MallTheme.colors.textSecondary,
     onClick: (() -> Unit)? = null
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "search_glow_infinite")
-    val idleGlowAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.12f,
-        targetValue = 0.28f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2800, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "idle_glow"
-    )
+    val reduceMotion = isReduceMotionEnabled()
+    val animateGlow = isDarkMode && !reduceMotion
+    val idleGlowAlpha = if (animateGlow) {
+        val infiniteTransition = rememberInfiniteTransition(label = "search_glow_infinite")
+        val alpha by infiniteTransition.animateFloat(
+            initialValue = 0.12f,
+            targetValue = 0.28f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(2800, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "idle_glow"
+        )
+        alpha
+    } else {
+        0.12f
+    }
 
     val searchElevation by animateDpAsState(if (isFocused) 16.dp else 8.dp, label = "search_elevation")
     val searchGlow by animateFloatAsState(if (isFocused) 0.55f else idleGlowAlpha, label = "search_glow")
@@ -133,7 +135,7 @@ internal fun GlowingSearchBar(
                 spotColor = currentAccent.copy(alpha = searchGlow)
             )
             .background(
-                if (isDarkMode) GlassCardBg.copy(alpha = 0.9f) else Color.White,
+                MallTheme.colors.surface,
                 RoundedCornerShape(24.dp)
             )
             .border(
@@ -229,10 +231,10 @@ internal fun DestinationCategoryCard(
                     spotColor = currentAccent.copy(alpha = 0.15f)
                 )
                 .background(
-                    if (isDarkMode) GlassCardBg.copy(alpha = 0.7f) else Color.White,
+                    MallTheme.colors.surface,
                     RoundedCornerShape(22.dp)
                 )
-                .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)), RoundedCornerShape(22.dp)),
+                .border(BorderStroke(1.dp, MallTheme.colors.border), RoundedCornerShape(22.dp)),
             contentAlignment = Alignment.Center
         ) {
             Box(
@@ -280,10 +282,10 @@ internal fun PopularStoreCard(
             .scale(pressScale)
             .shadow(6.dp, RoundedCornerShape(24.dp))
             .background(
-                if (isDarkMode) GlassCardBg.copy(alpha = 0.8f) else Color.White,
+                MallTheme.colors.surface,
                 RoundedCornerShape(24.dp)
             )
-            .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.08f)), RoundedCornerShape(24.dp))
+            .border(BorderStroke(1.dp, MallTheme.colors.border), RoundedCornerShape(24.dp))
             .clickable(interactionSource = interactionSource, indication = null) { onClick() }
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -291,7 +293,8 @@ internal fun PopularStoreCard(
         Box(
             modifier = Modifier
                 .size(60.dp)
-                .background(Color.White, CircleShape)
+                .background(MallTheme.colors.imagePlaceholder, CircleShape)
+                .border(BorderStroke(1.dp, MallTheme.colors.border), CircleShape)
                 .clip(CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -344,8 +347,8 @@ internal fun RefinedStoreRow(
         Box(
             modifier = Modifier
                 .size(52.dp)
-                .background(Color.White, CircleShape)
-                .border(BorderStroke(1.dp, Color.Black.copy(0.04f)), CircleShape)
+                .background(MallTheme.colors.imagePlaceholder, CircleShape)
+                .border(BorderStroke(1.dp, MallTheme.colors.border), CircleShape)
                 .clip(CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -437,11 +440,11 @@ internal fun CategoryChip(
     val pressed by interactionSource.collectIsPressedAsState()
     
     val bg by animateColorAsState(
-        if (selected) currentAccent else (if (isDarkMode) GlassCardBg.copy(alpha = 0.5f) else Color.White),
+        if (selected) currentAccent else MallTheme.colors.surface,
         animationSpec = tween(300), label = "chip_bg"
     )
     val contentColor by animateColorAsState(
-        if (selected) (if (isDarkMode) DeepNavyBg else Color.White) else currentTextSub,
+        if (selected) MallTheme.colors.onAccent else currentTextSub,
         animationSpec = tween(300), label = "chip_content"
     )
     val borderColor by animateColorAsState(
@@ -521,8 +524,8 @@ internal fun StoreRow(
         Box(
             modifier = Modifier
                 .size(64.dp)
-                .background(Color.White, CircleShape)
-                .border(BorderStroke(1.dp, Color.Black.copy(0.06f)), CircleShape)
+                .background(MallTheme.colors.imagePlaceholder, CircleShape)
+                .border(BorderStroke(1.dp, MallTheme.colors.border), CircleShape)
                 .clip(CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -557,7 +560,7 @@ internal fun StoreRow(
             Icon(
                 imageVector = if (isSaved) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                 contentDescription = stringResource(R.string.save_place),
-                tint = if (isSaved) FavoriteHeartRed else currentTextSub,
+                tint = if (isSaved) MallTheme.colors.errorText else currentTextSub,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -567,8 +570,8 @@ internal fun StoreRow(
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .background(if (isDarkMode) Color(0xFF102A35).copy(alpha = 0.5f) else currentAccent.copy(alpha = 0.08f), CircleShape)
-                .border(BorderStroke(1.2.dp, currentAccent.copy(alpha = 0.2f)), CircleShape)
+                .background(MallTheme.colors.surfaceSunken, CircleShape)
+                .border(BorderStroke(1.2.dp, MallTheme.colors.border), CircleShape)
                 .clip(CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -623,7 +626,7 @@ internal fun DestinationConfirmSheet(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                if (isDarkMode) GlassCardBg else Color.White,
+                MallTheme.colors.surface,
                 RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
             )
             .navigationBarsPadding()
@@ -641,8 +644,8 @@ internal fun DestinationConfirmSheet(
             Box(
                 modifier = Modifier
                     .size(72.dp)
-                    .background(Color.White, CircleShape)
-                    .border(BorderStroke(1.5.dp, Color.Black.copy(0.06f)), CircleShape)
+                    .background(MallTheme.colors.imagePlaceholder, CircleShape)
+                    .border(BorderStroke(1.dp, MallTheme.colors.border), CircleShape)
                     .clip(CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -686,7 +689,7 @@ internal fun DestinationConfirmSheet(
             shape = RoundedCornerShape(22.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = currentAccent,
-                contentColor = Color.White
+                contentColor = MallTheme.colors.onAccent
             )
         ) {
             Text(text = stringResource(R.string.home_start_navigation_btn), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
