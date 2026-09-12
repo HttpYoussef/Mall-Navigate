@@ -50,18 +50,13 @@ changed by this map; the migration tickets are the handoff boundary.
   `migration-tickets.md`. The map is now in its **execution phase** — see the RESUME POINT and
   the Migration progress ledger. This map's plan-only mandate is fulfilled; the batch tickets are
   the handoff boundary and `agy` runs them under orchestrator review.
-- **▶ RESUME POINT (2026-09-12)**: **ALL 8 TICKETS RESOLVED. CHARTING COMPLETE.** Spec:
+- **▶ RESUME POINT (2026-09-13)**: **ALL 8 TICKETS RESOLVED. CHARTING COMPLETE.** Spec:
   `docs/Theming/README.md` (§1–§10) + `palette.md` + `migration-tickets.md` (13 batch tickets
-  00–12). **Executing the migration, in progress.** **Batches 00-06 are landed AND
+  00–12). **Executing the migration, in progress.** **Batches 00-07 are landed AND
   user-signed-off-on-device** (commits `1473c4a`, `c7b9178`, `0eb210b`, `20e074e`, `2b90473`,
-  `c7a2f64`, `b5ec8f5` + their ledger-update commits). **Batch 07 (Profile / Settings / Saved —
-  CORE-FLOW MILESTONE) is landed (`d0f4a94`), reviewed, gates independently re-verified —
-  awaiting user on-device sign-off before Batch 08 is dispatched.** Device-check ask for Batch 07:
-  Saved Places screen, both modes — card backgrounds/text/back-button/bookmark icon/forward-
-  chevron badge all read correctly; empty state ("no favorites yet") icon and hint text look
-  right. **Once signed off, the core-flow milestone is complete** — light mode is correct on
-  every screen a regular shopper touches (Auth, Home, Offers/Vouchers, Destination,
-  Profile/Settings/Saved). **Next after sign-off: dispatch Batch 08 (Parking suite —
+  `c7a2f64`, `b5ec8f5`, `d0f4a94` + their ledger-update commits). **CORE-FLOW MILESTONE COMPLETE**
+  — light mode is correct on every screen a regular shopper touches (Auth, Home, Offers/Vouchers,
+  Destination, Profile/Settings/Saved). **Dispatching Batch 08 (Parking suite —
   `ParkingHomeScreen.kt`, `ParkingCameraScreen.kt`, `ParkingScanResultScreen.kt`,
   `ParkingMapScreen.kt` — the single biggest hotspot, 54 raw literals across 4 files)** to `agy`
   per `docs/Theming/migration-tickets.md` § "Batch 08". The working loop for every batch
@@ -242,7 +237,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 04 | Core Home (Homescreen.kt) | **signed off** (`2b90473`) |
 | 05 | Offers & Vouchers | **signed off** (`c7a2f64`) |
 | 06 | Destination (flatten Dsel* violet) | **signed off** (`b5ec8f5`) |
-| 07 | Profile / Settings / Saved — **core-flow milestone** | landed (`d0f4a94`) — awaiting device sign-off |
+| 07 | Profile / Settings / Saved — **core-flow milestone** | **signed off** (`d0f4a94`) |
 | 08 | Parking suite ×4 (54 literals) | pending |
 | 09 | Localization / first-run / camera ×5 | pending |
 | 10 | Navigation HUD & map chrome ×2 | pending |
