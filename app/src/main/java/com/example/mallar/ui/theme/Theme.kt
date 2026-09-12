@@ -1,5 +1,6 @@
 package com.example.mallar.ui.theme
 
+import android.app.Activity
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,11 +12,15 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import com.example.mallar.data.AppLanguagePlatform
 import com.example.mallar.data.AppPreferences
 
@@ -115,6 +120,20 @@ fun MallARTheme(
         fontFamilyFor(AppLanguagePlatform.currentLanguage(context))
     }
     val typography = remember(activeFontFamily) { typographyFor(activeFontFamily) }
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as? Activity)?.window
+            if (window != null) {
+                window.statusBarColor = mallColors.screenBackground.toArgb()
+                window.navigationBarColor = mallColors.screenBackground.toArgb()
+                val insetsController = WindowCompat.getInsetsController(window, view)
+                insetsController.isAppearanceLightStatusBars = !isDarkMode
+                insetsController.isAppearanceLightNavigationBars = !isDarkMode
+            }
+        }
+    }
 
     CompositionLocalProvider(
         LocalMallColors provides mallColors

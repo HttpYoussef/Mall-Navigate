@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import com.example.mallar.R
 import com.example.mallar.data.StartupState
+import com.example.mallar.ui.theme.DarkSystemBars
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -65,12 +66,7 @@ fun SplashScreen(
     val particles = remember { List(30) { Particle() } }
 
     // Sync status bar
-    SideEffect {
-        val window = (context as? android.app.Activity)?.window
-        if (window != null) {
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
-        }
-    }
+    DarkSystemBars()
 
     // Sequence Logic
     LaunchedEffect(Unit) {

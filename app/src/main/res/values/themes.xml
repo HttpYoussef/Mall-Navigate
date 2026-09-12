@@ -3,15 +3,13 @@
 
     <!-- Main Application Theme -->
     <style name="Theme.MallAR" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="android:windowBackground">#06131A</item>
-        <item name="android:statusBarColor">#06131A</item>
-        <item name="android:navigationBarColor">#06131A</item>
+        <item name="android:windowBackground">#F7F9FB</item>
     </style>
 
     <!-- Android 12+ Splash Screen API Theme -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <!-- Background color of the splash screen -->
-        <item name="windowSplashScreenBackground">#06131A</item>
+        <item name="windowSplashScreenBackground">#0F5F5F</item>
 
         <!-- Logo to display (static brand origin) -->
         <item name="windowSplashScreenAnimatedIcon">@drawable/logo_main</item>

@@ -31,6 +31,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.StartupCoordinator
 import com.example.mallar.data.StartupState
 import com.example.mallar.ui.navigation.*
@@ -57,6 +58,8 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         
         super.onCreate(savedInstanceState)
+
+        AppPreferences.init(this)
 
         setContent {
             val startupState by StartupCoordinator.state.collectAsState()
