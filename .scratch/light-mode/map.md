@@ -235,7 +235,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 00 | Foundation (theme pkg, MallColors, contrast test, checkThemeColors, pilots Language+Profile) | **signed off** (`1473c4a`) |
 | 01 | XML + system-bars + bootstrap (delete colors.xml, sync init, DarkSystemBars) | **signed off** (`c7b9178`) |
 | 02 | Shared renderers (StoreLogo, HomeSharedComponents; delete rememberHomeColorScheme) | **signed off** (`0eb210b`) |
-| 03 | Auth & onboarding (auth/ ×5) | landed (`20e074e`) — awaiting device sign-off |
+| 03 | Auth & onboarding (auth/ ×5) | **signed off** (`20e074e`) |
 | 04 | Core Home (Homescreen.kt) | pending |
 | 05 | Offers & Vouchers | pending |
 | 06 | Destination (flatten Dsel* violet) | pending |
