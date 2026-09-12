@@ -247,7 +247,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 05 | Offers & Vouchers | **signed off** (`c7a2f64`) |
 | 06 | Destination (flatten Dsel* violet) | **signed off** (`b5ec8f5`) |
 | 07 | Profile / Settings / Saved — **core-flow milestone** | **signed off** (`d0f4a94`) |
-| 08 | Parking suite ×4 (54 literals) | landed (`d1b3785`) — awaiting device sign-off |
+| 08 | Parking suite ×4 (54 literals) | **signed off** (`833f549`) |
 | 09 | Localization / first-run / camera ×5 | pending |
 | 10 | Navigation HUD & map chrome ×2 | pending |
 | 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | pending |
