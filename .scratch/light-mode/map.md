@@ -50,15 +50,39 @@ changed by this map; the migration tickets are the handoff boundary.
   `migration-tickets.md`. The map is now in its **execution phase** — see the RESUME POINT and
   the Migration progress ledger. This map's plan-only mandate is fulfilled; the batch tickets are
   the handoff boundary and `agy` runs them under orchestrator review.
-- **▶ RESUME POINT (2026-09-10)**: **ALL 8 TICKETS RESOLVED. CHARTING COMPLETE.** The spec is
-  written — `docs/Theming/README.md` (§1–§10) + `palette.md` + `migration-tickets.md` (13 batch
-  tickets 00–12). **Next: execute the migration.** Dispatch **Batch 00 (Foundation)** to `agy`
-  (`gemini-3.8-flash-high`) per the `agy-delegate` skill using
-  `docs/Theming/migration-tickets.md` § "Batch 00" as the brief source. Strictly sequential: one
-  dispatch → orchestrator reviews the diff + runs the gate set → orchestrator commits on
-  `feat/colors-light-modes` → **user runs the affected screens on a device both modes vs the
-  QA checklist and signs off** → next batch. Update the "Migration progress" ledger below after
-  each batch. Nothing is pushed.
+- **▶ RESUME POINT (2026-09-12, after a context compaction)**: **ALL 8 TICKETS RESOLVED.
+  CHARTING COMPLETE.** Spec: `docs/Theming/README.md` (§1–§10) + `palette.md` +
+  `migration-tickets.md` (13 batch tickets 00–12). **Executing the migration, in progress.**
+  **Batches 00, 01, 02 are landed AND user-signed-off-on-device** (commits `1473c4a`, `c7b9178`,
+  `0eb210b` + their ledger-update commits). **Next: dispatch Batch 03 (Auth & onboarding)** —
+  `ui/auth/WelcomeScreen.kt`, `SignInScreen.kt`, `SignUpScreen.kt`, `PhoneAuthScreen.kt`,
+  `OtpVerifyScreen.kt` — to `agy` (`gemini-3.8-flash-high`) per the `agy-delegate` skill, brief
+  sourced from `docs/Theming/migration-tickets.md` § "Batch 03" + the master token-mapping table
+  in that same file. The working loop for every batch (established over 00-02, keep doing this):
+  1. write a brief grounded in the exact current file contents (grep/read first — don't assume
+     the migration-tickets.md summary is precise enough on its own; past batches needed real
+     line numbers and exact legacy-constant lists);
+  2. flag any "legacy constants still used by other unmigrated files" risk explicitly in the
+     brief (this has mattered twice: `Color.kt` in Batch 00, `HomeSharedComponents.kt`'s design
+     tokens in Batch 02) — never let `agy` delete a shared constant still referenced elsewhere;
+  3. dispatch via `node "<agy-delegate skill dir>/scripts/relay.mjs" --brief ... --cd "<repo>"
+     --model gemini-3.8-flash-high --effort high --out-dir <scratchpad>/agy-batchNN
+     --timeout 30m`, `run_in_background: true`;
+  4. on completion: read `result.json`'s `finalMessage` + `touchedFiles`, then **actually read the
+     diff** (`git diff -w <files>`) — don't just trust the self-reported gate outcomes;
+  5. independently re-run the 5 gates yourself (`compileDebugKotlin`, `testDebugUnitTest`,
+     `compileDebugAndroidTestKotlin`, `checkThemeColors`, `lintDebug`) — every batch so far has
+     been clean-ish but Batches 01 and 02 each had one small defect worth fixing (an unsafe
+     `Activity` cast in Batch 01; a wrong default token in Batch 02) that only surfaced from
+     reading the diff, not from the gate output;
+  6. commit the verified diff yourself with a message describing what changed + what you fixed;
+  7. update the "Migration progress" ledger below (`landed (<hash>) — awaiting device sign-off`),
+     commit that too;
+  8. tell the user what to check on-device for that specific batch, and **wait for their
+     sign-off before dispatching the next batch** — do not auto-proceed even though the pattern
+     is now well-established.
+  Nothing is pushed. `config/theme-migration-allowlist.txt` shrinks per batch; do not touch a
+  file's allowlist line unless that batch's edit actually changed its match count.
 - **Sync mode bootstrap — IN SCOPE** (user sign-off, resolves codex C4): the foundation ticket
   reads the persisted dark-mode preference synchronously before the first themed frame. Ticket 06
   §6 specifies *how*; that it happens is settled.
@@ -204,9 +228,9 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 
 | Batch | Scope | Status |
 |---|---|---|
-| 00 | Foundation (theme pkg, MallColors, contrast test, checkThemeColors, pilots Language+Profile) | landed (`1473c4a`) — awaiting device sign-off |
-| 01 | XML + system-bars + bootstrap (delete colors.xml, sync init, DarkSystemBars) | landed (`c7b9178`) — awaiting device sign-off |
-| 02 | Shared renderers (StoreLogo, HomeSharedComponents; delete rememberHomeColorScheme) | landed (`0eb210b`) — awaiting device sign-off |
+| 00 | Foundation (theme pkg, MallColors, contrast test, checkThemeColors, pilots Language+Profile) | **signed off** (`1473c4a`) |
+| 01 | XML + system-bars + bootstrap (delete colors.xml, sync init, DarkSystemBars) | **signed off** (`c7b9178`) |
+| 02 | Shared renderers (StoreLogo, HomeSharedComponents; delete rememberHomeColorScheme) | **signed off** (`0eb210b`) |
 | 03 | Auth & onboarding (auth/ ×5) | pending |
 | 04 | Core Home (Homescreen.kt) | pending |
 | 05 | Offers & Vouchers | pending |
