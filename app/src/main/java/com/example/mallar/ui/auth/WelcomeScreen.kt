@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -21,10 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mallar.R
-import com.example.mallar.ui.theme.Teal
-import com.example.mallar.ui.theme.White
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
+import com.example.mallar.ui.theme.MallTheme
 
 @Composable
 fun WelcomeScreen(
@@ -33,18 +29,7 @@ fun WelcomeScreen(
     onSkipClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val view = LocalView.current
     var backPressedTime by remember { mutableLongStateOf(0L) }
-
-    val isDarkMode by com.example.mallar.data.AppPreferences.isDarkMode.collectAsState()
-
-    // Ensure dark icons on white background
-    SideEffect {
-        val window = (context as? android.app.Activity)?.window
-        if (window != null) {
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkMode
-        }
-    }
 
     BackHandler {
         val currentTime = System.currentTimeMillis()
@@ -59,7 +44,7 @@ fun WelcomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(if (isDarkMode) com.example.mallar.ui.theme.DarkBackground else Color.White)
+            .background(MallTheme.colors.screenBackground)
     ) {
         // Decorative background element
         Image(
@@ -85,7 +70,7 @@ fun WelcomeScreen(
                 text = androidx.compose.ui.res.stringResource(R.string.welcome_title),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isDarkMode) White else Teal,
+                color = MallTheme.colors.accentText,
                 textAlign = TextAlign.Center,
                 lineHeight = 36.sp
             )
@@ -115,8 +100,8 @@ fun WelcomeScreen(
                     .shadow(12.dp, RoundedCornerShape(16.dp)),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Teal,
-                    contentColor = White
+                    containerColor = MallTheme.colors.accent,
+                    contentColor = MallTheme.colors.onAccent
                 )
             ) {
                 Text(
@@ -137,7 +122,7 @@ fun WelcomeScreen(
                 shape = RoundedCornerShape(16.dp),
                 border = ButtonDefaults.outlinedButtonBorder.copy(width = 2.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Teal
+                    contentColor = MallTheme.colors.accentText
                 )
             ) {
                 Text(
@@ -156,7 +141,7 @@ fun WelcomeScreen(
             ) {
                 Text(
                     text = androidx.compose.ui.res.stringResource(R.string.skip_for_now),
-                    color = if (isDarkMode) White.copy(0.7f) else Teal.copy(alpha = 0.6f),
+                    color = MallTheme.colors.textSecondary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )

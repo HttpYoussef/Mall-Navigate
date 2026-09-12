@@ -21,8 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,20 +34,6 @@ import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import java.util.concurrent.TimeUnit
-
-private val GradientColors = listOf(
-    Color(0xFF0F6B6B),
-    Color(0xFF1A8C8C),
-    Color(0xFF2FA3B8),
-    Color(0xFF1A8C8C)
-)
-
-private val DarkGradientColors = listOf(
-    Color(0xFF051717),
-    Color(0xFF0A2D2D),
-    Color(0xFF0E3A42),
-    Color(0xFF0A2D2D)
-)
 
 @Composable
 fun SignUpScreen(
@@ -70,12 +54,10 @@ fun SignUpScreen(
     val activity = context as Activity
     val auth = FirebaseAuth.getInstance()
 
-    val isDarkMode by com.example.mallar.data.AppPreferences.isDarkMode.collectAsState()
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(if (isDarkMode) DarkGradientColors else GradientColors))
+            .background(MallTheme.colors.screenBackground)
     ) {
         Column(
             modifier = Modifier
@@ -97,13 +79,13 @@ fun SignUpScreen(
                     },
                     modifier = Modifier.size(48.dp),
                     shape = CircleShape,
-                    color = White.copy(alpha = 0.2f)
+                    color = MaterialTheme.colorScheme.surfaceVariant
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.back),
-                            tint = White,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -111,7 +93,7 @@ fun SignUpScreen(
 
                 Text(
                     text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.skip),
-                    color = White.copy(alpha = 0.9f),
+                    color = MallTheme.colors.textSecondary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
@@ -137,7 +119,7 @@ fun SignUpScreen(
                                 height = 8.dp
                             )
                             .background(
-                                if (isActive) White else White.copy(alpha = 0.3f),
+                                if (isActive) MallTheme.colors.accent else MallTheme.colors.border,
                                 CircleShape
                             )
                     )
@@ -252,10 +234,10 @@ fun SignUpScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)),
+                    .background(MallTheme.colors.scrim.copy(alpha = 0.4f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = White, strokeWidth = 3.dp)
+                CircularProgressIndicator(color = MallTheme.colors.onScrim, strokeWidth = 3.dp)
             }
         }
     }
@@ -280,7 +262,7 @@ private fun NameEntryPhase(
         Icon(
             imageVector = Icons.Default.Person,
             contentDescription = null,
-            tint = White.copy(alpha = 0.7f),
+            tint = MallTheme.colors.accentText,
             modifier = Modifier.size(48.dp)
         )
 
@@ -288,7 +270,7 @@ private fun NameEntryPhase(
 
         Text(
             text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.create_account),
-            color = White,
+            color = MallTheme.colors.textPrimary,
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -298,7 +280,7 @@ private fun NameEntryPhase(
 
         Text(
             text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.enter_name),
-            color = White.copy(alpha = 0.8f),
+            color = MallTheme.colors.textSecondary,
             fontSize = 15.sp,
             textAlign = TextAlign.Center
         )
@@ -333,10 +315,8 @@ private fun NameEntryPhase(
                 .shadow(8.dp, RoundedCornerShape(28.dp)),
             shape = RoundedCornerShape(28.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = White,
-                contentColor = Teal,
-                disabledContainerColor = White.copy(alpha = 0.5f),
-                disabledContentColor = Teal.copy(alpha = 0.5f)
+                containerColor = MallTheme.colors.accent,
+                contentColor = MallTheme.colors.onAccent
             ),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp)
         ) {
@@ -368,7 +348,7 @@ private fun PhoneEntryPhase(
     ) {
         Text(
             text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.enter_phone_nl),
-            color = White,
+            color = MallTheme.colors.textPrimary,
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -379,7 +359,7 @@ private fun PhoneEntryPhase(
 
         Text(
             text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.receive_6_digit),
-            color = White.copy(alpha = 0.8f),
+            color = MallTheme.colors.textSecondary,
             fontSize = 15.sp,
             textAlign = TextAlign.Center
         )
@@ -408,10 +388,8 @@ private fun PhoneEntryPhase(
                 .shadow(8.dp, RoundedCornerShape(28.dp)),
             shape = RoundedCornerShape(28.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = White,
-                contentColor = Teal,
-                disabledContainerColor = White.copy(alpha = 0.5f),
-                disabledContentColor = Teal.copy(alpha = 0.5f)
+                containerColor = MallTheme.colors.accent,
+                contentColor = MallTheme.colors.onAccent
             ),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp)
         ) {
@@ -440,7 +418,7 @@ private fun OtpPhase(
     ) {
         Text(
             text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.verify_code),
-            color = White,
+            color = MallTheme.colors.textPrimary,
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -450,7 +428,7 @@ private fun OtpPhase(
 
         Text(
             text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.we_sent_code),
-            color = White.copy(alpha = 0.8f),
+            color = MallTheme.colors.textSecondary,
             fontSize = 15.sp,
             textAlign = TextAlign.Center
         )
@@ -478,10 +456,8 @@ private fun OtpPhase(
                 .shadow(8.dp, RoundedCornerShape(28.dp)),
             shape = RoundedCornerShape(28.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = White,
-                contentColor = Teal,
-                disabledContainerColor = White.copy(alpha = 0.5f),
-                disabledContentColor = Teal.copy(alpha = 0.5f)
+                containerColor = MallTheme.colors.accent,
+                contentColor = MallTheme.colors.onAccent
             ),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp)
         ) {
@@ -492,7 +468,7 @@ private fun OtpPhase(
 
         Text(
             text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.did_not_receive),
-            color = White.copy(alpha = 0.6f),
+            color = MallTheme.colors.textSecondary,
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
@@ -523,14 +499,14 @@ private fun AuthTextField(
                 .fillMaxWidth()
                 .height(60.dp),
             shape = RoundedCornerShape(16.dp),
-            color = White.copy(alpha = 0.15f)
+            color = MallTheme.colors.surfaceSunken
         ) {
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 singleLine = true,
                 textStyle = TextStyle(
-                    color = White,
+                    color = MallTheme.colors.textPrimary,
                     fontSize = 17.sp,
                     fontWeight = FontWeight.SemiBold,
                     textDirection = if (isLtrOnly) androidx.compose.ui.text.style.TextDirection.Ltr else androidx.compose.ui.text.style.TextDirection.Content
@@ -547,7 +523,7 @@ private fun AuthTextField(
                         if (value.isEmpty()) {
                             Text(
                                 text = placeholder,
-                                color = White.copy(alpha = 0.4f),
+                                color = MallTheme.colors.textSecondary,
                                 fontSize = 17.sp,
                                 fontWeight = FontWeight.Medium
                             )

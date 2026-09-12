@@ -47,7 +47,7 @@ fun OtpVerifyScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Teal)
+            .background(MallTheme.colors.screenBackground)
     ) {
 
         // Background Image
@@ -79,7 +79,7 @@ fun OtpVerifyScreen(
                     onClick = onBackClick,
                     modifier = Modifier.size(56.dp),
                     shape = CircleShape,
-                    color = White
+                    color = MaterialTheme.colorScheme.surfaceVariant
                 ) {
 
                     Box(contentAlignment = Alignment.Center) {
@@ -87,7 +87,7 @@ fun OtpVerifyScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = Teal,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -111,7 +111,7 @@ fun OtpVerifyScreen(
             // Title
             Text(
                 text = stringResource(R.string.verify_code),
-                color = White,
+                color = MallTheme.colors.textPrimary,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -121,7 +121,7 @@ fun OtpVerifyScreen(
 
             Text(
                 text = stringResource(R.string.otp_sent_code_to_phone),
-                color = White.copy(alpha = 0.9f),
+                color = MallTheme.colors.textSecondary,
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center,
 
@@ -155,14 +155,14 @@ fun OtpVerifyScreen(
 
                             shape = RoundedCornerShape(12.dp),
 
-                            color = White
+                            color = MallTheme.colors.surface
                         ) {
 
                             Box(contentAlignment = Alignment.Center) {
 
                                 Text(
                                     text = char?.toString() ?: "",
-                                    color = Teal,
+                                    color = MallTheme.colors.accentText,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -216,7 +216,7 @@ fun OtpVerifyScreen(
                     .height(56.dp)
                     .border(
                         1.5.dp,
-                        White,
+                        MallTheme.colors.accent,
                         RoundedCornerShape(16.dp)
                     ),
 
@@ -224,9 +224,7 @@ fun OtpVerifyScreen(
 
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
-                    contentColor = White,
-                    disabledContainerColor = Color.Transparent,
-                    disabledContentColor = White.copy(alpha = 0.3f)
+                    contentColor = MallTheme.colors.accentText
                 )
             ) {
 
@@ -272,7 +270,7 @@ fun OtpVerifyScreen(
 
                 Text(
                     text = stringResource(R.string.otp_resend),
-                    color = White.copy(alpha = 0.7f),
+                    color = MallTheme.colors.textSecondary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
 
@@ -350,7 +348,7 @@ private fun KeyButton(
 
         shape = RoundedCornerShape(16.dp),
 
-        color = White.copy(alpha = 0.15f),
+        color = MallTheme.colors.surfaceSunken,
 
         shadowElevation = 0.dp
     ) {
@@ -362,7 +360,7 @@ private fun KeyButton(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Backspace,
                     contentDescription = stringResource(R.string.otp_backspace_cd),
-                    tint = White,
+                    tint = MallTheme.colors.textPrimary,
                     modifier = Modifier.size(26.dp)
                 )
 
@@ -372,7 +370,7 @@ private fun KeyButton(
                     text = text,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = White
+                    color = MallTheme.colors.textPrimary
                 )
             }
         }

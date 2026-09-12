@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -51,7 +50,7 @@ fun PhoneAuthScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Teal)
+            .background(MallTheme.colors.screenBackground)
     ) {
         Column(
             modifier = Modifier
@@ -74,7 +73,7 @@ fun PhoneAuthScreen(
                     onClick = onBackClick,
                     modifier = Modifier.size(56.dp),
                     shape = CircleShape,
-                    color = White
+                    color = MaterialTheme.colorScheme.surfaceVariant
                 ) {
 
                     Box(contentAlignment = Alignment.Center) {
@@ -82,7 +81,7 @@ fun PhoneAuthScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = Teal,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -90,7 +89,7 @@ fun PhoneAuthScreen(
 
                 Text(
                     text = stringResource(R.string.skip),
-                    color = White,
+                    color = MallTheme.colors.textSecondary,
                     fontSize = 17.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
@@ -107,7 +106,7 @@ fun PhoneAuthScreen(
             // Title
             Text(
                 text = stringResource(R.string.enter_phone_nl),
-                color = White,
+                color = MallTheme.colors.textPrimary,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -118,7 +117,7 @@ fun PhoneAuthScreen(
 
             Text(
                 text = stringResource(R.string.receive_6_digit),
-                color = White.copy(alpha = 0.9f),
+                color = MallTheme.colors.textSecondary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center
             )
@@ -134,7 +133,7 @@ fun PhoneAuthScreen(
                         .height(64.dp),
 
                     shape = RoundedCornerShape(16.dp),
-                    color = White
+                    color = MallTheme.colors.surface
                 ) {
 
                     Row(
@@ -151,7 +150,7 @@ fun PhoneAuthScreen(
 
                             Text(
                                 text = stringResource(R.string.country_code),
-                                color = Teal,
+                                color = MallTheme.colors.accentText,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -159,7 +158,7 @@ fun PhoneAuthScreen(
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
                                 contentDescription = null,
-                                tint = Teal
+                                tint = MallTheme.colors.accentText
                             )
                         }
 
@@ -172,9 +171,9 @@ fun PhoneAuthScreen(
                                 formatPhoneNumberDisplay(phoneNumber),
 
                             color = if (phoneNumber.isEmpty())
-                                Teal.copy(alpha = 0.3f)
+                                MallTheme.colors.textSecondary
                             else
-                                Teal,
+                                MallTheme.colors.accentText,
 
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
@@ -283,8 +282,8 @@ fun PhoneAuthScreen(
                     shape = RoundedCornerShape(16.dp),
 
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = White,
-                        contentColor = Teal
+                        containerColor = MallTheme.colors.accent,
+                        contentColor = MallTheme.colors.onAccent
                     ),
 
                     elevation = ButtonDefaults.buttonElevation(
@@ -368,7 +367,7 @@ private fun KeyButton(
 
         shape = RoundedCornerShape(16.dp),
 
-        color = White.copy(alpha = 0.15f),
+        color = MallTheme.colors.surfaceSunken,
 
         shadowElevation = 0.dp
     ) {
@@ -380,7 +379,7 @@ private fun KeyButton(
                 Icon(
                     imageVector = Icons.Default.Backspace,
                     contentDescription = stringResource(R.string.phone_auth_backspace_cd),
-                    tint = White,
+                    tint = MallTheme.colors.textPrimary,
                     modifier = Modifier.size(26.dp)
                 )
 
@@ -390,7 +389,7 @@ private fun KeyButton(
                     text = text,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = White
+                    color = MallTheme.colors.textPrimary
                 )
             }
         }
