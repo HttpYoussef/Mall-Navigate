@@ -1,6 +1,7 @@
 package com.example.mallar.ui.home
 
 import com.example.mallar.ui.theme.MallTheme
+import com.example.mallar.ui.theme.Elevation
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -41,7 +42,6 @@ import com.example.mallar.data.Place
 import com.example.mallar.data.PlaceRepository
 import com.example.mallar.data.floorDisplayLabel
 import com.example.mallar.data.VoucherRepository
-import com.example.mallar.ui.theme.SuccessGreen
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size as CoilSize
@@ -113,7 +113,7 @@ fun VoucherDetailsScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape)
-                                .background(if (isDarkMode) GlassCardBg.copy(alpha = 0.6f) else Color.White)
+                                .background(MallTheme.colors.surface)
                                 .border(BorderStroke(1.dp, currentBorder), CircleShape)
                                 .clickable { onBackClick() },
                             contentAlignment = Alignment.Center
@@ -140,9 +140,14 @@ fun VoucherDetailsScreen(
                         Box(
                             modifier = Modifier
                                 .size(84.dp)
-                                .shadow(14.dp, CircleShape, ambientColor = currentAccent.copy(alpha = 0.3f), spotColor = currentAccent.copy(alpha = 0.3f))
-                                .background(Color.White, CircleShape)
-                                .border(BorderStroke(1.dp, Color.Black.copy(alpha = 0.06f)), CircleShape),
+                                .shadow(
+                                    14.dp,
+                                    CircleShape,
+                                    ambientColor = if (isDarkMode) currentAccent.copy(alpha = 0.3f) else Elevation.shadowRaisedLight, // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                                    spotColor = if (isDarkMode) currentAccent.copy(alpha = 0.3f) else Elevation.shadowRaisedLight // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                                )
+                                .background(MallTheme.colors.imagePlaceholder, CircleShape)
+                                .border(BorderStroke(1.dp, MallTheme.colors.border), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             val request = remember(voucher.logoAssetPath) {
@@ -170,8 +175,8 @@ fun VoucherDetailsScreen(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .background(currentAccent.copy(alpha = if (isDarkMode) 0.18f else 0.12f))
-                                .border(1.dp, currentAccent.copy(alpha = 0.4f), RoundedCornerShape(50))
+                                .background(currentAccent.copy(alpha = if (isDarkMode) 0.18f else 0.12f)) // theme-lint:allow decorative accent-tinted pill background
+                                .border(1.dp, currentAccent.copy(alpha = 0.4f), RoundedCornerShape(50)) // theme-lint:allow decorative accent-tinted pill border
                                 .padding(horizontal = 18.dp, vertical = 9.dp)
                         ) {
                             Text(stringResource(voucher.discountTitleRes), color = currentAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -207,21 +212,33 @@ fun VoucherDetailsScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         val qrGlowColor by animateColorAsState(
-                            targetValue = if (redemptionState == RedemptionState.SUCCESS) SuccessGreen else currentAccent,
+                            targetValue = if (redemptionState == RedemptionState.SUCCESS) MallTheme.colors.success else currentAccent,
                             animationSpec = tween(360),
                             label = "qr_glow_color"
                         )
                         Box(
                             modifier = Modifier
-                                .shadow(16.dp, RoundedCornerShape(28.dp), ambientColor = qrGlowColor.copy(alpha = 0.25f), spotColor = qrGlowColor.copy(alpha = 0.25f))
+                                .shadow(
+                                    16.dp,
+                                    RoundedCornerShape(28.dp),
+                                    ambientColor = if (isDarkMode) qrGlowColor.copy(alpha = 0.25f) else Elevation.shadowRaisedLight, // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                                    spotColor = if (isDarkMode) qrGlowColor.copy(alpha = 0.25f) else Elevation.shadowRaisedLight // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                                )
                                 .clip(RoundedCornerShape(28.dp))
-                                .background(Brush.verticalGradient(listOf(qrGlowColor.copy(alpha = if (isDarkMode) 0.12f else 0.06f), currentCardBg)))
-                                .border(BorderStroke(1.dp, qrGlowColor.copy(alpha = 0.4f)), RoundedCornerShape(28.dp))
+                                .background(
+                                    Brush.verticalGradient(
+                                        listOf(
+                                            qrGlowColor.copy(alpha = if (isDarkMode) 0.12f else 0.06f), // theme-lint:allow decorative state-tinted background
+                                            currentCardBg
+                                        )
+                                    )
+                                )
+                                .border(BorderStroke(1.dp, qrGlowColor.copy(alpha = 0.4f)), RoundedCornerShape(28.dp)) // theme-lint:allow decorative state-tinted border
                                 .padding(24.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Box(
-                                modifier = Modifier.size(200.dp).clip(RoundedCornerShape(16.dp)).background(Color.White).padding(14.dp)
+                                modifier = Modifier.size(200.dp).clip(RoundedCornerShape(16.dp)).background(Color.White).padding(14.dp) // theme-lint:allow qr-code-contrast
                             ) {
                                 QrPlaceholder(seed = voucher.id, modifier = Modifier.fillMaxSize())
                             }
@@ -229,11 +246,11 @@ fun VoucherDetailsScreen(
 
                         Spacer(Modifier.height(16.dp))
                         Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(horizontal = 8.dp)) {
-                            Icon(Icons.Default.CheckCircle, null, tint = SuccessGreen, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.CheckCircle, null, tint = MallTheme.colors.successText, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = stringResource(R.string.voucher_redeemed_success_desc),
-                                color = SuccessGreen,
+                                color = MallTheme.colors.successText,
                                 fontSize = 13.sp,
                                 lineHeight = 18.sp,
                                 fontWeight = FontWeight.Medium
@@ -264,8 +281,8 @@ fun VoucherDetailsScreen(
             ) {
                 val buttonColor by animateColorAsState(
                     targetValue = when (redemptionState) {
-                        RedemptionState.SUCCESS -> SuccessGreen
-                        RedemptionState.READY -> if (isDarkMode) GlassCardBg else currentAccent
+                        RedemptionState.SUCCESS -> MallTheme.colors.success
+                        RedemptionState.READY -> if (isDarkMode) MaterialTheme.colorScheme.secondaryContainer else currentAccent
                         else -> currentAccent
                     },
                     animationSpec = tween(400),
@@ -296,11 +313,11 @@ fun VoucherDetailsScreen(
                             (redemptionState != RedemptionState.READY || matchedPlace != null),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = buttonColor,
-                        contentColor = if (redemptionState == RedemptionState.READY && isDarkMode) currentAccent else Color.White,
-                        disabledContainerColor = buttonColor.copy(alpha = 0.7f),
-                        disabledContentColor = Color.White
+                        contentColor = if (redemptionState == RedemptionState.READY && isDarkMode) MallTheme.colors.accentText else MallTheme.colors.onAccent,
+                        disabledContainerColor = buttonColor.copy(alpha = 0.7f), // theme-lint:allow decorative disabled-state dimming of the dynamic button fill
+                        disabledContentColor = MallTheme.colors.onAccent
                     ),
-                    border = if (redemptionState == RedemptionState.READY) BorderStroke(1.5.dp, currentAccent.copy(alpha = 0.5f)) else null
+                    border = if (redemptionState == RedemptionState.READY) BorderStroke(1.5.dp, currentAccent.copy(alpha = 0.5f)) else null // theme-lint:allow decorative accent-tinted border
                 ) {
                     AnimatedContent(
                         targetState = redemptionState,
@@ -315,7 +332,7 @@ fun VoucherDetailsScreen(
                                     Text(stringResource(R.string.voucher_redeem_now), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 }
                                 RedemptionState.REDEEMING -> {
-                                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.5.dp)
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MallTheme.colors.onAccent, strokeWidth = 2.5.dp)
                                 }
                                 RedemptionState.SUCCESS -> {
                                     Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(22.dp))
@@ -354,15 +371,15 @@ private fun QrPlaceholder(seed: String, modifier: Modifier = Modifier) {
         for (r in 0 until gridSize) {
             for (c in 0 until gridSize) {
                 if (cells[r][c]) {
-                    drawRect(color = Color.Black, topLeft = Offset(c * cell, r * cell), size = Size(cell, cell))
+                    drawRect(color = Color.Black, topLeft = Offset(c * cell, r * cell), size = Size(cell, cell)) // theme-lint:allow qr-code-contrast
                 }
             }
         }
         val finderPositions = listOf(Offset(0f, 0f), Offset((gridSize - 7) * cell, 0f), Offset(0f, (gridSize - 7) * cell))
         finderPositions.forEach { origin ->
-            drawRect(color = Color.Black, topLeft = origin, size = Size(cell * 7, cell * 7))
-            drawRect(color = Color.White, topLeft = origin + Offset(cell, cell), size = Size(cell * 5, cell * 5))
-            drawRect(color = Color.Black, topLeft = origin + Offset(cell * 2, cell * 2), size = Size(cell * 3, cell * 3))
+            drawRect(color = Color.Black, topLeft = origin, size = Size(cell * 7, cell * 7)) // theme-lint:allow qr-code-contrast
+            drawRect(color = Color.White, topLeft = origin + Offset(cell, cell), size = Size(cell * 5, cell * 5)) // theme-lint:allow qr-code-contrast
+            drawRect(color = Color.Black, topLeft = origin + Offset(cell * 2, cell * 2), size = Size(cell * 3, cell * 3)) // theme-lint:allow qr-code-contrast
         }
     }
 }

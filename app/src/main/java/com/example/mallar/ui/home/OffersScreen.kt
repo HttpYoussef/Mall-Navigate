@@ -1,6 +1,7 @@
 package com.example.mallar.ui.home
 
 import com.example.mallar.ui.theme.MallTheme
+import com.example.mallar.ui.theme.Elevation
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -63,9 +64,7 @@ import coil.size.Size as CoilSize
 // deliberately kept swap-ready (see Voucher.kt) so this screen doesn't need to
 // change when a real backend is connected later.
 //
-// Design tokens (DeepNavyBg/GlassCardBg/CyanGlow/etc.) are the same `internal`
-// tokens CategoryScreen.kt already reuses from Homescreen.kt — no duplicated
-// color system.
+// Design tokens resolve dynamically via MallTheme.colors tokens.
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
@@ -128,7 +127,7 @@ fun OffersScreen(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(if (isDarkMode) GlassCardBg.copy(alpha = 0.6f) else Color.White)
+                            .background(MallTheme.colors.surface)
                             .border(BorderStroke(1.dp, currentBorder), CircleShape)
                             .clickable { onBackClick() },
                         contentAlignment = Alignment.Center
@@ -170,7 +169,7 @@ fun OffersScreen(
                         .padding(horizontal = 20.dp)
                         .height(52.dp)
                         .shadow(6.dp, RoundedCornerShape(26.dp), clip = false)
-                        .background(if (isDarkMode) GlassCardBg else Color.White, RoundedCornerShape(26.dp))
+                        .background(MallTheme.colors.surface, RoundedCornerShape(26.dp))
                         .border(
                             BorderStroke(
                                 if (searchFocused) 1.5.dp else 1.dp,
@@ -299,8 +298,8 @@ private fun OfferFilterChip(
     currentBorder: Color,
     onClick: () -> Unit
 ) {
-    val bg = if (selected) currentAccent else (if (isDarkMode) GlassCardBg.copy(alpha = 0.6f) else Color.White)
-    val contentColor = if (selected) (if (isDarkMode) DeepNavyBg else Color.White) else currentTextSub
+    val bg = if (selected) currentAccent else MallTheme.colors.surface
+    val contentColor = if (selected) MallTheme.colors.onAccent else currentTextSub
     val borderColor = if (selected) Color.Transparent else currentBorder
 
     val interactionSource = remember { MutableInteractionSource() }
@@ -350,14 +349,22 @@ private fun VoucherCard(
         modifier = Modifier
             .fillMaxWidth()
             .scale(pressScale)
-            .shadow(10.dp, RoundedCornerShape(24.dp), ambientColor = currentAccent.copy(alpha = 0.2f), spotColor = currentAccent.copy(alpha = 0.2f))
+            .shadow(
+                10.dp,
+                RoundedCornerShape(24.dp),
+                ambientColor = if (isDarkMode) currentAccent.copy(alpha = 0.2f) else Elevation.shadowRaisedLight, // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                spotColor = if (isDarkMode) currentAccent.copy(alpha = 0.2f) else Elevation.shadowRaisedLight // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+            )
             .clip(RoundedCornerShape(24.dp))
             .background(
                 Brush.verticalGradient(
-                    listOf(currentAccent.copy(alpha = if (isDarkMode) 0.10f else 0.06f), currentCardBg)
+                    listOf(
+                        currentAccent.copy(alpha = if (isDarkMode) 0.10f else 0.06f), // theme-lint:allow decorative voucher-card background tint
+                        currentCardBg
+                    )
                 )
             )
-            .border(BorderStroke(1.dp, Color.White.copy(alpha = if (isDarkMode) 0.08f else 0.5f)), RoundedCornerShape(24.dp))
+            .border(BorderStroke(1.dp, MallTheme.colors.border), RoundedCornerShape(24.dp))
             .clickable(interactionSource = interactionSource, indication = null) { onClick() }
             .padding(18.dp)
     ) {
@@ -365,7 +372,7 @@ private fun VoucherCard(
             Box(
                 modifier = Modifier
                     .size(50.dp)
-                    .background(Color.White, CircleShape),
+                    .background(MallTheme.colors.imagePlaceholder, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 val request = remember(voucher.logoAssetPath) {
@@ -395,8 +402,8 @@ private fun VoucherCard(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
-                    .background(Color.White.copy(alpha = if (isDarkMode) 0.08f else 0.06f))
-                    .border(1.dp, currentAccent.copy(alpha = 0.3f), RoundedCornerShape(50))
+                    .background(MallTheme.colors.surfaceSunken)
+                    .border(1.dp, currentAccent.copy(alpha = 0.3f), RoundedCornerShape(50)) // theme-lint:allow decorative badge tint
                     .padding(horizontal = 10.dp, vertical = 5.dp)
             ) {
                 Text(floorDisplayLabel(voucher.floor), color = currentAccent, fontSize = 11.sp, fontWeight = FontWeight.Medium)
@@ -437,7 +444,7 @@ private fun VoucherCard(
         ) {
             Text(
                 text = stringResource(R.string.offers_get_voucher),
-                color = if (isDarkMode) DeepNavyBg else Color.White,
+                color = MallTheme.colors.onAccent,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -445,7 +452,7 @@ private fun VoucherCard(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
-                tint = if (isDarkMode) DeepNavyBg else Color.White,
+                tint = MallTheme.colors.onAccent,
                 modifier = Modifier.size(15.dp)
             )
         }
@@ -464,7 +471,7 @@ private fun OffersEmptyState(
                 modifier = Modifier
                     .size(72.dp)
                     .clip(CircleShape)
-                    .background(if (isDarkMode) GlassCardBg.copy(alpha = 0.6f) else Color.White),
+                    .background(MallTheme.colors.surface),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
