@@ -75,7 +75,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -89,23 +91,8 @@ import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.Place
 import com.example.mallar.ui.components.StoreLogo
 import com.example.mallar.ui.home.DestinationConfirmSheet
-
-// ── Design tokens — screen-local "Refined Indigo-Violet" system ──────────────
-
-private val DselBgDark           = Color(0xFF0A0E1A)
-private val DselBgLight          = Color(0xFFF6F7FB)
-private val DselSurfaceDark      = Color(0xFF131A2C)
-private val DselSurfaceLight     = Color(0xFFFFFFFF)
-private val DselSurfaceAltDark   = Color(0xFF1B2438)
-private val DselSurfaceAltLight  = Color(0xFFEEF0F7)
-private val DselAccentDark       = Color(0xFF6D5DF6)
-private val DselAccentLight      = Color(0xFF5847E8)
-private val DselAquaDark         = Color(0xFF38CFE8)
-private val DselAquaLight        = Color(0xFF0FA8C4)
-private val DselTextMainDark     = Color(0xFFF2F4FB)
-private val DselTextMainLight    = Color(0xFF111527)
-private val DselTextSubDark      = Color(0xFF9AA3BC)
-private val DselTextSubLight     = Color(0xFF5C6478)
+import com.example.mallar.ui.theme.Elevation
+import com.example.mallar.ui.theme.MallTheme
 
 // ── Spacing system (8pt grid) ────────────────────────────────────────────────
 private val DselGutter = 20.dp
@@ -114,7 +101,6 @@ private val DselSectionGap = 36.dp
 private data class DselTokens(
     val bg: Color,
     val surface: Color,
-    val surfaceAlt: Color,
     val accent: Color,
     val aqua: Color,
     val textMain: Color,
@@ -123,30 +109,28 @@ private data class DselTokens(
 )
 
 @Composable
-private fun rememberDselTokens(isDarkMode: Boolean): DselTokens {
-    return remember(isDarkMode) {
-        if (isDarkMode) {
-            DselTokens(
-                bg         = DselBgDark,
-                surface    = DselSurfaceDark,
-                surfaceAlt = DselSurfaceAltDark,
-                accent     = DselAccentDark,
-                aqua       = DselAquaDark,
-                textMain   = DselTextMainDark,
-                textSub    = DselTextSubDark,
-                border     = Color.White.copy(alpha = 0.09f),
-            )
-        } else {
-            DselTokens(
-                bg         = DselBgLight,
-                surface    = DselSurfaceLight,
-                surfaceAlt = DselSurfaceAltLight,
-                accent     = DselAccentLight,
-                aqua       = DselAquaLight,
-                textMain   = DselTextMainLight,
-                textSub    = DselTextSubLight,
-                border     = Color.Black.copy(alpha = 0.07f),
-            )
+private fun dselTokens(): DselTokens = DselTokens(
+    bg = MallTheme.colors.screenBackground,
+    surface = MallTheme.colors.surface,
+    accent = MallTheme.colors.accent,
+    aqua = MallTheme.colors.accentText,
+    textMain = MallTheme.colors.textPrimary,
+    textSub = MallTheme.colors.textSecondary,
+    border = MallTheme.colors.border,
+)
+
+@Composable
+private fun isReduceMotionEnabled(): Boolean {
+    val context = LocalContext.current
+    return remember(context) {
+        try {
+            android.provider.Settings.Global.getFloat(
+                context.contentResolver,
+                android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
+                1f
+            ) == 0f
+        } catch (_: Exception) {
+            false
         }
     }
 }
@@ -181,7 +165,7 @@ fun DestinationSelectionScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isDarkMode by AppPreferences.isDarkMode.collectAsState()
-    val tokens = rememberDselTokens(isDarkMode)
+    val tokens = dselTokens()
 
     var pendingPlace by remember { mutableStateOf<Place?>(null) }
     var contentVisible by remember { mutableStateOf(value = false) }
@@ -200,19 +184,21 @@ fun DestinationSelectionScreen(
             .background(tokens.bg)
     ) {
         // Subtle atmospheric wash (lighter than the previous 450dp gradient)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(240.dp)
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            tokens.accent.copy(alpha = if (isDarkMode) 0.12f else 0.09f),
-                            Color.Transparent
+        if (isDarkMode) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(240.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                tokens.accent.copy(alpha = 0.12f), // theme-lint:allow decorative dark-mode atmospheric wash
+                                Color.Transparent
+                            )
                         )
                     )
-                )
-        )
+            )
+        }
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -311,36 +297,39 @@ fun DestinationSelectionScreen(
                             ),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Cheap breathing glow: animates only the halo's alpha,
-                        // never the card's RenderNode shadow.
-                        val glowTransition = rememberInfiniteTransition(label = "dsel_search_glow")
-                        val haloPulse by glowTransition.animateFloat(
-                            initialValue = 0.45f,
-                            targetValue = 1f,
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(1500),
-                                repeatMode = RepeatMode.Reverse
-                            ),
-                            label = "dsel_halo_pulse"
-                        )
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            // Soft radial bloom behind the card
-                            Box(
-                                modifier = Modifier
-                                    .width(380.dp)
-                                    .height(200.dp)
-                                    .alpha(haloPulse)
-                                    .background(
-                                        Brush.radialGradient(
-                                            colors = listOf(
-                                                tokens.accent.copy(alpha = 0.30f),
-                                                Color.Transparent
+                            if (isDarkMode && !isReduceMotionEnabled()) {
+                                // Cheap breathing glow: animates only the halo's alpha,
+                                // never the card's RenderNode shadow.
+                                val glowTransition = rememberInfiniteTransition(label = "dsel_search_glow")
+                                val haloPulse by glowTransition.animateFloat(
+                                    initialValue = 0.45f,
+                                    targetValue = 1f,
+                                    animationSpec = infiniteRepeatable(
+                                        animation = tween(1500),
+                                        repeatMode = RepeatMode.Reverse
+                                    ),
+                                    label = "dsel_halo_pulse"
+                                )
+                                // Soft radial bloom behind the card
+                                Box(
+                                    modifier = Modifier
+                                        .width(380.dp)
+                                        .height(200.dp)
+                                        .alpha(haloPulse)
+                                        .background(
+                                            Brush.radialGradient(
+                                                colors = listOf(
+                                                    tokens.accent.copy(alpha = 0.30f), // theme-lint:allow decorative dark-mode search-pill halo
+                                                    Color.Transparent
+                                                )
                                             )
                                         )
-                                    )
-                            )
+                                )
+                            }
                             DselSearchPill(
                                 tokens = tokens,
+                                isDarkMode = isDarkMode,
                                 onClick = onSearchClick,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -403,6 +392,7 @@ fun DestinationSelectionScreen(
                                         DselPopularCard(
                                             place = place,
                                             tokens = tokens,
+                                            isDarkMode = isDarkMode,
                                             onClick = { pendingPlace = place }
                                         )
                                     }
@@ -422,6 +412,7 @@ fun DestinationSelectionScreen(
                         DselStoreRow(
                             place = place,
                             tokens = tokens,
+                            isDarkMode = isDarkMode,
                             onClick = { pendingPlace = place },
                             modifier = Modifier.padding(horizontal = DselGutter, vertical = 5.dp)
                         )
@@ -458,6 +449,7 @@ fun DestinationSelectionScreen(
                             DselStoreRow(
                                 place = place,
                                 tokens = tokens,
+                                isDarkMode = isDarkMode,
                                 onClick = { pendingPlace = place },
                                 modifier = Modifier.padding(horizontal = DselGutter, vertical = 5.dp)
                             )
@@ -478,7 +470,7 @@ fun DestinationSelectionScreen(
                     Box(
                         Modifier
                             .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.5f))
+                            .background(MallTheme.colors.scrim.copy(alpha = 0.4f))
                             .clickable { pendingPlace = null }
                     )
                     Box(Modifier.align(Alignment.BottomCenter)) {
@@ -534,6 +526,7 @@ private fun DselIconButton(
 @Composable
 private fun DselSearchPill(
     tokens: DselTokens,
+    isDarkMode: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -554,18 +547,22 @@ private fun DselSearchPill(
             .shadow(
                 elevation = if (pressed) 10.dp else 30.dp,
                 shape = RoundedCornerShape(28.dp),
-                ambientColor = tokens.accent.copy(alpha = 0.50f),
-                spotColor = tokens.accent.copy(alpha = 0.50f)
+                ambientColor = if (isDarkMode) tokens.accent.copy(alpha = 0.50f) else Elevation.shadowRaisedLight, // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                spotColor = if (isDarkMode) tokens.accent.copy(alpha = 0.50f) else Elevation.shadowRaisedLight // theme-lint:allow decorative dark glow, kept per README §8 component matrix
             )
             .clip(RoundedCornerShape(28.dp))
             .background(
-                Brush.linearGradient(
-                    colors = listOf(
-                        tokens.accent.copy(alpha = 0.85f),
-                        tokens.aqua.copy(alpha = 0.55f),
-                        tokens.accent.copy(alpha = 0.65f)
+                if (isDarkMode) {
+                    Brush.linearGradient(
+                        colors = listOf(
+                            tokens.accent.copy(alpha = 0.85f), // theme-lint:allow decorative dark search-pill gradient, subtle treatment retained
+                            tokens.accent.copy(alpha = 0.55f), // theme-lint:allow decorative dark search-pill gradient, subtle treatment retained
+                            tokens.accent.copy(alpha = 0.65f)  // theme-lint:allow decorative dark search-pill gradient, subtle treatment retained
+                        )
                     )
-                )
+                } else {
+                    SolidColor(tokens.accent)
+                }
             )
             .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
             .padding(1.6.dp)
@@ -583,16 +580,20 @@ private fun DselSearchPill(
                     .size(72.dp)
                     .clip(RoundedCornerShape(21.dp))
                     .background(
-                        Brush.linearGradient(
-                            listOf(tokens.accent, tokens.accent.copy(alpha = 0.72f))
-                        )
+                        if (isDarkMode) {
+                            Brush.linearGradient(
+                                listOf(tokens.accent, tokens.accent.copy(alpha = 0.72f)) // theme-lint:allow decorative dark icon-badge gradient, subtle treatment retained
+                            )
+                        } else {
+                            SolidColor(tokens.accent)
+                        }
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Search,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = MallTheme.colors.onAccent,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -624,8 +625,8 @@ private fun DselSearchPill(
             Box(
                 modifier = Modifier
                     .size(46.dp)
-                    .background(tokens.accent.copy(alpha = 0.10f), CircleShape)
-                    .border(1.dp, tokens.accent.copy(alpha = 0.22f), CircleShape),
+                    .background(tokens.accent.copy(alpha = 0.10f), CircleShape) // theme-lint:allow decorative icon-badge tint
+                    .border(1.dp, tokens.accent.copy(alpha = 0.22f), CircleShape), // theme-lint:allow decorative icon-badge tint
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -735,7 +736,7 @@ private fun DselCategoryTile(
             Box(
                 modifier = Modifier
                     .size(50.dp)
-                    .background(tokens.accent.copy(alpha = 0.12f), CircleShape)
+                    .background(tokens.accent.copy(alpha = 0.12f), CircleShape) // theme-lint:allow decorative icon-badge tint
             )
             Icon(
                 imageVector = category.icon,
@@ -766,6 +767,7 @@ private fun DselCategoryTile(
 private fun DselPopularCard(
     place: Place,
     tokens: DselTokens,
+    isDarkMode: Boolean,
     onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -783,8 +785,8 @@ private fun DselPopularCard(
             .shadow(
                 elevation = if (pressed) 2.dp else 6.dp,
                 shape = RoundedCornerShape(20.dp),
-                ambientColor = tokens.accent.copy(alpha = 0.10f),
-                spotColor = tokens.accent.copy(alpha = 0.10f)
+                ambientColor = if (isDarkMode) tokens.accent.copy(alpha = 0.10f) else Elevation.shadowRaisedLight, // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                spotColor = if (isDarkMode) tokens.accent.copy(alpha = 0.10f) else Elevation.shadowRaisedLight // theme-lint:allow decorative dark glow, kept per README §8 component matrix
             )
             .clip(RoundedCornerShape(20.dp))
             .background(tokens.surface)
@@ -796,7 +798,7 @@ private fun DselPopularCard(
         Box(
             modifier = Modifier
                 .size(64.dp)
-                .background(Color.White, CircleShape)
+                .background(MallTheme.colors.imagePlaceholder, CircleShape)
                 .border(1.dp, tokens.border, CircleShape)
                 .clip(CircleShape),
             contentAlignment = Alignment.Center
@@ -835,6 +837,7 @@ private fun DselPopularCard(
 private fun DselStoreRow(
     place: Place,
     tokens: DselTokens,
+    isDarkMode: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -853,8 +856,8 @@ private fun DselStoreRow(
             .shadow(
                 elevation = 4.dp,
                 shape = RoundedCornerShape(18.dp),
-                ambientColor = tokens.accent.copy(alpha = 0.08f),
-                spotColor = tokens.accent.copy(alpha = 0.08f)
+                ambientColor = if (isDarkMode) tokens.accent.copy(alpha = 0.08f) else Elevation.shadowRaisedLight, // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                spotColor = if (isDarkMode) tokens.accent.copy(alpha = 0.08f) else Elevation.shadowRaisedLight // theme-lint:allow decorative dark glow, kept per README §8 component matrix
             )
             .clip(RoundedCornerShape(18.dp))
             .background(tokens.surface)
@@ -866,7 +869,7 @@ private fun DselStoreRow(
         Box(
             modifier = Modifier
                 .size(52.dp)
-                .background(Color.White, CircleShape)
+                .background(MallTheme.colors.imagePlaceholder, CircleShape)
                 .border(1.dp, tokens.border, CircleShape)
                 .clip(CircleShape),
             contentAlignment = Alignment.Center
@@ -902,7 +905,7 @@ private fun DselStoreRow(
         Box(
             modifier = Modifier
                 .size(36.dp)
-                .background(tokens.accent.copy(alpha = 0.10f), CircleShape),
+                .background(tokens.accent.copy(alpha = 0.10f), CircleShape), // theme-lint:allow decorative icon-badge tint
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -933,7 +936,7 @@ private fun DselEmptyHint(
         Icon(
             imageVector = Icons.Rounded.Storefront,
             contentDescription = null,
-            tint = tokens.textSub.copy(alpha = 0.5f),
+            tint = tokens.textSub.copy(alpha = 0.5f), // theme-lint:allow decorative empty-state de-emphasis
             modifier = Modifier.size(18.dp)
         )
         Text(

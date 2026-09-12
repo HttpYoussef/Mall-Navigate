@@ -69,7 +69,7 @@ fun DestinationSearchScreen(
                         modifier = Modifier
                             .size(44.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(if (isDarkMode) GlassCardBg.copy(alpha = 0.5f) else Color.White)
+                            .background(MallTheme.colors.surface)
                             .border(BorderStroke(1.dp, currentBorder), RoundedCornerShape(14.dp))
                             .clickable { onBackClick() },
                         contentAlignment = Alignment.Center
@@ -150,7 +150,7 @@ private fun SearchEmptyState(title: String, subtitle: String, currentTextSub: Co
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
-                tint = currentTextSub.copy(alpha = 0.15f),
+                tint = currentTextSub.copy(alpha = 0.15f), // theme-lint:allow decorative empty-state de-emphasis
                 modifier = Modifier.size(100.dp)
             )
             Spacer(Modifier.height(32.dp))
@@ -164,7 +164,7 @@ private fun SearchEmptyState(title: String, subtitle: String, currentTextSub: Co
             Spacer(Modifier.height(10.dp))
             Text(
                 text = subtitle,
-                color = currentTextSub.copy(alpha = 0.6f),
+                color = currentTextSub.copy(alpha = 0.6f), // theme-lint:allow decorative empty-state de-emphasis
                 fontSize = 15.sp,
                 lineHeight = 22.sp,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center

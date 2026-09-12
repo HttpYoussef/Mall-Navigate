@@ -83,7 +83,7 @@ fun DestinationCategoryScreen(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(RoundedCornerShape(16.dp))
-                                    .background(if (isDarkMode) GlassCardBg.copy(alpha = 0.6f) else Color.White)
+                                    .background(MallTheme.colors.surface)
                                     .border(BorderStroke(1.2.dp, currentBorder), RoundedCornerShape(16.dp))
                                     .clickable { onBackClick() },
                                 contentAlignment = Alignment.Center
