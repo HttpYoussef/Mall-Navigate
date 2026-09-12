@@ -52,17 +52,18 @@ changed by this map; the migration tickets are the handoff boundary.
   the handoff boundary and `agy` runs them under orchestrator review.
 - **▶ RESUME POINT (2026-09-12)**: **ALL 8 TICKETS RESOLVED. CHARTING COMPLETE.** Spec:
   `docs/Theming/README.md` (§1–§10) + `palette.md` + `migration-tickets.md` (13 batch tickets
-  00–12). **Executing the migration, in progress.** **Batches 00, 01, 02 are landed AND
-  user-signed-off-on-device** (commits `1473c4a`, `c7b9178`, `0eb210b` + their ledger-update
-  commits). **Batch 03 (Auth & onboarding) is landed (`20e074e`), reviewed, gates independently
-  re-verified — awaiting user on-device sign-off before Batch 04 is dispatched.** Device-check
-  ask for Batch 03: Welcome, Sign In, Sign Up screens both modes (no teal flood in light mode,
-  buttons/text/phase-dots correctly tokenized, status/nav bar icons correct on entry); the legacy
-  `phone_auth`/`otp_verify` routes are not reachable from any current UI button (kept only for
-  backward-compat deep links) so they don't need a device check unless the user wants to confirm
-  via direct route navigation. **Next after sign-off: dispatch Batch 04 (Core Home —
-  `Homescreen.kt`, ~1102 lines)** to `agy` per `docs/Theming/migration-tickets.md` § "Batch 04".
-  The working loop for every batch (established over 00-03, keep doing this):
+  00–12). **Executing the migration, in progress.** **Batches 00-03 are landed AND
+  user-signed-off-on-device** (commits `1473c4a`, `c7b9178`, `0eb210b`, `20e074e` + their
+  ledger-update commits). **Batch 04 (Core Home, `Homescreen.kt`) is landed (`2b90473`),
+  reviewed, gates independently re-verified — awaiting user on-device sign-off before Batch 05 is
+  dispatched.** Device-check ask for Batch 04: Home screen both modes — no accent/purple-tinted
+  glow shadow on the Start-Navigation CTA, BottomNav, or Parking hero card in **light** mode
+  (dark mode keeps its glow); the offer floor-badge ("Floor 1/2") reads clearly in both modes
+  (this was a real ~1.2:1 contrast bug, now fixed); BottomNav's active-tab pill still crossfades
+  smoothly on tab switch; the parking-spot car illustration and "available spaces" badge still
+  read fine on the light canvas. **Next after sign-off: dispatch Batch 05 (Offers & Vouchers)**
+  to `agy` per `docs/Theming/migration-tickets.md` § "Batch 05". The working loop for every batch
+  (established over 00-04, keep doing this):
   1. write a brief grounded in the exact current file contents (grep/read first — don't assume
      the migration-tickets.md summary is precise enough on its own; past batches needed real
      line numbers and exact legacy-constant lists);
@@ -236,7 +237,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 01 | XML + system-bars + bootstrap (delete colors.xml, sync init, DarkSystemBars) | **signed off** (`c7b9178`) |
 | 02 | Shared renderers (StoreLogo, HomeSharedComponents; delete rememberHomeColorScheme) | **signed off** (`0eb210b`) |
 | 03 | Auth & onboarding (auth/ ×5) | **signed off** (`20e074e`) |
-| 04 | Core Home (Homescreen.kt) | pending |
+| 04 | Core Home (Homescreen.kt) | landed (`2b90473`) — awaiting device sign-off |
 | 05 | Offers & Vouchers | pending |
 | 06 | Destination (flatten Dsel* violet) | pending |
 | 07 | Profile / Settings / Saved — **core-flow milestone** | pending |
