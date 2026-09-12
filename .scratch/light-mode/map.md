@@ -239,7 +239,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 02 | Shared renderers (StoreLogo, HomeSharedComponents; delete rememberHomeColorScheme) | **signed off** (`0eb210b`) |
 | 03 | Auth & onboarding (auth/ ×5) | **signed off** (`20e074e`) |
 | 04 | Core Home (Homescreen.kt) | **signed off** (`2b90473`) |
-| 05 | Offers & Vouchers | landed (`c7a2f64`) — awaiting device sign-off |
+| 05 | Offers & Vouchers | **signed off** (`c7a2f64`) |
 | 06 | Destination (flatten Dsel* violet) | pending |
 | 07 | Profile / Settings / Saved — **core-flow milestone** | pending |
 | 08 | Parking suite ×4 (54 literals) | pending |
