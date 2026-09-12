@@ -52,19 +52,20 @@ changed by this map; the migration tickets are the handoff boundary.
   the handoff boundary and `agy` runs them under orchestrator review.
 - **▶ RESUME POINT (2026-09-12)**: **ALL 8 TICKETS RESOLVED. CHARTING COMPLETE.** Spec:
   `docs/Theming/README.md` (§1–§10) + `palette.md` + `migration-tickets.md` (13 batch tickets
-  00–12). **Executing the migration, in progress.** **Batches 00-04 are landed AND
-  user-signed-off-on-device** (commits `1473c4a`, `c7b9178`, `0eb210b`, `20e074e`, `2b90473` +
-  their ledger-update commits). **Batch 05 (Offers & Vouchers) is landed (`c7a2f64`), reviewed,
-  gates independently re-verified — awaiting user on-device sign-off before Batch 06 is
-  dispatched.** Device-check ask for Batch 05: Offers list + a voucher detail screen, both modes
-  — cards/chips/icon circles are flat (no glassy tint) in light mode; the redemption flow (tap
-  "Redeem now" on a voucher) shows a green success state and QR code correctly in both modes; the
-  "Ready to navigate" button state (after redemption) still reads correctly in dark mode (its fill
-  moved from a legacy glass constant to `secondaryContainer` — a judgement call, worth a specific
-  look). **Next after sign-off: dispatch Batch 06 (Destination — `DestinationCategoryScreen.kt`,
-  `DestinationSearchScreen.kt`, `DestinationSelectionScreen.kt`, flatten `Dsel*` violet)** to
-  `agy` per `docs/Theming/migration-tickets.md` § "Batch 06". The working loop for every batch
-  (established over 00-05, keep doing this):
+  00–12). **Executing the migration, in progress.** **Batches 00-05 are landed AND
+  user-signed-off-on-device** (commits `1473c4a`, `c7b9178`, `0eb210b`, `20e074e`, `2b90473`,
+  `c7a2f64` + their ledger-update commits). **Batch 06 (Destination) is landed (`b5ec8f5`),
+  reviewed, gates independently re-verified — awaiting user on-device sign-off before Batch 07 is
+  dispatched.** Device-check ask for Batch 06: `DestinationCategoryScreen`, `DestinationSearch`,
+  and `DestinationSelectionScreen` (the "Where would you go?" screen), all both modes — the
+  selection screen's search pill and category tiles no longer show any violet/indigo/aqua tint
+  anywhere (it now matches the app's teal accent exactly, in both modes); in **light** mode the
+  search pill and its icon badge are flat solid teal (no gradient), and the background wash/halo
+  behind it are gone entirely; in **dark** mode a subtle same-hue gradient and halo glow are
+  still present. **Next after sign-off: dispatch Batch 07 (Profile / Settings / Saved —
+  `SavedPlacesScreen.kt`, completes the core-flow milestone)** to `agy` per
+  `docs/Theming/migration-tickets.md` § "Batch 07". The working loop for every batch (established
+  over 00-06, keep doing this):
   1. write a brief grounded in the exact current file contents (grep/read first — don't assume
      the migration-tickets.md summary is precise enough on its own; past batches needed real
      line numbers and exact legacy-constant lists);
@@ -240,7 +241,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 03 | Auth & onboarding (auth/ ×5) | **signed off** (`20e074e`) |
 | 04 | Core Home (Homescreen.kt) | **signed off** (`2b90473`) |
 | 05 | Offers & Vouchers | **signed off** (`c7a2f64`) |
-| 06 | Destination (flatten Dsel* violet) | pending |
+| 06 | Destination (flatten Dsel* violet) | landed (`b5ec8f5`) — awaiting device sign-off |
 | 07 | Profile / Settings / Saved — **core-flow milestone** | pending |
 | 08 | Parking suite ×4 (54 literals) | pending |
 | 09 | Localization / first-run / camera ×5 | pending |
