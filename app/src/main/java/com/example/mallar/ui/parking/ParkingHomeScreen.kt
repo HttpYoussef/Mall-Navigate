@@ -121,9 +121,8 @@ fun ParkingHomeScreen(
                 } else {
                     SavedParkingState(
                         location = loc,
+                        isDarkMode = isDarkMode,
                         currentCard = currentCard,
-                        currentTextMain = currentTextMain,
-                        currentTextSub = currentTextSub,
                         onNavigateClick = onNavigateToCarClick,
                         onEditClick = onEditLocationClick,
                         onDeleteClick = { ParkingManager.deleteLocation() }
@@ -271,13 +270,17 @@ private fun ParkingStepItem(
 @Composable
 private fun SavedParkingState(
     location: ParkingLocation,
+    isDarkMode: Boolean,
     currentCard: Color,
-    currentTextMain: Color,
-    currentTextSub: Color,
     onNavigateClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
+    // Explicit pure black/white for this hero card's body text, per user request -
+    // overrides the AA-tuned textPrimary/textSecondary tokens for this card only.
+    val heroTextColor = if (isDarkMode) Color.White else Color.Black // theme-lint:allow explicit hero-card contrast per user request
+    val heroTextSubColor = heroTextColor.copy(alpha = 0.6f) // theme-lint:allow explicit hero-card contrast per user request
+
     // Single high-fidelity details card matching mockup Screen 3
     Card(
         modifier = Modifier
@@ -329,7 +332,7 @@ private fun SavedParkingState(
             ) {
                 Text(
                     text = "${location.zone}-${location.slot}".bidiIsolated(),
-                    color = currentTextMain,
+                    color = heroTextColor,
                     fontSize = 44.sp,
                     fontWeight = FontWeight.Black,
                     letterSpacing = (-0.5).sp
@@ -345,29 +348,29 @@ private fun SavedParkingState(
             Spacer(Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.floor_label, location.floor.bidiIsolated()),
-                color = currentTextSub,
+                color = heroTextSubColor,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
-            
+
             Spacer(Modifier.height(20.dp))
             HorizontalDivider(color = MallTheme.colors.divider)
             Spacer(Modifier.height(20.dp))
 
             // Detail rows inside the card
-            DetailRow(label = stringResource(R.string.park_field_zone), value = location.zone.bidiIsolated(), currentTextMain, currentTextSub)
+            DetailRow(label = stringResource(R.string.park_field_zone), value = location.zone.bidiIsolated(), heroTextColor, heroTextSubColor)
             HorizontalDivider(color = MallTheme.colors.divider, modifier = Modifier.padding(vertical = 10.dp))
-            
-            DetailRow(label = stringResource(R.string.park_field_slot), value = location.slot.bidiIsolated(), currentTextMain, currentTextSub)
+
+            DetailRow(label = stringResource(R.string.park_field_slot), value = location.slot.bidiIsolated(), heroTextColor, heroTextSubColor)
             HorizontalDivider(color = MallTheme.colors.divider, modifier = Modifier.padding(vertical = 10.dp))
-            
-            DetailRow(label = stringResource(R.string.park_field_floor), value = location.floor.bidiIsolated(), currentTextMain, currentTextSub)
+
+            DetailRow(label = stringResource(R.string.park_field_floor), value = location.floor.bidiIsolated(), heroTextColor, heroTextSubColor)
             HorizontalDivider(color = MallTheme.colors.divider, modifier = Modifier.padding(vertical = 10.dp))
-            
+
             val dateString = Timestamps.format(location.savedAt).bidiIsolated()
-            DetailRow(label = stringResource(R.string.park_home_saved_time), value = dateString, currentTextMain, currentTextSub)
+            DetailRow(label = stringResource(R.string.park_home_saved_time), value = dateString, heroTextColor, heroTextSubColor)
         }
     }
 
