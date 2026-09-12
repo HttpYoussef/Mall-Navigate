@@ -25,7 +25,7 @@ import com.example.mallar.R
 import com.example.mallar.data.AppLanguage
 import com.example.mallar.data.AppLanguagePlatform
 import com.example.mallar.data.AppLanguageResolver
-import com.example.mallar.ui.theme.Teal
+import com.example.mallar.ui.theme.MallTheme
 
 /**
  * Route wrapper for the Language screen.
@@ -137,7 +137,7 @@ fun LanguageScreenContent(
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = null,
-                                tint = Teal,
+                                tint = MallTheme.colors.accentText,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -146,7 +146,7 @@ fun LanguageScreenContent(
                     if (index < languages.lastIndex) {
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 16.dp),
-                            color = colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                            color = MallTheme.colors.divider
                         )
                     }
                 }

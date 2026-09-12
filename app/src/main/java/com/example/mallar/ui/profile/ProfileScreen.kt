@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -40,7 +41,7 @@ import com.example.mallar.data.AppPreferences
 import com.example.mallar.data.FavoritesManager
 import com.example.mallar.data.Place
 import com.example.mallar.data.PlaceRepository
-import com.example.mallar.ui.theme.*
+import com.example.mallar.ui.theme.MallTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -152,8 +153,7 @@ fun ProfileScreen(
         // ── Favorite Stores ─────────────────────────────────────────────────
         SectionLabel(
             text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.favorite_stores),
-            icon = Icons.Default.Favorite,
-            color = colorScheme.onBackground
+            icon = Icons.Default.Favorite
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -173,7 +173,7 @@ fun ProfileScreen(
                     Icon(
                         imageVector = Icons.Default.FavoriteBorder,
                         contentDescription = null,
-                        tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        tint = MallTheme.colors.textDisabled,
                         modifier = Modifier.size(40.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -186,7 +186,7 @@ fun ProfileScreen(
                     Text(
                         text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.bookmark_hint),
                         fontSize = 12.sp,
-                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        color = MallTheme.colors.textSecondary
                     )
                 }
             }
@@ -208,7 +208,7 @@ fun ProfileScreen(
                         if (index < favoritePlaces.lastIndex) {
                             HorizontalDivider(
                                 modifier = Modifier.padding(horizontal = 16.dp),
-                                color = colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                                color = MallTheme.colors.divider
                             )
                         }
                     }
@@ -221,8 +221,7 @@ fun ProfileScreen(
         // ── Preferences ─────────────────────────────────────────────────────
         SectionLabel(
             text = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.preferences),
-            icon = Icons.Default.Settings,
-            color = colorScheme.onBackground
+            icon = Icons.Default.Settings
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -244,7 +243,7 @@ fun ProfileScreen(
 
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    color = colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                    color = MallTheme.colors.divider
                 )
 
                 LanguageRow(
@@ -265,12 +264,12 @@ fun ProfileScreen(
                 .height(56.dp),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (user != null) RedAccent.copy(alpha = 0.1f) else Teal,
-                contentColor = if (user != null) RedAccent else White
+                containerColor = if (user != null) colorScheme.errorContainer else MallTheme.colors.accent,
+                contentColor = if (user != null) colorScheme.onErrorContainer else MallTheme.colors.onAccent
             )
         ) {
             Icon(
-                imageVector = if (user != null) Icons.AutoMirrored.Filled.Logout else Icons.Default.Login,
+                imageVector = if (user != null) Icons.AutoMirrored.Filled.Logout else Icons.AutoMirrored.Filled.Login,
                 contentDescription = null,
                 modifier = Modifier.size(20.dp)
             )
@@ -311,7 +310,7 @@ private fun ProfileAvatarCard(
                     .shadow(6.dp, CircleShape)
                     .clip(CircleShape)
                     .background(
-                        Brush.linearGradient(listOf(Teal, TealLight)),
+                        Brush.linearGradient(listOf(MallTheme.colors.accent, MallTheme.colors.brandTeal)),
                         CircleShape
                     )
                     .clickable { onEditAvatar() },
@@ -337,7 +336,7 @@ private fun ProfileAvatarCard(
                         text = displayName.take(1).uppercase().ifEmpty { "?" },
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Bold,
-                        color = White
+                        color = MallTheme.colors.onAccent
                     )
                 }
             }
@@ -356,7 +355,7 @@ private fun ProfileAvatarCard(
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
                         contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.change_photo),
-                        tint = Teal,
+                        tint = MallTheme.colors.accentText,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -400,7 +399,11 @@ private fun ProfileAvatarCard(
 
 // ── Section Label ────────────────────────────────────────────────────────────
 @Composable
-private fun SectionLabel(text: String, icon: ImageVector, color: Color) {
+private fun SectionLabel(
+    text: String,
+    icon: ImageVector,
+    color: Color = MallTheme.colors.textSecondary
+) {
     Row(
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -408,7 +411,7 @@ private fun SectionLabel(text: String, icon: ImageVector, color: Color) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Teal,
+            tint = MallTheme.colors.accentText,
             modifier = Modifier.size(18.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -416,7 +419,7 @@ private fun SectionLabel(text: String, icon: ImageVector, color: Color) {
             text = text,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = color.copy(alpha = 0.6f),
+            color = color,
             letterSpacing = 0.5.sp
         )
     }
@@ -465,7 +468,7 @@ private fun FavoriteStoreRow(
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = androidx.compose.ui.res.stringResource(com.example.mallar.R.string.remove),
-                tint = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                tint = MallTheme.colors.textSecondary,
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -488,7 +491,7 @@ private fun DarkModeToggleRow(
         Icon(
             imageVector = if (isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
             contentDescription = null,
-            tint = Teal,
+            tint = MallTheme.colors.accentText,
             modifier = Modifier.size(22.dp)
         )
 
@@ -506,8 +509,8 @@ private fun DarkModeToggleRow(
             checked = isDarkMode,
             onCheckedChange = onToggle,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = White,
-                checkedTrackColor = Teal,
+                checkedThumbColor = MallTheme.colors.onAccent,
+                checkedTrackColor = MallTheme.colors.accent,
                 uncheckedThumbColor = colorScheme.onSurfaceVariant,
                 uncheckedTrackColor = colorScheme.surfaceVariant
             )
@@ -534,7 +537,7 @@ private fun LanguageRow(
         Icon(
             imageVector = Icons.Default.Language,
             contentDescription = null,
-            tint = Teal,
+            tint = MallTheme.colors.accentText,
             modifier = Modifier.size(22.dp)
         )
 
@@ -564,4 +567,3 @@ private fun LanguageRow(
         )
     }
 }
-

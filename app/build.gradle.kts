@@ -146,3 +146,101 @@ dependencies {
         libs.androidx.compose.ui.test.manifest
     )
 }
+
+tasks.register("checkThemeColors") {
+    group = "verification"
+    description = "Scans Kotlin UI files for un-tokenized color literals and invalid alpha usages."
+
+    doLast {
+        val uiDir = file("src/main/java/com/example/mallar/ui")
+        val voiceFile = file("src/main/java/com/example/mallar/voice/VoiceAssistantOverlay.kt")
+        val allowlistFile = rootProject.file("config/theme-migration-allowlist.txt")
+
+        val inScopeFiles = mutableListOf<File>()
+        if (uiDir.exists()) {
+            uiDir.walkTopDown().filter { it.isFile && it.extension == "kt" }.forEach { f ->
+                val relToUi = f.relativeTo(uiDir).path.replace('\\', '/')
+                if (!relToUi.startsWith("theme/") && relToUi != "theme") {
+                    inScopeFiles.add(f)
+                }
+            }
+        }
+        if (voiceFile.exists()) {
+            inScopeFiles.add(voiceFile)
+        }
+
+        val patterns = listOf(
+            Regex("""Color\(0x"""),
+            Regex("""Color\(\s*red\s*="""),
+            Regex("""Color\.(White|Black|Gray|LightGray|DarkGray|Red|Green|Blue|Cyan|Magenta|Yellow)\b"""),
+            Regex("""\.copy\(\s*alpha\s*="""),
+            Regex("""@color/"""),
+            Regex("""R\.color\.""")
+        )
+        val allowMarker = Regex("""//\s*theme-lint:allow.*$""")
+
+        val allowlist = mutableMapOf<String, Int>()
+        val allowlistExists = allowlistFile.exists()
+        if (allowlistExists) {
+            allowlistFile.readLines().forEach { line ->
+                val trimmed = line.trim()
+                if (trimmed.isNotEmpty() && !trimmed.startsWith("#")) {
+                    val parts = trimmed.split(":")
+                    if (parts.size == 2) {
+                        allowlist[parts[0].trim()] = parts[1].trim().toInt()
+                    }
+                }
+            }
+        }
+
+        val errors = mutableListOf<String>()
+
+        for (file in inScopeFiles) {
+            val relPath = rootProject.projectDir.toPath().relativize(file.toPath()).toString().replace('\\', '/')
+            val lines = file.readLines()
+            var fileMatchCount = 0
+            val offendingLines = mutableListOf<String>()
+
+            lines.forEachIndexed { index, line ->
+                val lineNum = index + 1
+                if (!allowMarker.containsMatchIn(line)) {
+                    var lineMatches = 0
+                    for (pattern in patterns) {
+                        if (pattern.pattern == """\.copy\(\s*alpha\s*=""" && line.contains("scrim")) {
+                            continue
+                        }
+                        lineMatches += pattern.findAll(line).count()
+                    }
+                    if (lineMatches > 0) {
+                        fileMatchCount += lineMatches
+                        offendingLines.add("  $relPath:$lineNum: (matches=$lineMatches) ${line.trim()}")
+                    }
+                }
+            }
+
+            if (allowlistExists) {
+                val allowedCount = allowlist[relPath] ?: 0
+                if (fileMatchCount > allowedCount) {
+                    errors.add("File $relPath has $fileMatchCount matches (allowed: $allowedCount):\n" + offendingLines.joinToString("\n"))
+                }
+            } else {
+                if (fileMatchCount > 0) {
+                    errors.add("File $relPath has $fileMatchCount banned matches:\n" + offendingLines.joinToString("\n"))
+                }
+            }
+        }
+
+        if (errors.isNotEmpty()) {
+            throw GradleException(
+                "checkThemeColors failed with ${errors.size} violating file(s):\n\n" +
+                        errors.joinToString("\n\n")
+            )
+        } else {
+            println("checkThemeColors: All in-scope files passed cleanly.")
+        }
+    }
+}
+
+tasks.matching { it.name == "check" }.configureEach {
+    dependsOn("checkThemeColors")
+}
