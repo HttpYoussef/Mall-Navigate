@@ -56,10 +56,19 @@ changed by this map; the migration tickets are the handoff boundary.
   user-signed-off-on-device** (commits `1473c4a`, `c7b9178`, `0eb210b`, `20e074e`, `2b90473`,
   `c7a2f64`, `b5ec8f5`, `d0f4a94` + their ledger-update commits). **CORE-FLOW MILESTONE COMPLETE**
   — light mode is correct on every screen a regular shopper touches (Auth, Home, Offers/Vouchers,
-  Destination, Profile/Settings/Saved). **Dispatching Batch 08 (Parking suite —
-  `ParkingHomeScreen.kt`, `ParkingCameraScreen.kt`, `ParkingScanResultScreen.kt`,
-  `ParkingMapScreen.kt` — the single biggest hotspot, 54 raw literals across 4 files)** to `agy`
-  per `docs/Theming/migration-tickets.md` § "Batch 08". The working loop for every batch
+  Destination, Profile/Settings/Saved). **Batch 08 (Parking suite — `ParkingHomeScreen.kt`,
+  `ParkingCameraScreen.kt`, `ParkingScanResultScreen.kt`, `ParkingMapScreen.kt`, the single
+  biggest hotspot, 54 raw literals across 4 files) is landed (`d1b3785`), reviewed, gates
+  independently re-verified — awaiting user on-device sign-off.** `ParkingCameraScreen`'s
+  viewfinder (post-permission) and all of `ParkingMapScreen` are now locked always-dark routes via
+  `DarkSystemBars()`. Device-check ask for Batch 08: **ParkingHomeScreen** empty state + saved
+  state (banner, save button, card, buttons) both modes; **ParkingScanResultScreen**'s OCR result
+  cards both modes; **ParkingCameraScreen**'s permission-fallback screen in both modes (the
+  viewfinder itself should look identically dark regardless of the app's mode setting);
+  **ParkingMapScreen** should also look identically dark regardless of mode. Next after sign-off:
+  dispatch Batch 09 (Localization/first-run/camera ×5, incl. `SplashScreen` full migration +
+  `MallSelectionScreen` cold-start icon fix) per `docs/Theming/migration-tickets.md` § "Batch 09".
+  The working loop for every batch
   (established over 00-07, keep doing this):
   1. write a brief grounded in the exact current file contents (grep/read first — don't assume
      the migration-tickets.md summary is precise enough on its own; past batches needed real
@@ -238,7 +247,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 05 | Offers & Vouchers | **signed off** (`c7a2f64`) |
 | 06 | Destination (flatten Dsel* violet) | **signed off** (`b5ec8f5`) |
 | 07 | Profile / Settings / Saved — **core-flow milestone** | **signed off** (`d0f4a94`) |
-| 08 | Parking suite ×4 (54 literals) | pending |
+| 08 | Parking suite ×4 (54 literals) | landed (`d1b3785`) — awaiting device sign-off |
 | 09 | Localization / first-run / camera ×5 | pending |
 | 10 | Navigation HUD & map chrome ×2 | pending |
 | 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | pending |
