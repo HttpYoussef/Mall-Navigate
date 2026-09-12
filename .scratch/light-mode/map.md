@@ -52,18 +52,19 @@ changed by this map; the migration tickets are the handoff boundary.
   the handoff boundary and `agy` runs them under orchestrator review.
 - **▶ RESUME POINT (2026-09-12)**: **ALL 8 TICKETS RESOLVED. CHARTING COMPLETE.** Spec:
   `docs/Theming/README.md` (§1–§10) + `palette.md` + `migration-tickets.md` (13 batch tickets
-  00–12). **Executing the migration, in progress.** **Batches 00-03 are landed AND
-  user-signed-off-on-device** (commits `1473c4a`, `c7b9178`, `0eb210b`, `20e074e` + their
-  ledger-update commits). **Batch 04 (Core Home, `Homescreen.kt`) is landed (`2b90473`),
-  reviewed, gates independently re-verified — awaiting user on-device sign-off before Batch 05 is
-  dispatched.** Device-check ask for Batch 04: Home screen both modes — no accent/purple-tinted
-  glow shadow on the Start-Navigation CTA, BottomNav, or Parking hero card in **light** mode
-  (dark mode keeps its glow); the offer floor-badge ("Floor 1/2") reads clearly in both modes
-  (this was a real ~1.2:1 contrast bug, now fixed); BottomNav's active-tab pill still crossfades
-  smoothly on tab switch; the parking-spot car illustration and "available spaces" badge still
-  read fine on the light canvas. **Next after sign-off: dispatch Batch 05 (Offers & Vouchers)**
-  to `agy` per `docs/Theming/migration-tickets.md` § "Batch 05". The working loop for every batch
-  (established over 00-04, keep doing this):
+  00–12). **Executing the migration, in progress.** **Batches 00-04 are landed AND
+  user-signed-off-on-device** (commits `1473c4a`, `c7b9178`, `0eb210b`, `20e074e`, `2b90473` +
+  their ledger-update commits). **Batch 05 (Offers & Vouchers) is landed (`c7a2f64`), reviewed,
+  gates independently re-verified — awaiting user on-device sign-off before Batch 06 is
+  dispatched.** Device-check ask for Batch 05: Offers list + a voucher detail screen, both modes
+  — cards/chips/icon circles are flat (no glassy tint) in light mode; the redemption flow (tap
+  "Redeem now" on a voucher) shows a green success state and QR code correctly in both modes; the
+  "Ready to navigate" button state (after redemption) still reads correctly in dark mode (its fill
+  moved from a legacy glass constant to `secondaryContainer` — a judgement call, worth a specific
+  look). **Next after sign-off: dispatch Batch 06 (Destination — `DestinationCategoryScreen.kt`,
+  `DestinationSearchScreen.kt`, `DestinationSelectionScreen.kt`, flatten `Dsel*` violet)** to
+  `agy` per `docs/Theming/migration-tickets.md` § "Batch 06". The working loop for every batch
+  (established over 00-05, keep doing this):
   1. write a brief grounded in the exact current file contents (grep/read first — don't assume
      the migration-tickets.md summary is precise enough on its own; past batches needed real
      line numbers and exact legacy-constant lists);
@@ -238,7 +239,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 02 | Shared renderers (StoreLogo, HomeSharedComponents; delete rememberHomeColorScheme) | **signed off** (`0eb210b`) |
 | 03 | Auth & onboarding (auth/ ×5) | **signed off** (`20e074e`) |
 | 04 | Core Home (Homescreen.kt) | **signed off** (`2b90473`) |
-| 05 | Offers & Vouchers | pending |
+| 05 | Offers & Vouchers | landed (`c7a2f64`) — awaiting device sign-off |
 | 06 | Destination (flatten Dsel* violet) | pending |
 | 07 | Profile / Settings / Saved — **core-flow milestone** | pending |
 | 08 | Parking suite ×4 (54 literals) | pending |
