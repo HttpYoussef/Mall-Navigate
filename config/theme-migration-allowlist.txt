@@ -1,6 +1,5 @@
 app/src/main/java/com/example/mallar/ui/components/StoreLogo.kt:4
 app/src/main/java/com/example/mallar/ui/home/HomeSharedComponents.kt:56
-app/src/main/java/com/example/mallar/ui/home/Homescreen.kt:77
 app/src/main/java/com/example/mallar/ui/home/OffersScreen.kt:19
 app/src/main/java/com/example/mallar/ui/home/VoucherDetailsScreen.kt:23
 app/src/main/java/com/example/mallar/ui/destination/DestinationCategoryScreen.kt:2

@@ -1,5 +1,6 @@
 package com.example.mallar.ui.home
 
+import com.example.mallar.ui.theme.Elevation
 import com.example.mallar.ui.theme.MallTheme
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -74,9 +75,9 @@ private data class OfferItem(
 )
 
 private val sampleOffers = listOf(
-    OfferItem("v_starbucks_upsize", "logos/Starbucks.png", "Starbucks", Color(0xFF1E6E4A), R.string.home_offer_free_upsize, R.string.home_offer_on_any_beverage,   2),
-    OfferItem("v_zara_15off",       "logos/ZARA.png",      "Zara",       Color(0xFF6E1E2E), R.string.home_offer_15_off,     R.string.home_offer_on_selected_items, 1),
-    OfferItem("v_mango_20off",      "logos/Mango.png",     "Mango",      Color(0xFF8B4513), R.string.home_offer_20_off,     R.string.home_offer_on_all_items,      1),
+    OfferItem("v_starbucks_upsize", "logos/Starbucks.png", "Starbucks", Color(0xFF1E6E4A), R.string.home_offer_free_upsize, R.string.home_offer_on_any_beverage,   2), // theme-lint:allow OfferItem.tint, data-owned per-brand colour (README §9)
+    OfferItem("v_zara_15off",       "logos/ZARA.png",      "Zara",       Color(0xFF6E1E2E), R.string.home_offer_15_off,     R.string.home_offer_on_selected_items, 1), // theme-lint:allow OfferItem.tint, data-owned per-brand colour (README §9)
+    OfferItem("v_mango_20off",      "logos/Mango.png",     "Mango",      Color(0xFF8B4513), R.string.home_offer_20_off,     R.string.home_offer_on_all_items,      1), // theme-lint:allow OfferItem.tint, data-owned per-brand colour (README §9)
 )
 
 // ── Bottom nav items ──────────────────────────────────────────────────────────
@@ -88,6 +89,29 @@ private val navItems = listOf(
     NavItem(R.string.bottom_nav_ask_ai,  Icons.Default.SmartToy),
     NavItem(R.string.bottom_nav_profile, Icons.Default.Person),
 )
+
+// Bespoke car-illustration fills — decorative Canvas artwork, not a semantic role (Batch 04).
+private val CarRoofFill = Color(0xFF0F2633)   // theme-lint:allow bespoke illustration fill
+private val CarBodyFill = Color(0xFF0A1720)   // theme-lint:allow bespoke illustration fill
+private val CarWindowFill = Color(0xFF152D3D) // theme-lint:allow bespoke illustration fill
+private val CarAccentDark = Color(0xFF0D1E26) // theme-lint:allow bespoke illustration fill
+private val CarLightHousing = Color(0xFF02090D) // theme-lint:allow bespoke illustration fill
+
+@Composable
+private fun isReduceMotionEnabled(): Boolean {
+    val context = LocalContext.current
+    return remember(context) {
+        try {
+            android.provider.Settings.Global.getFloat(
+                context.contentResolver,
+                android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
+                1f
+            ) == 0f
+        } catch (_: Exception) {
+            false
+        }
+    }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HomeScreen Redesign
@@ -161,8 +185,8 @@ fun HomeScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            currentAccent.copy(alpha = 0.12f),
-                            currentAccent.copy(alpha = 0.04f),
+                            currentAccent.copy(alpha = 0.12f), // theme-lint:allow decorative top-glow gradient wash
+                            currentAccent.copy(alpha = 0.04f), // theme-lint:allow decorative top-glow gradient wash
                             Color.Transparent
                         )
                     )
@@ -206,7 +230,7 @@ fun HomeScreen(
                                             null -> stringResource(R.string.home_discover_brands)
                                             else -> stringResource(R.string.home_mall_brands, stringResource(mallNameRes(mall)))
                                         },
-                                        color = currentTextMain.copy(alpha = 0.7f),
+                                        color = currentTextSub,
                                         fontSize = 14.sp
                                     )
                                 }
@@ -215,12 +239,9 @@ fun HomeScreen(
                                 Box(
                                     modifier = Modifier
                                         .size(44.dp)
-                                        .background(if (isDarkMode) GlassCardBg.copy(alpha = 0.6f) else Color.White, CircleShape)
+                                        .background(if (isDarkMode) GlassCardBg.copy(alpha = 0.6f) else currentCardBg, CircleShape) // theme-lint:allow legacy dark glass-card bg, preserved pending its own batch
                                         .border(
-                                            BorderStroke(
-                                                1.dp,
-                                                if (isDarkMode) Color.White.copy(0.12f) else Color.Black.copy(0.08f)
-                                            ),
+                                            BorderStroke(1.dp, MallTheme.colors.border),
                                             CircleShape
                                         )
                                         .clip(CircleShape)
@@ -252,16 +273,21 @@ fun HomeScreen(
                         visible = contentVisible,
                         enter = fadeIn(tween(280, delayMillis = 90)) + slideInVertically(tween(280, delayMillis = 90)) { it / 6 }
                     ) {
-                        val infiniteTransition = rememberInfiniteTransition(label = "nav_glow_infinite")
-                        val idleGlowAlpha by infiniteTransition.animateFloat(
-                            initialValue = 0.25f,
-                            targetValue = 0.45f,
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(2000, easing = LinearEasing),
-                                repeatMode = RepeatMode.Reverse
-                            ),
-                            label = "nav_idle_glow"
-                        )
+                        val idleGlowAlpha = if (isDarkMode && !isReduceMotionEnabled()) {
+                            val infiniteTransition = rememberInfiniteTransition(label = "nav_glow_infinite")
+                            val alpha by infiniteTransition.animateFloat(
+                                initialValue = 0.25f,
+                                targetValue = 0.45f,
+                                animationSpec = infiniteRepeatable(
+                                    animation = tween(2000, easing = LinearEasing),
+                                    repeatMode = RepeatMode.Reverse
+                                ),
+                                label = "nav_idle_glow"
+                            )
+                            alpha
+                        } else {
+                            0f
+                        }
                         val navInteractionSource = remember { MutableInteractionSource() }
                         val navPressed by navInteractionSource.collectIsPressedAsState()
                         val navPressScale by animateFloatAsState(
@@ -292,20 +318,20 @@ fun HomeScreen(
                                 .shadow(
                                     elevation = 30.dp,
                                     shape = RoundedCornerShape(32.dp),
-                                    ambientColor = currentAccent.copy(alpha = navGlow),
-                                    spotColor = currentAccent.copy(alpha = navGlow)
+                                    ambientColor = if (isDarkMode) currentAccent.copy(alpha = navGlow) else Elevation.shadowRaisedLight, // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                                    spotColor = if (isDarkMode) currentAccent.copy(alpha = navGlow) else Elevation.shadowRaisedLight // theme-lint:allow decorative dark glow, kept per README §8 component matrix
                                 )
                                 .clip(RoundedCornerShape(32.dp))
                                 .background(
                                     Brush.linearGradient(
                                         colors = if (isDarkMode) {
-                                            listOf(currentAccent.copy(alpha = 0.28f), GlassCardBg, GlassCardBg)
+                                            listOf(currentAccent.copy(alpha = 0.28f), GlassCardBg, GlassCardBg) // theme-lint:allow decorative CTA background tint
                                         } else {
-                                            listOf(currentAccent.copy(alpha = 0.16f), currentCardBg, currentCardBg)
+                                            listOf(currentAccent.copy(alpha = 0.16f), currentCardBg, currentCardBg) // theme-lint:allow decorative CTA background tint
                                         }
                                     )
                                 )
-                                .border(BorderStroke(1.2.dp, currentAccent.copy(alpha = 0.5f)), RoundedCornerShape(32.dp))
+                                .border(BorderStroke(1.2.dp, currentAccent.copy(alpha = 0.5f)), RoundedCornerShape(32.dp)) // theme-lint:allow decorative accent-tinted card border
                                 .clickable(interactionSource = navInteractionSource, indication = null) {
                                     onNavigateToDestinationSelection()
                                 }
@@ -317,7 +343,7 @@ fun HomeScreen(
                                     .align(Alignment.TopCenter)
                                     .background(
                                         Brush.verticalGradient(
-                                            listOf(Color.White.copy(alpha = 0.08f), Color.Transparent)
+                                            listOf(Color.White.copy(alpha = 0.08f), Color.Transparent) // theme-lint:allow decorative glass-sheen highlight
                                         ),
                                         RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                                     )
@@ -337,7 +363,7 @@ fun HomeScreen(
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .background(
-                                                Brush.radialGradient(listOf(currentAccent.copy(alpha = 0.4f), Color.Transparent)),
+                                                Brush.radialGradient(listOf(currentAccent.copy(alpha = 0.4f), Color.Transparent)), // theme-lint:allow decorative icon glow
                                                 CircleShape
                                             )
                                     )
@@ -345,14 +371,14 @@ fun HomeScreen(
                                         modifier = Modifier
                                             .size(64.dp)
                                             .background(
-                                                Brush.radialGradient(listOf(currentAccent.copy(alpha = 0.22f), Color.Transparent)),
+                                                Brush.radialGradient(listOf(currentAccent.copy(alpha = 0.22f), Color.Transparent)), // theme-lint:allow decorative icon glow
                                                 CircleShape
                                             )
                                     )
                                     Box(
                                         modifier = Modifier
                                             .size(58.dp)
-                                            .border(1.5.dp, currentAccent.copy(alpha = 0.6f), CircleShape)
+                                            .border(1.5.dp, currentAccent.copy(alpha = 0.6f), CircleShape) // theme-lint:allow decorative icon ring
                                     )
                                     Icon(
                                         imageVector = Icons.Default.Navigation,
@@ -392,7 +418,7 @@ fun HomeScreen(
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                         contentDescription = stringResource(R.string.home_start_navigation),
-                                        tint = if (isDarkMode) DeepNavyBg else Color.White,
+                                        tint = MallTheme.colors.onAccent,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -553,7 +579,7 @@ fun HomeScreen(
                         Box(
                             Modifier
                                 .fillMaxSize()
-                                .background(Color.Black.copy(alpha = 0.45f))
+                                .background(MallTheme.colors.scrim.copy(alpha = 0.4f))
                                 .clickable { pendingPlace = null }
                         )
                     }
@@ -602,8 +628,8 @@ private fun BottomNav(
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val navBg = if (isDarkMode) GlassCardBg.copy(alpha = 0.88f) else Color.White.copy(alpha = 0.94f)
-    val navBorder = if (isDarkMode) Color.White.copy(alpha = 0.10f) else currentAccent.copy(alpha = 0.12f)
+    val navBg = if (isDarkMode) GlassCardBg.copy(alpha = 0.88f) else MallTheme.colors.surface // theme-lint:allow legacy dark glass-card bg, preserved pending its own batch
+    val navBorder = if (isDarkMode) MallTheme.colors.hairlineOverlay else MallTheme.colors.border
 
     Box(
         modifier = modifier
@@ -617,8 +643,8 @@ private fun BottomNav(
                 .shadow(
                     elevation = 18.dp,
                     shape = RoundedCornerShape(28.dp),
-                    ambientColor = currentAccent.copy(alpha = 0.22f),
-                    spotColor = currentAccent.copy(alpha = 0.22f)
+                    ambientColor = if (isDarkMode) currentAccent.copy(alpha = 0.22f) else Elevation.shadowRaisedLight, // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                    spotColor = if (isDarkMode) currentAccent.copy(alpha = 0.22f) else Elevation.shadowRaisedLight // theme-lint:allow decorative dark glow, kept per README §8 component matrix
                 )
                 .clip(RoundedCornerShape(28.dp))
                 .background(navBg)
@@ -658,10 +684,10 @@ private fun BottomNavTab(
         animationSpec = tween(220),
         label = "nav_tab_tint"
     )
-    val pillAlpha by animateFloatAsState(
-        targetValue = if (active) 0.14f else 0f,
+    val pillColor by animateColorAsState(
+        targetValue = if (active) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
         animationSpec = tween(220),
-        label = "nav_tab_pill_alpha"
+        label = "nav_tab_pill_color"
     )
     val iconScale by animateFloatAsState(
         targetValue = if (pressed) 0.85f else if (active) 1.12f else 1f,
@@ -681,7 +707,7 @@ private fun BottomNavTab(
     ) {
         Box(
             modifier = Modifier
-                .background(currentAccent.copy(alpha = pillAlpha), RoundedCornerShape(14.dp))
+                .background(pillColor, RoundedCornerShape(14.dp))
                 .padding(horizontal = 14.dp, vertical = 4.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -746,21 +772,21 @@ private fun ParkingHeroCard(
             .shadow(
                 elevation = 16.dp,
                 shape = RoundedCornerShape(28.dp),
-                ambientColor = ParkingPurple.copy(alpha = glowAlpha),
-                spotColor = ParkingPurple.copy(alpha = glowAlpha)
+                ambientColor = if (isDarkMode) ParkingPurple.copy(alpha = glowAlpha) else Elevation.shadowRaisedLight, // theme-lint:allow decorative dark glow, kept per README §8 component matrix
+                spotColor = if (isDarkMode) ParkingPurple.copy(alpha = glowAlpha) else Elevation.shadowRaisedLight // theme-lint:allow decorative dark glow, kept per README §8 component matrix
             )
             .clip(RoundedCornerShape(28.dp))
             .background(
                 Brush.verticalGradient(
                     colors = if (isDarkMode) {
-                        listOf(ParkingPurpleDeep.copy(alpha = 0.45f), currentCardBg)
+                        listOf(ParkingPurpleDeep.copy(alpha = 0.45f), currentCardBg) // theme-lint:allow decorative parking-card background tint
                     } else {
-                        listOf(ParkingPurple.copy(alpha = 0.14f), currentCardBg)
+                        listOf(ParkingPurple.copy(alpha = 0.14f), currentCardBg) // theme-lint:allow decorative parking-card background tint
                     }
                 )
             )
             .border(
-                BorderStroke(1.dp, Color.White.copy(alpha = if (isDarkMode) 0.10f else 0.5f)),
+                BorderStroke(1.dp, MallTheme.colors.border),
                 RoundedCornerShape(28.dp)
             )
             .clickable(interactionSource = interactionSource, indication = null) { onParkingClick() }
@@ -771,7 +797,7 @@ private fun ParkingHeroCard(
                 .height(70.dp)
                 .align(Alignment.TopCenter)
                 .background(
-                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.07f), Color.Transparent)),
+                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.07f), Color.Transparent)), // theme-lint:allow decorative glass-sheen highlight
                     RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
                 )
         )
@@ -818,8 +844,8 @@ private fun ParkingHeroCard(
             Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
-                    .background(Color.White.copy(alpha = if (isDarkMode) 0.10f else 0.7f))
-                    .border(1.dp, Color.White.copy(alpha = if (isDarkMode) 0.16f else 0.9f), RoundedCornerShape(50))
+                    .background(MallTheme.colors.surface)
+                    .border(1.dp, MallTheme.colors.border, RoundedCornerShape(50))
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -854,8 +880,8 @@ private fun ParkingHeroCard(
                 .padding(top = 18.dp, end = 18.dp)
                 .scale(0.85f)
                 .clip(RoundedCornerShape(14.dp))
-                .background(if (isDarkMode) Color(0xFF121B2E).copy(alpha = 0.85f) else Color.White.copy(alpha = 0.9f))
-                .border(1.dp, Color.White.copy(alpha = if (isDarkMode) 0.08f else 0.6f), RoundedCornerShape(14.dp))
+                .background(if (isDarkMode) MallTheme.colors.surfaceSunken else MallTheme.colors.surface)
+                .border(1.dp, MallTheme.colors.border, RoundedCornerShape(14.dp))
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -879,6 +905,7 @@ private fun OfferCard(
     onClick: () -> Unit
 ) {
     val context = LocalContext.current
+    val currentCardBg = MallTheme.colors.surface
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
     val pressScale by animateFloatAsState(if (pressed) 0.96f else 1f, label = "offer_card_press")
@@ -891,10 +918,10 @@ private fun OfferCard(
             .clip(RoundedCornerShape(22.dp))
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(offer.tint.copy(alpha = if (isDarkMode) 0.55f else 0.28f), GlassCardBg.takeIf { isDarkMode } ?: Color.White)
+                    colors = listOf(offer.tint.copy(alpha = if (isDarkMode) 0.55f else 0.28f), GlassCardBg.takeIf { isDarkMode } ?: currentCardBg) // theme-lint:allow OfferItem.tint, data-owned per-brand colour (README §9)
                 )
             )
-            .border(1.dp, Color.White.copy(alpha = if (isDarkMode) 0.06f else 0.5f), RoundedCornerShape(22.dp))
+            .border(1.dp, MallTheme.colors.border, RoundedCornerShape(22.dp))
             .clickable(interactionSource = interactionSource, indication = null) { onClick() }
             .padding(14.dp)
     ) {
@@ -902,7 +929,7 @@ private fun OfferCard(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .background(Color.White, CircleShape),
+                    .background(MallTheme.colors.imagePlaceholder, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 val request = remember(offer.logoAssetPath) {
@@ -934,11 +961,11 @@ private fun OfferCard(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
-                    .background(CyanGlow.copy(alpha = 0.12f))
-                    .border(1.dp, CyanGlow.copy(alpha = 0.35f), RoundedCornerShape(50))
+                    .background(MallTheme.colors.accentText.copy(alpha = 0.12f)) // theme-lint:allow decorative badge tint, badge text itself is AA-checked accentText at full opacity
+                    .border(1.dp, MallTheme.colors.accentText.copy(alpha = 0.35f), RoundedCornerShape(50)) // theme-lint:allow decorative badge tint, badge text itself is AA-checked accentText at full opacity
                     .padding(horizontal = 10.dp, vertical = 5.dp)
             ) {
-                Text(floorDisplayLabel(offer.floor), color = CyanGlow, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                Text(floorDisplayLabel(offer.floor), color = MallTheme.colors.accentText, fontSize = 11.sp, fontWeight = FontWeight.Medium)
             }
         }
     }
@@ -958,7 +985,7 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
                 val yLine = h * (0.6f + (i * 0.1f))
                 val wLine = w * (0.4f + (i * 0.15f))
             drawLine(
-                color = currentAccent.copy(alpha = 0.08f / i),
+                color = currentAccent.copy(alpha = 0.08f / i), // theme-lint:allow bespoke car-illustration decorative fill
                 start = Offset((w - wLine) / 2f, yLine),
                 end = Offset((w + wLine) / 2f, yLine),
                 strokeWidth = 2f
@@ -969,7 +996,7 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
         val pinY = h * 0.25f
 
         drawCircle(
-            color = currentAccent.copy(alpha = 0.2f),
+            color = currentAccent.copy(alpha = 0.2f), // theme-lint:allow bespoke car-illustration decorative fill
             radius = 16f,
             center = Offset(pinX, pinY)
         )
@@ -979,7 +1006,7 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
             center = Offset(pinX, pinY)
         )
         drawCircle(
-            color = Color.White,
+            color = Color.White, // theme-lint:allow bespoke car-illustration decorative fill
             radius = 7f,
             center = Offset(pinX, pinY)
         )
@@ -993,7 +1020,7 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
         }
         drawPath(
             path = pPath,
-            color = if (isDarkMode) Color(0xFF0D1E26) else currentAccent,
+            color = if (isDarkMode) CarAccentDark else currentAccent,
             style = Stroke(width = 1.5f)
         )
 
@@ -1009,8 +1036,8 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
             lineTo(carX + carW * 0.16f, carY + carH * 0.4f)
             close()
         }
-        drawPath(roofPath, Color(0xFF0F2633).copy(alpha = 0.9f))
-        drawPath(roofPath, currentAccent.copy(alpha = 0.2f), style = Stroke(width = 1f))
+        drawPath(roofPath, CarRoofFill.copy(alpha = 0.9f)) // theme-lint:allow bespoke car-illustration decorative fill
+        drawPath(roofPath, currentAccent.copy(alpha = 0.2f), style = Stroke(width = 1f)) // theme-lint:allow bespoke car-illustration decorative fill
 
         val windPath = androidx.compose.ui.graphics.Path().apply {
             moveTo(carX + carW * 0.29f, carY + 2f)
@@ -1019,7 +1046,7 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
             lineTo(carX + carW * 0.20f, carY + carH * 0.36f)
             close()
         }
-        drawPath(windPath, currentAccent.copy(alpha = 0.25f))
+        drawPath(windPath, currentAccent.copy(alpha = 0.25f)) // theme-lint:allow bespoke car-illustration decorative fill
 
         val bodyPath = androidx.compose.ui.graphics.Path().apply {
             moveTo(carX + carW * 0.08f, carY + carH * 0.4f)
@@ -1029,11 +1056,11 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
             quadraticTo(carX + carW * 0.02f, carY + carH * 0.5f, carX + carW * 0.08f, carY + carH * 0.4f)
             close()
         }
-        drawPath(bodyPath, Color(0xFF0A1720))
-        drawPath(bodyPath, currentAccent.copy(alpha = 0.4f), style = Stroke(width = 1f))
+        drawPath(bodyPath, CarBodyFill)
+        drawPath(bodyPath, currentAccent.copy(alpha = 0.4f), style = Stroke(width = 1f)) // theme-lint:allow bespoke car-illustration decorative fill
 
         drawRoundRect(
-            color = Color(0xFF152D3D),
+            color = CarWindowFill,
             topLeft = Offset(carX + carW * 0.32f, carY + carH * 0.56f),
             size = Size(carW * 0.36f, carH * 0.2f),
             cornerRadius = CornerRadius(4f, 4f)
@@ -1041,7 +1068,7 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
         for (i in 0..2) {
             val yOffset = carY + carH * 0.58f + i * 4f
             drawLine(
-                color = currentAccent.copy(alpha = 0.3f),
+                color = currentAccent.copy(alpha = 0.3f), // theme-lint:allow bespoke car-illustration decorative fill
                 start = Offset(carX + carW * 0.35f, yOffset),
                 end = Offset(carX + carW * 0.65f, yOffset),
                 strokeWidth = 1f
@@ -1063,10 +1090,10 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
             close()
         }
 
-        drawPath(leftLightPath, Color(0xFF0D1E26))
-        drawPath(rightLightPath, Color(0xFF0D1E26))
-        drawPath(leftLightPath, currentAccent.copy(alpha = 0.8f))
-        drawPath(rightLightPath, currentAccent.copy(alpha = 0.8f))
+        drawPath(leftLightPath, CarAccentDark)
+        drawPath(rightLightPath, CarAccentDark)
+        drawPath(leftLightPath, currentAccent.copy(alpha = 0.8f)) // theme-lint:allow bespoke car-illustration decorative fill
+        drawPath(rightLightPath, currentAccent.copy(alpha = 0.8f)) // theme-lint:allow bespoke car-illustration decorative fill
 
         val leftBeam = androidx.compose.ui.graphics.Path().apply {
             moveTo(carX + carW * 0.12f, carY + carH * 0.54f)
@@ -1083,17 +1110,17 @@ private fun ParkingCarIllustration(isDarkMode: Boolean, currentAccent: Color) {
             close()
         }
 
-        drawPath(leftBeam, Brush.verticalGradient(listOf(currentAccent.copy(alpha = 0.3f), Color.Transparent)))
-        drawPath(rightBeam, Brush.verticalGradient(listOf(currentAccent.copy(alpha = 0.3f), Color.Transparent)))
+        drawPath(leftBeam, Brush.verticalGradient(listOf(currentAccent.copy(alpha = 0.3f), Color.Transparent))) // theme-lint:allow bespoke car-illustration decorative fill
+        drawPath(rightBeam, Brush.verticalGradient(listOf(currentAccent.copy(alpha = 0.3f), Color.Transparent))) // theme-lint:allow bespoke car-illustration decorative fill
 
         drawRoundRect(
-            color = Color(0xFF02090D),
+            color = CarLightHousing,
             topLeft = Offset(carX + carW * 0.08f, carY + carH * 0.76f),
             size = Size(carW * 0.12f, carH * 0.15f),
             cornerRadius = CornerRadius(2f, 2f)
         )
         drawRoundRect(
-            color = Color(0xFF02090D),
+            color = CarLightHousing,
             topLeft = Offset(carX + carW * 0.80f, carY + carH * 0.76f),
             size = Size(carW * 0.12f, carH * 0.15f),
             cornerRadius = CornerRadius(2f, 2f)
