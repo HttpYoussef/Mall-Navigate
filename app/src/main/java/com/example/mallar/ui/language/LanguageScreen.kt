@@ -85,7 +85,7 @@ fun LanguageScreenContent(
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.back),
                         tint = colorScheme.onSurface,
                         modifier = Modifier.size(20.dp)
                     )
