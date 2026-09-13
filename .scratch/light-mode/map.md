@@ -87,17 +87,34 @@ changed by this map; the migration tickets are the handoff boundary.
   whenever this screen actually gets wired up. Fixed one cosmetic defect in agy's diff (a stray
   one-space indent shift across two helper functions in `ChatBottomSheet.kt`, from the import
   insertion) before committing. `StoreDetailScreen.kt` and `VoiceAssistantOverlay.kt` are both
-  currently unwired (no live navigation path reaches them), so this batch's "verify on device"
-  step is necessarily limited to `ChatBottomSheet` (check it from both Home and the camera/
-  LogoScan flow, both light and dark app-mode settings) — the other two just need to keep
-  compiling and rendering correctly if manually invoked. Two pre-existing allowlist rows for
-  `StoreLogo.kt` and `HomeSharedComponents.kt` (from the already-signed-off Batch 02) remain in
-  `config/theme-migration-allowlist.txt` — not this batch's concern, but **Batch 12 must resolve
-  or explain them** before deleting the allowlist file, since Batch 12's acceptance bar is an
-  empty allowlist. **Next: dispatch Batch 12 (lint-gate hard-error flip)** once Batch 11 is signed
-  off — re-read `docs/Theming/migration-tickets.md` § "Batch 12" AND `docs/Theming/README.md` §9
-  fresh first, and account for those two leftover rows. This is the **last batch** — no more
-  screen-migration work follows it.
+  currently unwired (no live navigation path reaches them), so that batch's "verify on device"
+  step was limited to `ChatBottomSheet`. **Batch 11 is now signed off** (`5934f6e`).
+  **Batch 12 (Lint-gate hard-error flip) is landed** (`bf6cae5`), awaiting device sign-off — **this
+  is the last of the 13 migration batches; there is no Batch 13.** Turned out the allowlist wasn't
+  actually empty going in: `StoreLogo.kt`'s row was fully stale (0 real matches, safe to drop) but
+  `HomeSharedComponents.kt`'s row was masking 8 genuinely-dead `Color(0x...)` constants (deleted,
+  confirmed zero references anywhere in the repo) and 13 unmarked decorative `.copy(alpha=)` calls
+  on already-adaptive `currentAccent`/`currentTextSub` parameters (marked exempt) — plus 3 still-live
+  constants (`GlassCardBg`/`ParkingPurple`/`ParkingPurpleDeep`, used by `Homescreen.kt`, whose own
+  markers had already anticipated this batch resolving them) kept and marked rather than deleted.
+  `checkThemeColors` in `app/build.gradle.kts` was simplified to drop the allowlist-reading branch
+  entirely and always take the hard-error path (that path already existed and was already correct —
+  it just needed the dead allowlist logic removed once the file was gone).
+  `config/theme-migration-allowlist.txt` is now **permanently deleted**. Did a full independent
+  grep sweep of `ui/**` (outside `ui/theme/**`) + `voice/VoiceAssistantOverlay.kt` myself before
+  writing the brief, and agy did its own sweep after landing — both found zero unmarked violations
+  anywhere in the app. All 5 gates green, `checkThemeColors` passing clean with the allowlist file
+  genuinely gone (not just emptied) — the hard-error enforcement is real and active. **What to
+  check on-device for this last sign-off**: since this batch touched no screen UI at all (only the
+  Gradle task + one shared-components file's markers/dead-code), there's nothing new to look at
+  visually — the ask is really just "does the app still build and run normally," which the gates
+  already confirm; a normal pass through Home/Profile/Parking/Navigation in both light and dark
+  mode as a final regression check is reasonable but not strictly required by this batch's own
+  scope. **Once this is signed off, the entire colour-token migration is complete** — no further
+  batches, no more `agy` dispatches for this effort. What would remain only as *optional, out-of-
+  scope-for-this-effort* follow-up (per the map's own "Out of scope" section, unchanged): actually
+  wiring up `StoreDetailScreen`/`VoiceAssistantOverlay` into real navigation if the app ever wants
+  them; a dedicated dark-mode visual-polish pass; follow-system/three-way theme switching.
   The working loop for every batch
   (established over 00-07, keep doing this):
   1. write a brief grounded in the exact current file contents (grep/read first — don't assume
@@ -281,7 +298,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 09 | Localization / first-run / camera ×5 | **signed off** (`0e41474`) |
 | 10 | Navigation HUD & map chrome ×2 | **signed off** (`c254a30`) |
 | 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | **signed off** (`5934f6e`) |
-| 12 | Lint-gate hard-error flip | pending |
+| 12 | Lint-gate hard-error flip | landed (`bf6cae5`) — awaiting device sign-off |
 
 ## Not yet specified
 
