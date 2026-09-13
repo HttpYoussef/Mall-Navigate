@@ -30,20 +30,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mallar.R
+import com.example.mallar.ui.theme.MallTheme
 import kotlin.math.sin
 import kotlin.math.cos
 import kotlin.math.PI
-
-// ── Design tokens ─────────────────────────────────────────────────────────────
-private val AiBlue        = Color(0xFF00BCD4)
-private val AiBlueDeep    = Color(0xFF006064)
-private val AiPurple      = Color(0xFF7C4DFF)
-private val AiCard        = Color(0xFF0D1B2A)
-private val AiSurface     = Color(0xFF112240)
-private val AiSuccess     = Color(0xFF00E676)
-private val AiError       = Color(0xFFFF5252)
-private val AiText        = Color(0xFFE8F4F8)
-private val AiTextMuted   = Color(0xFF78909C)
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -69,7 +59,7 @@ fun VoiceAssistantOverlay(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.78f))
+            .background(MallTheme.colors.scrim.copy(alpha = 0.78f))
             .clickable(onClick = {}),  // absorb touches
         contentAlignment = Alignment.BottomCenter
     ) {
@@ -91,7 +81,7 @@ fun VoiceAssistantOverlay(
                 .shadow(24.dp, RoundedCornerShape(32.dp))
                 .clip(RoundedCornerShape(32.dp))
                 .background(
-                    Brush.verticalGradient(listOf(AiSurface, AiCard))
+                    Brush.verticalGradient(listOf(MallTheme.colors.scrimCard, MallTheme.colors.scrimSurface))
                 )
                 .padding(horizontal = 24.dp, vertical = 28.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -159,7 +149,7 @@ fun FloatingVoiceButton(
             modifier = Modifier
                 .size(size * 1.5f)
                 .clip(CircleShape)
-                .background(AiBlue.copy(alpha = glowAlpha * pulseScale))
+                .background(MallTheme.colors.accentText.copy(alpha = glowAlpha * pulseScale)) // theme-lint:allow mic pulse glow alpha
         )
         // Button
         Box(
@@ -170,8 +160,8 @@ fun FloatingVoiceButton(
                 .background(
                     Brush.radialGradient(
                         listOf(
-                            if (isActive) AiBlue else Color(0xFF1A3550),
-                            if (isActive) AiBlueDeep else Color(0xFF0D1B2A)
+                            if (isActive) MallTheme.colors.accentText else MallTheme.colors.scrimCard,
+                            if (isActive) MallTheme.colors.accent else MallTheme.colors.scrimSurface
                         )
                     )
                 )
@@ -181,7 +171,7 @@ fun FloatingVoiceButton(
             Icon(
                 imageVector = if (isActive) Icons.Default.Mic else Icons.Default.Mic,
                 contentDescription = stringResource(R.string.voice_assistant),
-                tint = if (isActive) Color.White else AiBlue,
+                tint = if (isActive) MallTheme.colors.onScrim else MallTheme.colors.accentText,
                 modifier = Modifier.size(size * 0.45f)
             )
         }
@@ -206,11 +196,11 @@ fun NavigationVoiceFab(
 @Composable
 private fun StatusPill(status: VoiceAssistantStatus) {
     val (text, color) = when (status) {
-        VoiceAssistantStatus.IDLE      -> stringResource(R.string.voice_assistant) to AiTextMuted
-        VoiceAssistantStatus.LISTENING -> stringResource(R.string.listening) to AiBlue
-        VoiceAssistantStatus.THINKING  -> stringResource(R.string.thinking) to AiPurple
-        VoiceAssistantStatus.SPEAKING  -> stringResource(R.string.speaking) to AiSuccess
-        VoiceAssistantStatus.ERROR     -> stringResource(R.string.try_again) to AiError
+        VoiceAssistantStatus.IDLE      -> stringResource(R.string.voice_assistant) to MallTheme.colors.onScrimMuted
+        VoiceAssistantStatus.LISTENING -> stringResource(R.string.listening) to MallTheme.colors.accentText
+        VoiceAssistantStatus.THINKING  -> stringResource(R.string.thinking) to MallTheme.colors.warningText
+        VoiceAssistantStatus.SPEAKING  -> stringResource(R.string.speaking) to MallTheme.colors.successText
+        VoiceAssistantStatus.ERROR     -> stringResource(R.string.try_again) to MallTheme.colors.errorText
     }
 
     val dotAlpha by rememberInfiniteTransition(label = "dot").animateFloat(
@@ -223,7 +213,7 @@ private fun StatusPill(status: VoiceAssistantStatus) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .background(color.copy(alpha = 0.12f))
+            .background(color.copy(alpha = 0.12f)) // theme-lint:allow status-pill decorative alpha
             .padding(horizontal = 14.dp, vertical = 6.dp)
     ) {
         if (status != VoiceAssistantStatus.IDLE) {
@@ -231,7 +221,7 @@ private fun StatusPill(status: VoiceAssistantStatus) {
                 modifier = Modifier
                     .size(7.dp)
                     .clip(CircleShape)
-                    .background(color.copy(alpha = dotAlpha))
+                    .background(color.copy(alpha = dotAlpha)) // theme-lint:allow status-pill decorative alpha
             )
             Spacer(Modifier.width(7.dp))
         }
@@ -264,8 +254,8 @@ private fun CentralVisual(
                 .background(
                     Brush.radialGradient(
                         listOf(
-                            if (isActive) AiBlue else Color(0xFF1A3550),
-                            if (isActive) AiBlueDeep else Color(0xFF0D1B2A)
+                            if (isActive) MallTheme.colors.accentText else MallTheme.colors.scrimCard,
+                            if (isActive) MallTheme.colors.accent else MallTheme.colors.scrimSurface
                         )
                     )
                 )
@@ -275,7 +265,7 @@ private fun CentralVisual(
             Icon(
                 imageVector = if (status == VoiceAssistantStatus.LISTENING) Icons.Default.MicOff else Icons.Default.Mic,
                 contentDescription = null,
-                tint = Color.White,
+                tint = MallTheme.colors.onScrim,
                 modifier = Modifier.size(34.dp)
             )
         }
@@ -296,6 +286,8 @@ private fun WaveformRing() {
         label = "waveScale"
     )
 
+    val barColor = MallTheme.colors.accentText
+
     Canvas(modifier = Modifier.size(140.dp)) {
         val bars = 32
         val radius = size.minDimension * 0.42f
@@ -314,7 +306,7 @@ private fun WaveformRing() {
             val ey = centerY + outerR * sin(angle.toDouble()).toFloat()
 
             drawLine(
-                color = AiBlue.copy(alpha = 0.6f + 0.4f * amplitude),
+                color = barColor.copy(alpha = 0.6f + 0.4f * amplitude), // theme-lint:allow animated waveform bar alpha
                 start = Offset(sx, sy),
                 end = Offset(ex, ey),
                 strokeWidth = 4f,
@@ -333,6 +325,8 @@ private fun ThinkingOrbs() {
         label = "orbRotation"
     )
 
+    val orbColor = MallTheme.colors.warningText
+
     Canvas(modifier = Modifier.size(140.dp)) {
         val radius = size.minDimension * 0.40f
         val centerX = size.width / 2f
@@ -346,7 +340,7 @@ private fun ThinkingOrbs() {
             val orbScale = 0.5f + 0.5f * ((i.toFloat() / orbCount))
 
             drawCircle(
-                color = AiPurple.copy(alpha = 0.4f + orbScale * 0.6f),
+                color = orbColor.copy(alpha = 0.4f + orbScale * 0.6f), // theme-lint:allow animated orb alpha
                 radius = 10f * orbScale,
                 center = Offset(orbX, orbY)
             )
@@ -363,6 +357,8 @@ private fun SpeakingWave() {
         label = "speakPhase"
     )
 
+    val waveColor = MallTheme.colors.successText
+
     Canvas(modifier = Modifier.size(140.dp)) {
         val bars = 5
         val barWidth = 10f
@@ -376,7 +372,7 @@ private fun SpeakingWave() {
             val barH = maxHeight * heightFactor
 
             drawLine(
-                color = AiSuccess.copy(alpha = 0.7f + 0.3f * heightFactor),
+                color = waveColor.copy(alpha = 0.7f + 0.3f * heightFactor), // theme-lint:allow animated speaking wave bar alpha
                 start = Offset(x, centerY - barH / 2f),
                 end   = Offset(x, centerY + barH / 2f),
                 strokeWidth = barWidth,
@@ -394,14 +390,14 @@ private fun TextDisplay(uiState: VoiceAssistantUiState) {
             .fillMaxWidth()
             .heightIn(min = 72.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.White.copy(alpha = 0.04f))
+            .background(MallTheme.colors.onScrim.copy(alpha = 0.04f)) // theme-lint:allow subtle highlight panel, onScrim doesn't match the scrim auto-exemption
             .padding(horizontal = 20.dp, vertical = 14.dp)
     ) {
         // Transcript (what user said)
         AnimatedVisibility(uiState.transcript.isNotBlank()) {
             Text(
                 text = uiState.transcript,
-                color = AiTextMuted,
+                color = MallTheme.colors.onScrimMuted,
                 fontSize = 13.sp,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Normal,
@@ -417,7 +413,7 @@ private fun TextDisplay(uiState: VoiceAssistantUiState) {
         AnimatedVisibility(uiState.assistantReply.isNotBlank()) {
             Text(
                 text = uiState.assistantReply,
-                color = AiText,
+                color = MallTheme.colors.onScrim,
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Medium,
@@ -430,7 +426,7 @@ private fun TextDisplay(uiState: VoiceAssistantUiState) {
         AnimatedVisibility(uiState.errorMessage != null) {
             Text(
                 text = uiState.errorMessage ?: "",
-                color = AiError,
+                color = MallTheme.colors.errorText,
                 fontSize = 13.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -449,7 +445,7 @@ private fun TextDisplay(uiState: VoiceAssistantUiState) {
                     VoiceAssistantStatus.THINKING  -> "…"
                     else -> ""
                 },
-                color = AiTextMuted,
+                color = MallTheme.colors.onScrimMuted,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -475,11 +471,11 @@ private fun BottomActionRow(
             modifier = Modifier
                 .size(44.dp)
                 .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.07f))
+                .background(MallTheme.colors.onScrim.copy(alpha = 0.07f)) // theme-lint:allow close-button background, onScrim doesn't match the scrim auto-exemption
                 .clickable(onClick = onDismiss),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Close, null, tint = AiTextMuted, modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.Close, null, tint = MallTheme.colors.onScrimMuted, modifier = Modifier.size(20.dp))
         }
 
         // Hint text
@@ -490,7 +486,7 @@ private fun BottomActionRow(
                 VoiceAssistantStatus.THINKING  -> stringResource(R.string.processing)
                 else -> stringResource(R.string.ar_en_toggle)
             },
-            color = AiTextMuted,
+            color = MallTheme.colors.onScrimMuted,
             fontSize = 12.sp
         )
 
@@ -498,12 +494,12 @@ private fun BottomActionRow(
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(12.dp))
-                .background(AiBlue.copy(alpha = 0.12f))
+                .background(MallTheme.colors.accentText.copy(alpha = 0.12f)) // theme-lint:allow decorative chip background
                 .padding(horizontal = 10.dp, vertical = 6.dp)
         ) {
             Text(
                 text = if (isArabic) stringResource(R.string.lang_ar) else stringResource(R.string.lang_en),
-                color = AiBlue, fontSize = 12.sp, fontWeight = FontWeight.Bold
+                color = MallTheme.colors.accentText, fontSize = 12.sp, fontWeight = FontWeight.Bold
             )
         }
     }

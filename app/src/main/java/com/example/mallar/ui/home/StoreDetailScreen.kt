@@ -39,6 +39,11 @@ import com.example.mallar.ui.localization.NavigationState
 
 // NavigationState is defined in LogoScanScreen.kt
 
+private val StoreGlowDeep1 = Color(0xFF1A1A2E) // theme-lint:allow decorative ambient glow, fixed by design
+private val StoreGlowDeep2 = Color(0xFF16213E) // theme-lint:allow decorative ambient glow, fixed by design
+private val LocationPinAccent = Color(0xFFE53935) // theme-lint:allow location-pin accent, fixed by design, not a status color
+private val MapModeButtonBg = Color(0xFF444444) // theme-lint:allow secondary action button, fixed neutral gray by design
+
 @Composable
 fun StoreDetailScreen(
     place: Place,
@@ -72,7 +77,7 @@ fun StoreDetailScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(if (isDarkMode) com.example.mallar.ui.theme.DarkBackground else Color(0xFFF5F7FA))
+            .background(MallTheme.colors.screenBackground)
     ) {
         // ── Background gradient ──────────────────────────────────────────────
         Box(
@@ -80,8 +85,12 @@ fun StoreDetailScreen(
                 .fillMaxSize()
                 .background(
                     androidx.compose.ui.graphics.Brush.verticalGradient(
-                        if (isDarkMode) listOf(Color(0xFF1A1A2E), Color(0xFF16213E), com.example.mallar.ui.theme.DarkBackground)
-                        else listOf(com.example.mallar.ui.theme.Teal.copy(0.1f), com.example.mallar.ui.theme.TealLight.copy(0.05f), Color.Transparent)
+                        if (isDarkMode) listOf(StoreGlowDeep1, StoreGlowDeep2, MallTheme.colors.screenBackground)
+                        else listOf(
+                            MallTheme.colors.accent.copy(alpha = 0.1f), // theme-lint:allow decorative ambient glow
+                            MallTheme.colors.accent.copy(alpha = 0.05f), // theme-lint:allow decorative ambient glow
+                            Color.Transparent
+                        )
                     )
                 )
         )
@@ -99,10 +108,10 @@ fun StoreDetailScreen(
                 onClick = onBackClick,
                 modifier = Modifier.size(48.dp),
                 shape = CircleShape,
-                color = if (isDarkMode) White.copy(alpha = 0.15f) else Color.Black.copy(0.05f)
+                color = MallTheme.colors.textPrimary.copy(alpha = 0.08f) // theme-lint:allow adaptive low-alpha tint for translucent icon-button chrome
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = if (isDarkMode) White else Color.Black)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = MallTheme.colors.textPrimary)
                 }
             }
 
@@ -110,10 +119,10 @@ fun StoreDetailScreen(
                 onClick = onBackClick,
                 modifier = Modifier.size(48.dp),
                 shape = CircleShape,
-                color = if (isDarkMode) White.copy(alpha = 0.15f) else Color.Black.copy(0.05f)
+                color = MallTheme.colors.textPrimary.copy(alpha = 0.08f) // theme-lint:allow adaptive low-alpha tint for translucent icon-button chrome
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.Close, stringResource(R.string.close), tint = if (isDarkMode) White else Color.Black)
+                    Icon(Icons.Filled.Close, stringResource(R.string.close), tint = MallTheme.colors.textPrimary)
                 }
             }
         }
@@ -132,7 +141,7 @@ fun StoreDetailScreen(
                     .size(130.dp)
                     .shadow(if (isDarkMode) 0.dp else 24.dp, RoundedCornerShape(28.dp)),
                 shape = RoundedCornerShape(28.dp),
-                color = if (isDarkMode) com.example.mallar.ui.theme.DarkCard else White
+                color = MallTheme.colors.surface
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -155,7 +164,7 @@ fun StoreDetailScreen(
                 text = place.brand,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 28.sp,
-                color = if (isDarkMode) com.example.mallar.ui.theme.DarkTextPrimary else com.example.mallar.ui.theme.TextPrimary,
+                color = MallTheme.colors.textPrimary,
                 textAlign = TextAlign.Center
             )
 
@@ -166,24 +175,24 @@ fun StoreDetailScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Icon(Icons.Filled.LocationOn, null, tint = RedAccent, modifier = Modifier.size(16.dp))
+                Icon(Icons.Filled.LocationOn, null, tint = LocationPinAccent, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     stringResource(R.string.distance_meters, WesternDigits.format(distM)),
-                    color = if (isDarkMode) White.copy(alpha = 0.8f) else com.example.mallar.ui.theme.TextSecondary,
+                    color = MallTheme.colors.textSecondary,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Surface(
                     shape = CircleShape,
-                    color = RedAccent,
+                    color = LocationPinAccent,
                     modifier = Modifier.size(6.dp)
                 ) {}
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     pluralStringResource(R.plurals.duration_minutes, mins, WesternDigits.format(mins)),
-                    color = if (isDarkMode) White.copy(alpha = 0.8f) else com.example.mallar.ui.theme.TextSecondary,
+                    color = MallTheme.colors.textSecondary,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -210,11 +219,11 @@ fun StoreDetailScreen(
                     },
                     modifier = Modifier.weight(1f).height(60.dp).shadow(16.dp, RoundedCornerShape(30.dp)),
                     shape = RoundedCornerShape(30.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Teal)
+                    colors = ButtonDefaults.buttonColors(containerColor = MallTheme.colors.accent)
                 ) {
-                    Icon(Icons.Filled.ViewInAr, null, tint = White, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.ViewInAr, null, tint = MallTheme.colors.onAccent, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.ar_mode), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = White)
+                    Text(stringResource(R.string.ar_mode), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = MallTheme.colors.onAccent)
                 }
                 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -236,11 +245,11 @@ fun StoreDetailScreen(
                     },
                     modifier = Modifier.weight(1f).height(60.dp).shadow(16.dp, RoundedCornerShape(30.dp)),
                     shape = RoundedCornerShape(30.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
+                    colors = ButtonDefaults.buttonColors(containerColor = MapModeButtonBg)
                 ) {
-                    Icon(Icons.Filled.Map, null, tint = White, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.Map, null, tint = MallTheme.colors.onScrim, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.map_mode), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = White)
+                    Text(stringResource(R.string.map_mode), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = MallTheme.colors.onScrim)
                 }
             }
 
@@ -248,7 +257,7 @@ fun StoreDetailScreen(
 
             Text(
                 text = stringResource(R.string.choose_nav_mode_to, place.brand.bidiIsolated()),
-                color = if (isDarkMode) White.copy(alpha = 0.5f) else com.example.mallar.ui.theme.TextSecondary,
+                color = MallTheme.colors.textSecondary,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
             )

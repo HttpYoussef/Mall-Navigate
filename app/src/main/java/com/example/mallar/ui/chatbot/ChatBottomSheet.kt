@@ -39,6 +39,7 @@ import com.example.mallar.data.MallGraph
 import com.example.mallar.data.MallGraphRepository
 import com.example.mallar.data.Place
 import com.example.mallar.ui.localization.NavigationState
+import com.example.mallar.ui.theme.MallTheme
 import kotlinx.coroutines.launch
 
 private fun getCategoryLabelEn(category: String): String {
@@ -62,15 +63,6 @@ private fun getCategoryLabelAr(category: String): String {
         else -> category
     }
 }
-
-// Design tokens matching the rest of the app
-private val ChatTeal       = Color(0xFF009688)
-private val ChatTealLight  = Color(0xFFE0F2F1)
-private val ChatBotBg      = Color(0xFFF5F5F5)
-private val ChatUserBg     = ChatTeal
-private val ChatUserText   = Color.White
-private val ChatBotText    = Color(0xFF212121)
-private val ChatSheetBg    = Color.White
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Chat Bottom Sheet
@@ -377,7 +369,7 @@ fun ChatBottomSheet(
             .fillMaxWidth()
             .fillMaxHeight(0.72f),
         shape  = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-        color  = ChatSheetBg,
+        color  = MallTheme.colors.surface,
         shadowElevation = 16.dp
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -385,7 +377,7 @@ fun ChatBottomSheet(
             // ── Header ────────────────────────────────────────────────────────
             ChatHeader(onDismiss = onDismiss)
 
-            HorizontalDivider(color = Color(0xFFEEEEEE))
+            HorizontalDivider(color = MallTheme.colors.divider)
 
             // ── Messages list ─────────────────────────────────────────────────
             LazyColumn(
@@ -436,13 +428,13 @@ private fun ChatHeader(onDismiss: () -> Unit) {
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(ChatTeal),
+                .background(MallTheme.colors.accent),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.SmartToy,
                 contentDescription = null,
-                tint = Color.White,
+                tint = MallTheme.colors.onAccent,
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -454,12 +446,12 @@ private fun ChatHeader(onDismiss: () -> Unit) {
                 text       = stringResource(R.string.chat_assistant_title),
                 fontWeight = FontWeight.Bold,
                 fontSize   = 16.sp,
-                color      = Color.Black
+                color      = MallTheme.colors.textPrimary
             )
             Text(
                 text     = stringResource(R.string.chat_assistant_subtitle),
                 fontSize = 12.sp,
-                color    = Color.Gray
+                color    = MallTheme.colors.textSecondary
             )
         }
 
@@ -469,7 +461,7 @@ private fun ChatHeader(onDismiss: () -> Unit) {
                 .width(36.dp)
                 .height(4.dp)
                 .clip(CircleShape)
-                .background(Color(0xFFDDDDDD))
+                .background(MallTheme.colors.border)
         )
 
         Spacer(Modifier.width(12.dp))
@@ -482,7 +474,7 @@ private fun ChatHeader(onDismiss: () -> Unit) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = stringResource(R.string.close_chat),
-                tint = Color.Gray,
+                tint = MallTheme.colors.textSecondary,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -508,13 +500,13 @@ private fun ChatBubble(message: ChatMessage, onStartNavigation: ((Boolean) -> Un
                     modifier = Modifier
                         .size(28.dp)
                         .clip(CircleShape)
-                        .background(ChatTeal),
+                        .background(MallTheme.colors.accent),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.SmartToy,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = MallTheme.colors.onAccent,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -526,11 +518,11 @@ private fun ChatBubble(message: ChatMessage, onStartNavigation: ((Boolean) -> Un
                         Spacer(modifier = Modifier.height(6.dp))
                         Button(
                             onClick = { onStartNavigation(false) },
-                            colors = ButtonDefaults.buttonColors(containerColor = ChatTeal),
+                            colors = ButtonDefaults.buttonColors(containerColor = MallTheme.colors.accent),
                             modifier = Modifier.padding(start = 4.dp),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text(stringResource(R.string.show_map_btn), color = Color.White, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.show_map_btn), color = MallTheme.colors.onAccent, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -554,7 +546,7 @@ private fun BubbleContent(text: String, isUser: Boolean) {
                     bottomEnd   = 18.dp
                 )
             )
-            .background(if (isUser) ChatUserBg else ChatBotBg)
+            .background(if (isUser) MallTheme.colors.accent else MallTheme.colors.surfaceSunken)
             .padding(horizontal = 14.dp, vertical = 10.dp)
     ) {
         // Render **bold** markdown-style (*word*)
@@ -580,7 +572,7 @@ private fun BubbleContent(text: String, isUser: Boolean) {
         }
         Text(
             text     = annotated,
-            color    = if (isUser) ChatUserText else ChatBotText,
+            color    = if (isUser) MallTheme.colors.onAccent else MallTheme.colors.textPrimary,
             fontSize = 14.sp,
             lineHeight = 20.sp
         )
@@ -606,16 +598,16 @@ private fun ThinkingIndicator() {
             modifier = Modifier
                 .size(28.dp)
                 .clip(CircleShape)
-                .background(ChatTeal),
+                .background(MallTheme.colors.accent),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.SmartToy, null, tint = Color.White, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.SmartToy, null, tint = MallTheme.colors.onAccent, modifier = Modifier.size(16.dp))
         }
         Spacer(Modifier.width(8.dp))
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 18.dp, bottomStart = 18.dp, bottomEnd = 18.dp))
-                .background(ChatBotBg)
+                .background(MallTheme.colors.surfaceSunken)
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -624,7 +616,7 @@ private fun ThinkingIndicator() {
                         modifier = Modifier
                             .size(7.dp)
                             .clip(CircleShape)
-                            .background(ChatTeal.copy(alpha = alpha - (i * 0.1f).coerceAtLeast(0f)))
+                            .background(MallTheme.colors.accent.copy(alpha = alpha - (i * 0.1f).coerceAtLeast(0f))) // theme-lint:allow decorative thinking-dot animation
                     )
                 }
             }
@@ -645,7 +637,7 @@ private fun ChatInputBar(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color    = Color.White,
+        color    = MallTheme.colors.surface,
         shadowElevation = 8.dp
     ) {
         Row(
@@ -660,15 +652,15 @@ private fun ChatInputBar(
                 placeholder    = {
                     Text(
                         stringResource(R.string.where_to_go_placeholder),
-                        color    = Color.Gray,
+                        color    = MallTheme.colors.textDisabled,
                         fontSize = 14.sp
                     )
                 },
                 shape          = RoundedCornerShape(24.dp),
                 singleLine     = true,
                 colors         = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor   = ChatTeal,
-                    unfocusedBorderColor = Color(0xFFDDDDDD)
+                    focusedBorderColor   = MallTheme.colors.accent,
+                    unfocusedBorderColor = MallTheme.colors.border
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(onSend = { onSend() })
@@ -679,8 +671,8 @@ private fun ChatInputBar(
             // Send button
             FloatingActionButton(
                 onClick        = onSend,
-                containerColor = if (value.isNotBlank() && !isLoading) ChatTeal else Color(0xFFBDBDBD),
-                contentColor   = Color.White,
+                containerColor = if (value.isNotBlank() && !isLoading) MallTheme.colors.accent else MallTheme.colors.border,
+                contentColor   = MallTheme.colors.onAccent,
                 shape          = CircleShape,
                 elevation      = FloatingActionButtonDefaults.elevation(0.dp),
                 modifier       = Modifier.size(48.dp)
