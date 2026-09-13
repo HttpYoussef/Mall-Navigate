@@ -52,23 +52,27 @@ changed by this map; the migration tickets are the handoff boundary.
   the handoff boundary and `agy` runs them under orchestrator review.
 - **▶ RESUME POINT (2026-09-13)**: **ALL 8 TICKETS RESOLVED. CHARTING COMPLETE.** Spec:
   `docs/Theming/README.md` (§1–§10) + `palette.md` + `migration-tickets.md` (13 batch tickets
-  00–12). **Executing the migration, in progress.** **Batches 00-07 are landed AND
+  00–12). **Executing the migration, in progress.** **Batches 00-08 are landed AND
   user-signed-off-on-device** (commits `1473c4a`, `c7b9178`, `0eb210b`, `20e074e`, `2b90473`,
-  `c7a2f64`, `b5ec8f5`, `d0f4a94` + their ledger-update commits). **CORE-FLOW MILESTONE COMPLETE**
-  — light mode is correct on every screen a regular shopper touches (Auth, Home, Offers/Vouchers,
-  Destination, Profile/Settings/Saved). **Batch 08 (Parking suite — `ParkingHomeScreen.kt`,
-  `ParkingCameraScreen.kt`, `ParkingScanResultScreen.kt`, `ParkingMapScreen.kt`, the single
-  biggest hotspot, 54 raw literals across 4 files) is landed (`d1b3785`), reviewed, gates
-  independently re-verified — awaiting user on-device sign-off.** `ParkingCameraScreen`'s
-  viewfinder (post-permission) and all of `ParkingMapScreen` are now locked always-dark routes via
-  `DarkSystemBars()`. Device-check ask for Batch 08: **ParkingHomeScreen** empty state + saved
-  state (banner, save button, card, buttons) both modes; **ParkingScanResultScreen**'s OCR result
-  cards both modes; **ParkingCameraScreen**'s permission-fallback screen in both modes (the
-  viewfinder itself should look identically dark regardless of the app's mode setting);
-  **ParkingMapScreen** should also look identically dark regardless of mode. Next after sign-off:
-  dispatch Batch 09 (Localization/first-run/camera ×5, incl. `SplashScreen` full migration +
-  `MallSelectionScreen` cold-start icon fix) per `docs/Theming/migration-tickets.md` § "Batch 09".
-  The working loop for every batch
+  `c7a2f64`, `b5ec8f5`, `d0f4a94`, `833f549` + their ledger-update commits). **CORE-FLOW MILESTONE
+  COMPLETE** — light mode is correct on every screen a regular shopper touches (Auth, Home,
+  Offers/Vouchers, Destination, Profile/Settings/Saved). Parking suite (Batch 08) also signed off,
+  including a post-sign-off tweak: the ParkingHomeScreen saved-spot "hero" card's body text is now
+  explicit pure black/white (user request), not the AA-tuned token value. **Batch 09
+  (Localization/first-run/camera — `PermissionsScreen.kt`, `LogoScanScreen.kt`,
+  `LocalizationConfirmScreen.kt`, `MallSelectionScreen.kt`, `SplashScreen.kt`) is landed
+  (`0e41474`), reviewed, gates independently re-verified — awaiting user on-device sign-off.**
+  `SplashScreen` keeps its fixed deep-teal identity (not token-driven, by design). `LogoScanScreen`
+  splits into always-dark camera-overlay chrome (scrim family) vs. adaptive full-screen
+  `PICK_DESTINATION`/`DESTINATION_DETAIL`; `LocalizationConfirmScreen` is entirely always-dark
+  overlay. Device-check ask for Batch 09: **first-run flow** — Permissions screen (both modes),
+  Mall Selection screen (both modes, cold start after splash), Splash (should look identical
+  regardless of mode setting); **LogoScanScreen** — camera-idle overlay/loading banners should
+  look dark regardless of mode, but the "pick a destination" and "destination detail" screens
+  (reached via the search flow) should adapt to light/dark; **LocalizationConfirmScreen** (the
+  bottom sheet after a successful scan) should look dark regardless of mode. Next after sign-off:
+  dispatch Batch 10 (Navigation HUD & map chrome ×2) per `docs/Theming/migration-tickets.md`
+  § "Batch 10". The working loop for every batch
   (established over 00-07, keep doing this):
   1. write a brief grounded in the exact current file contents (grep/read first — don't assume
      the migration-tickets.md summary is precise enough on its own; past batches needed real
@@ -248,7 +252,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 06 | Destination (flatten Dsel* violet) | **signed off** (`b5ec8f5`) |
 | 07 | Profile / Settings / Saved — **core-flow milestone** | **signed off** (`d0f4a94`) |
 | 08 | Parking suite ×4 (54 literals) | **signed off** (`833f549`) |
-| 09 | Localization / first-run / camera ×5 | pending |
+| 09 | Localization / first-run / camera ×5 | landed (`0e41474`) — awaiting device sign-off |
 | 10 | Navigation HUD & map chrome ×2 | pending |
 | 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | pending |
 | 12 | Lint-gate hard-error flip | pending |
