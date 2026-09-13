@@ -3,66 +3,50 @@
 Living document. Update it when an item closes or a new one appears. Check it before assuming
 the subsystem is "done".
 
-Status as of branch `feat/app-localization` (draft PR #1). Latest relevant commits:
-`0a09460` (theme memoization), `b301c51` (voucher content), `15f5aef` (runbook).
+**`feat/app-localization` is merged into `main`** (2026‑09‑13, via `feat/colors-light-modes`,
+which was stacked on top of it — both efforts landed in one fast‑forward, `cc46c1a`). PR #1
+closes automatically once `main` is pushed. Work now happens directly on `main`. Latest
+relevant commits: `0a09460` (theme memoization), `b301c51` (voucher content), `cc46c1a` (merge
+— brings in `main`'s independent AR perf commits), `0d3c9fd` (LanguageScreen back-button label +
+debug pseudolocales). **`main` is not yet pushed to `origin`** — that's the repo owner's own step.
 
 ---
 
-## A. Blocking / needs a decision
+## A. Resolved
 
-### A1 — Pending merge of `main` into `feat/app-localization`
+### A1 — ~~Pending merge of `main` into `feat/app-localization`~~ DONE (`cc46c1a`)
 
-`feat/app-localization` was cut from `main` at `e4ad8b7`. Local `main` has since advanced with
-**6 AR commits** the branch does not have, including:
-
-```
-64775a3 ar: disable ARCore plane-debug visualization      ← frame-rate relevant
-d1f28bb ar: harden floor-plane selection / damped elevation
-940f112 ar: remove unused RenderPoseSmoother
-026864c ar: sync marker rotation with position
-1d0ca78 ar: measure real ARCore yaw at accept-time
-5f5c7c2 ar: diagnostic logging for transform/anchor churn
-```
-
-**Consequence:** the on‑device report "AR orientation phase is slower on the branch than on
-`main`" is **confounded** — the branch is missing AR perf work, not (only) carrying a
-localization regression. `MallARTheme` memoization (`0a09460`) was a real fix regardless, but
-the comparison can't be trusted until the branch has those 6 commits.
-
-**Action:** `git merge main` into `feat/app-localization` (a clean merge — verified once
-locally, `UnifiedNavigationScreen.kt` auto‑merges), re‑run the 4 gates, then re‑test the AR
-orientation phase in Arabic. Held pending the repo owner's go (they asked not to merge/push
-until the feature is otherwise complete). `origin/main` is still at `e4ad8b7`; the 6 commits
-are local‑only.
+The branch was missing 6 AR perf commits from `main` (incl. `ar: disable ARCore plane-debug
+visualization`), which confounded any on-device AR-performance comparison against `main`. Fixed
+by merging `main` into the branch (clean, zero conflicts — `UnifiedNavigationScreen.kt` and
+`LogoScanScreen.kt` both auto-merged and were hand-verified to keep both sides' changes), all 5
+gates green, then fast-forwarding `main` to that point. **The AR-perf confound is gone** — B3 can
+now be tested for real.
 
 ---
 
 ## B. Open QA items (ticket 13 sweep — in progress, USER on device)
 
-### B1 — `LanguageScreen.kt` hardcoded `contentDescription = "Back"`
+### B1 — ~~`LanguageScreen.kt` hardcoded `contentDescription = "Back"`~~ FIXED (`0d3c9fd`)
 
-`app/src/main/java/com/example/mallar/ui/language/LanguageScreen.kt`, the top‑bar back button
-in `LanguageScreenContent` — `contentDescription = "Back"` is a literal. Should be
-`stringResource(R.string.back)` (the key exists). Small fix, do it in the next string pass.
+Now `stringResource(R.string.back)`.
 
-### B2 — Debug pseudolocales not force‑enabled
+### B2 — ~~Debug pseudolocales not force‑enabled~~ FIXED (`0d3c9fd`)
 
-The spec wanted debug builds to enable `en_XA` / `ar_XB` automatically
-(`buildTypes.debug { isPseudoLocalesEnabled = true }` in `app/build.gradle.kts`). It is **not
-set**. QA currently has to enable them via Developer Options or `adb`. Add it to make the
-pseudolocale pass frictionless.
+`app/build.gradle.kts` `buildTypes.debug { isPseudoLocalesEnabled = true }` added. `en_XA` /
+`ar_XB` are now available on any debug build without touching Developer Options.
 
 ### B3 — Theme memoization (`0a09460`) needs on‑device confirmation
 
-The fix is committed + pushed and gates‑green, but "orientation phase is back to `main`'s
-smoothness in Arabic" has **not** been confirmed on a physical device (and can't be cleanly,
-until A1 — the merge — lands). Confirm after the merge.
+Committed, gates‑green, merged to `main`. The AR-perf confound (A1) is now resolved, so this is
+testable for real: confirm the AR pre-trip orientation phase is smooth in Arabic on a physical
+device.
 
 ### B4 — Voucher content fix (`b301c51`) needs on‑device confirmation
 
 Open Offers + a voucher detail in Arabic; confirm title / description / expiry line / terms
 are all Arabic and the offer search still matches by localized title. Committed, gates‑green,
-not yet device‑verified. **Not pushed** (held per owner instruction).
+merged to `main`, not yet device‑verified.
 
 ### B5 — Ticket 01 (AppCompat spike) never formally executed
 
