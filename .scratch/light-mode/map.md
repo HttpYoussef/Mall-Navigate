@@ -65,21 +65,39 @@ changed by this map; the migration tickets are the handoff boundary.
   `LogoScanScreen` splits into always-dark camera-overlay chrome (scrim family) vs. adaptive
   full-screen `PICK_DESTINATION`/`DESTINATION_DETAIL`; `LocalizationConfirmScreen` is entirely
   always-dark overlay. **Batch 10 (Navigation HUD & map chrome — `UnifiedNavigationScreen.kt` +
-  `StaticMapScreen.kt`) is landed (`c254a30`), awaiting device sign-off.** Both screens converted
+  `StaticMapScreen.kt`) is now signed off** (`c254a30`). Both screens converted
   to the always-dark scrim family + accent/success/error for HUD accents and route markers;
   `DarkSystemBars()` added unconditionally to both. Dead constants deleted; a handful of
   mode-independent HUD identifiers (route/user-position colors, debug-overlay colors) kept as
   named constants with `theme-lint:allow` markers rather than forced onto semantic tokens, since
-  the ticket didn't ask to reskin the HUD's own visual identity. One design note for the device
+  the ticket didn't ask to reskin the HUD's own visual identity. One design note from the device
   check: the route-info card's border on `StaticMapScreen` went from a 10%-alpha white hairline to
-  a solid `onScrimMuted` border — a visible (if minor) prominence change worth a look. This
-  dispatch was killed mid-run by a system OOM (no `result.json`); reviewed the complete diff
+  a solid `onScrimMuted` border — a visible (if minor) prominence change, accepted on sign-off.
+  That dispatch was killed mid-run by a system OOM (no `result.json`); reviewed the complete diff
   directly against the brief instead of retrying, per the Batch 08 OOM-recovery precedent — gates
-  re-run clean after a `./gradlew --stop` freed the stale daemon memory. **Next: dispatch Batch 11
-  (Bespoke-dark overlays: `ChatBottomSheet.kt`, `StoreDetailScreen.kt`,
-  `VoiceAssistantOverlay.kt` — allowlist confirms `ChatBottomSheet.kt:21` still present)** once
-  Batch 10 is signed off; read `docs/Theming/migration-tickets.md` § "Batch 11" fresh first. Then
-  12 (lint-gate hard-error flip, delete the allowlist, re-read `docs/Theming/README.md` §9 first).
+  re-run clean after a `./gradlew --stop` freed the stale daemon memory. **Batch 11 (Bespoke-dark
+  overlays — `ChatBottomSheet.kt`, `StoreDetailScreen.kt`, `VoiceAssistantOverlay.kt`) is landed
+  (`5934f6e`), awaiting device sign-off.** `ChatBottomSheet` (adaptive, hosted from both Home and
+  LogoScanScreen) and `StoreDetailScreen` (adaptive, unwired) now read `MallTheme.colors.*`;
+  `StoreDetailScreen` keeps its `isDarkMode` read solely for a shadow-elevation branch and a
+  decorative ambient-glow gradient (neither has a color-token substitute). `VoiceAssistantOverlay`
+  (always-dark, unwired) converted to the scrim family + accent/status-text tokens; its "thinking"
+  purple status had no dedicated token (purple is retired app-wide) so it was mapped onto
+  `warningText` as a flagged best-judgment call, not a locked decision — worth a second look
+  whenever this screen actually gets wired up. Fixed one cosmetic defect in agy's diff (a stray
+  one-space indent shift across two helper functions in `ChatBottomSheet.kt`, from the import
+  insertion) before committing. `StoreDetailScreen.kt` and `VoiceAssistantOverlay.kt` are both
+  currently unwired (no live navigation path reaches them), so this batch's "verify on device"
+  step is necessarily limited to `ChatBottomSheet` (check it from both Home and the camera/
+  LogoScan flow, both light and dark app-mode settings) — the other two just need to keep
+  compiling and rendering correctly if manually invoked. Two pre-existing allowlist rows for
+  `StoreLogo.kt` and `HomeSharedComponents.kt` (from the already-signed-off Batch 02) remain in
+  `config/theme-migration-allowlist.txt` — not this batch's concern, but **Batch 12 must resolve
+  or explain them** before deleting the allowlist file, since Batch 12's acceptance bar is an
+  empty allowlist. **Next: dispatch Batch 12 (lint-gate hard-error flip)** once Batch 11 is signed
+  off — re-read `docs/Theming/migration-tickets.md` § "Batch 12" AND `docs/Theming/README.md` §9
+  fresh first, and account for those two leftover rows. This is the **last batch** — no more
+  screen-migration work follows it.
   The working loop for every batch
   (established over 00-07, keep doing this):
   1. write a brief grounded in the exact current file contents (grep/read first — don't assume
@@ -262,7 +280,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 08 | Parking suite ×4 (54 literals) | **signed off** (`833f549`) |
 | 09 | Localization / first-run / camera ×5 | **signed off** (`0e41474`) |
 | 10 | Navigation HUD & map chrome ×2 | **signed off** (`c254a30`) |
-| 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | pending |
+| 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | landed (`5934f6e`) — awaiting device sign-off |
 | 12 | Lint-gate hard-error flip | pending |
 
 ## Not yet specified
