@@ -43,19 +43,9 @@ import java.util.Locale
 
 // ── Design Specification Tokens ──────────────────────────────────────────────
 
-internal val DeepNavyBg      = Color(0xFF06131A)
-internal val GlassCardBg     = Color(0xFF0D1E26)
-internal val DesignPurple    = Color(0xFF9D5CFF) // Specification accent
-internal val MutedTextSubDark = Color(0xFF8BA3AD)
-
-internal val ParkingPurple      = Color(0xFF8B7CF6)
-internal val ParkingPurpleDeep  = Color(0xFF4C3FD9)
-internal val CyanGlow           = Color(0xFF19D3E6)
-internal val FavoriteHeartRed   = Color(0xFFEF476F)
-
-internal val LightBg          = Color(0xFFF7F9FA)
-internal val LightCardBg      = Color(0xFFFFFFFF)
-internal val MutedTextSubLight = Color(0xFF888EA8)
+internal val GlassCardBg        = Color(0xFF0D1E26) // theme-lint:allow decorative parking/glass-card identity, preserved per Homescreen.kt's own markers
+internal val ParkingPurple      = Color(0xFF8B7CF6) // theme-lint:allow decorative parking/glass-card identity, preserved per Homescreen.kt's own markers
+internal val ParkingPurpleDeep  = Color(0xFF4C3FD9) // theme-lint:allow decorative parking/glass-card identity, preserved per Homescreen.kt's own markers
 
 // ── Helper Utilities ─────────────────────────────────────────────────────────
 
@@ -131,8 +121,8 @@ internal fun GlowingSearchBar(
             .shadow(
                 elevation = searchElevation,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = currentAccent.copy(alpha = searchGlow),
-                spotColor = currentAccent.copy(alpha = searchGlow)
+                ambientColor = currentAccent.copy(alpha = searchGlow), // theme-lint:allow decorative alpha on an adaptive color parameter
+                spotColor = currentAccent.copy(alpha = searchGlow) // theme-lint:allow decorative alpha on an adaptive color parameter
             )
             .background(
                 MallTheme.colors.surface,
@@ -141,7 +131,7 @@ internal fun GlowingSearchBar(
             .border(
                 BorderStroke(
                     searchBorderWidth,
-                    if (isFocused) currentAccent else currentAccent.copy(alpha = idleGlowAlpha + 0.1f)
+                    if (isFocused) currentAccent else currentAccent.copy(alpha = idleGlowAlpha + 0.1f) // theme-lint:allow decorative alpha on an adaptive color parameter
                 ),
                 RoundedCornerShape(24.dp)
             )
@@ -227,8 +217,8 @@ internal fun DestinationCategoryCard(
                 .shadow(
                     elevation = 8.dp,
                     shape = RoundedCornerShape(22.dp),
-                    ambientColor = currentAccent.copy(alpha = 0.15f),
-                    spotColor = currentAccent.copy(alpha = 0.15f)
+                    ambientColor = currentAccent.copy(alpha = 0.15f), // theme-lint:allow decorative alpha on an adaptive color parameter
+                    spotColor = currentAccent.copy(alpha = 0.15f) // theme-lint:allow decorative alpha on an adaptive color parameter
                 )
                 .background(
                     MallTheme.colors.surface,
@@ -240,7 +230,7 @@ internal fun DestinationCategoryCard(
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .background(currentAccent.copy(alpha = 0.12f), CircleShape)
+                    .background(currentAccent.copy(alpha = 0.12f), CircleShape) // theme-lint:allow decorative alpha on an adaptive color parameter
             )
             
             when (val ic = category.icon) {
@@ -377,7 +367,7 @@ internal fun RefinedStoreRow(
         Icon(
             imageVector = Icons.Default.ChevronRight,
             contentDescription = null,
-            tint = currentTextSub.copy(alpha = 0.4f),
+            tint = currentTextSub.copy(alpha = 0.4f), // theme-lint:allow decorative alpha on an adaptive color parameter
             modifier = Modifier.size(20.dp)
         )
     }
@@ -448,7 +438,7 @@ internal fun CategoryChip(
         animationSpec = tween(300), label = "chip_content"
     )
     val borderColor by animateColorAsState(
-        if (selected) currentAccent.copy(alpha = 0.6f) else currentBorder,
+        if (selected) currentAccent.copy(alpha = 0.6f) else currentBorder, // theme-lint:allow decorative alpha on an adaptive color parameter
         animationSpec = tween(300), label = "chip_border"
     )
     val haloAlpha by animateFloatAsState(if (selected) 0.15f else 0f, animationSpec = tween(400), label = "chip_halo")
@@ -462,8 +452,8 @@ internal fun CategoryChip(
             .shadow(
                 elevation = if (selected) 10.dp else 0.dp,
                 shape = RoundedCornerShape(18.dp),
-                ambientColor = currentAccent.copy(alpha = haloAlpha),
-                spotColor = currentAccent.copy(alpha = haloAlpha),
+                ambientColor = currentAccent.copy(alpha = haloAlpha), // theme-lint:allow decorative alpha on an adaptive color parameter
+                spotColor = currentAccent.copy(alpha = haloAlpha), // theme-lint:allow decorative alpha on an adaptive color parameter
                 clip = false
             )
             .clip(RoundedCornerShape(18.dp))
@@ -592,7 +582,7 @@ internal fun EmptyState(currentTextSub: Color) {
             Icon(
                 imageVector = Icons.Default.SearchOff,
                 contentDescription = null,
-                tint = currentTextSub.copy(alpha = 0.25f),
+                tint = currentTextSub.copy(alpha = 0.25f), // theme-lint:allow decorative alpha on an adaptive color parameter
                 modifier = Modifier.size(64.dp)
             )
             Spacer(Modifier.height(18.dp))
@@ -604,7 +594,7 @@ internal fun EmptyState(currentTextSub: Color) {
             )
             Text(
                 text = stringResource(R.string.home_try_different_keyword),
-                color = currentTextSub.copy(alpha = 0.7f),
+                color = currentTextSub.copy(alpha = 0.7f), // theme-lint:allow decorative alpha on an adaptive color parameter
                 fontSize = 14.sp
             )
         }
@@ -636,7 +626,7 @@ internal fun DestinationConfirmSheet(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .size(width = 44.dp, height = 5.dp)
-                .background(currentTextSub.copy(alpha = 0.25f), RoundedCornerShape(2.5.dp))
+                .background(currentTextSub.copy(alpha = 0.25f), RoundedCornerShape(2.5.dp)) // theme-lint:allow decorative alpha on an adaptive color parameter
         )
         Spacer(Modifier.height(24.dp))
 

@@ -154,7 +154,6 @@ tasks.register("checkThemeColors") {
     doLast {
         val uiDir = file("src/main/java/com/example/mallar/ui")
         val voiceFile = file("src/main/java/com/example/mallar/voice/VoiceAssistantOverlay.kt")
-        val allowlistFile = rootProject.file("config/theme-migration-allowlist.txt")
 
         val inScopeFiles = mutableListOf<File>()
         if (uiDir.exists()) {
@@ -178,20 +177,6 @@ tasks.register("checkThemeColors") {
             Regex("""R\.color\.""")
         )
         val allowMarker = Regex("""//\s*theme-lint:allow.*$""")
-
-        val allowlist = mutableMapOf<String, Int>()
-        val allowlistExists = allowlistFile.exists()
-        if (allowlistExists) {
-            allowlistFile.readLines().forEach { line ->
-                val trimmed = line.trim()
-                if (trimmed.isNotEmpty() && !trimmed.startsWith("#")) {
-                    val parts = trimmed.split(":")
-                    if (parts.size == 2) {
-                        allowlist[parts[0].trim()] = parts[1].trim().toInt()
-                    }
-                }
-            }
-        }
 
         val errors = mutableListOf<String>()
 
@@ -218,15 +203,8 @@ tasks.register("checkThemeColors") {
                 }
             }
 
-            if (allowlistExists) {
-                val allowedCount = allowlist[relPath] ?: 0
-                if (fileMatchCount > allowedCount) {
-                    errors.add("File $relPath has $fileMatchCount matches (allowed: $allowedCount):\n" + offendingLines.joinToString("\n"))
-                }
-            } else {
-                if (fileMatchCount > 0) {
-                    errors.add("File $relPath has $fileMatchCount banned matches:\n" + offendingLines.joinToString("\n"))
-                }
+            if (fileMatchCount > 0) {
+                errors.add("File $relPath has $fileMatchCount banned matches:\n" + offendingLines.joinToString("\n"))
             }
         }
 
