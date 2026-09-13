@@ -89,7 +89,7 @@ changed by this map; the migration tickets are the handoff boundary.
   insertion) before committing. `StoreDetailScreen.kt` and `VoiceAssistantOverlay.kt` are both
   currently unwired (no live navigation path reaches them), so that batch's "verify on device"
   step was limited to `ChatBottomSheet`. **Batch 11 is now signed off** (`5934f6e`).
-  **Batch 12 (Lint-gate hard-error flip) is landed** (`bf6cae5`), awaiting device sign-off — **this
+  **Batch 12 (Lint-gate hard-error flip) is landed AND signed off** (`bf6cae5`) — **this
   is the last of the 13 migration batches; there is no Batch 13.** Turned out the allowlist wasn't
   actually empty going in: `StoreLogo.kt`'s row was fully stale (0 real matches, safe to drop) but
   `HomeSharedComponents.kt`'s row was masking 8 genuinely-dead `Color(0x...)` constants (deleted,
@@ -110,11 +110,25 @@ changed by this map; the migration tickets are the handoff boundary.
   visually — the ask is really just "does the app still build and run normally," which the gates
   already confirm; a normal pass through Home/Profile/Parking/Navigation in both light and dark
   mode as a final regression check is reasonable but not strictly required by this batch's own
-  scope. **Once this is signed off, the entire colour-token migration is complete** — no further
+  scope. **User verified 2026-09-13 — the entire colour-token migration is complete.** No further
   batches, no more `agy` dispatches for this effort. What would remain only as *optional, out-of-
   scope-for-this-effort* follow-up (per the map's own "Out of scope" section, unchanged): actually
   wiring up `StoreDetailScreen`/`VoiceAssistantOverlay` into real navigation if the app ever wants
   them; a dedicated dark-mode visual-polish pass; follow-system/three-way theme switching.
+  **Before merging `feat/colors-light-modes` anywhere (main or elsewhere): this branch is stacked
+  on top of `feat/app-localization`** (confirmed via `git merge-base --is-ancestor` — every commit
+  of `feat/app-localization` is an ancestor of this branch). Concretely: `main..feat/app-localization`
+  is 26 commits, `feat/app-localization..feat/colors-light-modes` is 48 commits, `main..feat/colors-
+  light-modes` is 74 total. Per `[[app-localization-effort]]` memory, `feat/app-localization` itself
+  is still an **unmerged draft PR #1, pending owner OK** — merging `feat/colors-light-modes`
+  straight into `main` right now would bring the entire (separately-tracked, not-yet-approved) i18n
+  effort along with it, bundled into the same merge. Not this effort's call to make — just make
+  sure that's the intended outcome before merging, rather than a surprise. The branch itself is
+  otherwise clean: working tree has no uncommitted changes (only the long-standing untracked infra:
+  `.agents/`, `.claude/`, `AGENTS.md`, `Testing images/`, `docs/agents/`, `skills-lock.json`), all
+  74 commits are local + already pushed to `origin/feat/colors-light-modes` except the last 6 from
+  this session (never pushed anywhere per the "not pushing yet" instruction — the user's manual
+  merge will carry those along however they choose to land the branch).
   The working loop for every batch
   (established over 00-07, keep doing this):
   1. write a brief grounded in the exact current file contents (grep/read first — don't assume
@@ -298,7 +312,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 09 | Localization / first-run / camera ×5 | **signed off** (`0e41474`) |
 | 10 | Navigation HUD & map chrome ×2 | **signed off** (`c254a30`) |
 | 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | **signed off** (`5934f6e`) |
-| 12 | Lint-gate hard-error flip | landed (`bf6cae5`) — awaiting device sign-off |
+| 12 | Lint-gate hard-error flip | **signed off** (`bf6cae5`) — **migration complete** |
 
 ## Not yet specified
 
