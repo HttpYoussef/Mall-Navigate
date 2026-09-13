@@ -64,14 +64,23 @@ changed by this map; the migration tickets are the handoff boundary.
   too** — `SplashScreen` keeps its fixed deep-teal identity (not token-driven, by design);
   `LogoScanScreen` splits into always-dark camera-overlay chrome (scrim family) vs. adaptive
   full-screen `PICK_DESTINATION`/`DESTINATION_DETAIL`; `LocalizationConfirmScreen` is entirely
-  always-dark overlay. **Next: dispatch Batch 10 (Navigation HUD & map chrome ×2)** per
-  `docs/Theming/migration-tickets.md` § "Batch 10" — likely `UnifiedNavigationScreen.kt` +
-  `StaticMapScreen.kt` (confirmed still on the allowlist: `UnifiedNavigationScreen.kt:27`,
-  `StaticMapScreen.kt:29`); read that ticket section fresh at the start of Batch 10 (not yet read
-  this session). Remaining after 10: 11 (Bespoke-dark overlays: `ChatBottomSheet.kt`,
-  `StoreDetailScreen.kt`, `VoiceAssistantOverlay.kt` — allowlist confirms
-  `ChatBottomSheet.kt:21` still present) → 12 (lint-gate hard-error flip, delete the allowlist,
-  re-read `docs/Theming/README.md` §9 first). The working loop for every batch
+  always-dark overlay. **Batch 10 (Navigation HUD & map chrome — `UnifiedNavigationScreen.kt` +
+  `StaticMapScreen.kt`) is landed (`c254a30`), awaiting device sign-off.** Both screens converted
+  to the always-dark scrim family + accent/success/error for HUD accents and route markers;
+  `DarkSystemBars()` added unconditionally to both. Dead constants deleted; a handful of
+  mode-independent HUD identifiers (route/user-position colors, debug-overlay colors) kept as
+  named constants with `theme-lint:allow` markers rather than forced onto semantic tokens, since
+  the ticket didn't ask to reskin the HUD's own visual identity. One design note for the device
+  check: the route-info card's border on `StaticMapScreen` went from a 10%-alpha white hairline to
+  a solid `onScrimMuted` border — a visible (if minor) prominence change worth a look. This
+  dispatch was killed mid-run by a system OOM (no `result.json`); reviewed the complete diff
+  directly against the brief instead of retrying, per the Batch 08 OOM-recovery precedent — gates
+  re-run clean after a `./gradlew --stop` freed the stale daemon memory. **Next: dispatch Batch 11
+  (Bespoke-dark overlays: `ChatBottomSheet.kt`, `StoreDetailScreen.kt`,
+  `VoiceAssistantOverlay.kt` — allowlist confirms `ChatBottomSheet.kt:21` still present)** once
+  Batch 10 is signed off; read `docs/Theming/migration-tickets.md` § "Batch 11" fresh first. Then
+  12 (lint-gate hard-error flip, delete the allowlist, re-read `docs/Theming/README.md` §9 first).
+  The working loop for every batch
   (established over 00-07, keep doing this):
   1. write a brief grounded in the exact current file contents (grep/read first — don't assume
      the migration-tickets.md summary is precise enough on its own; past batches needed real
@@ -252,7 +261,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 07 | Profile / Settings / Saved — **core-flow milestone** | **signed off** (`d0f4a94`) |
 | 08 | Parking suite ×4 (54 literals) | **signed off** (`833f549`) |
 | 09 | Localization / first-run / camera ×5 | **signed off** (`0e41474`) |
-| 10 | Navigation HUD & map chrome ×2 | pending |
+| 10 | Navigation HUD & map chrome ×2 | landed (`c254a30`) — awaiting device sign-off |
 | 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | pending |
 | 12 | Lint-gate hard-error flip | pending |
 
