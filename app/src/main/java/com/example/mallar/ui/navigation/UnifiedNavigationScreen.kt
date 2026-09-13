@@ -49,20 +49,13 @@ import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.*
 import com.example.mallar.ar.ui.ArSceneViewWrapper
 import com.example.mallar.ui.localization.NavigationState
+import com.example.mallar.ui.theme.*
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-private val NavBlue     = Color(0xFF1E64FF)
-private val NavBlueDark = Color(0xFF0A3DBF)
-private val NavGreen    = Color(0xFF00C853)
-private val NavAmber    = Color(0xFFFFA726)
-private val NavSurface  = Color(0xFF0A0F1E)
-private val NavCard     = Color(0xF0121829)
-private val PathColor   = Color(0xFF00BCD4)
-private val PathShadow  = Color(0x99006064)
-private val StartGreen  = Color(0xFF43A047)
-private val EndRed      = Color(0xFFE53935)
-private val UserBlue    = Color(0xFF2979FF)
-private val WalkedColor = Color(0x886E6E6E)
+private val NavAmber    = Color(0xFFFFA726) // theme-lint:allow always-dark HUD indicator, fixed by design
+private val PathColor   = Color(0xFF00BCD4) // theme-lint:allow always-dark HUD indicator, fixed by design
+private val PathShadow  = Color(0x99006064) // theme-lint:allow always-dark HUD indicator, fixed by design
+private val UserBlue    = Color(0xFF2979FF) // theme-lint:allow always-dark HUD indicator, fixed by design
 
 // ── Map source dimensions ─────────────────────────────────────────────────────
 private const val MAP_SRC_W = 1200f
@@ -74,6 +67,7 @@ fun UnifiedNavigationScreen(
     onBackClick: () -> Unit,
     viewModel: UnifiedNavigationViewModel = viewModel()
 ) {
+    DarkSystemBars()
     val state           by viewModel.navState.collectAsState()
     val poseEnabled     by viewModel.poseEnabled.collectAsState()
     val orientationState by viewModel.orientationState.collectAsState()
@@ -165,7 +159,7 @@ fun UnifiedNavigationScreen(
     Box(
         Modifier
             .fillMaxSize()
-            .background(NavSurface)
+            .background(MallTheme.colors.scrimSurface)
             .onSizeChanged { sz ->
                 if (sz.width > 0 && sz.height > 0) {
                     viewModel.setScreenSize(sz.width.toFloat(), sz.height.toFloat())
@@ -206,14 +200,14 @@ fun UnifiedNavigationScreen(
                     .navigationBarsPadding()
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(if (voiceMuted) NavAmber.copy(0.88f) else Color.Black.copy(0.55f))
+                    .background(if (voiceMuted) NavAmber.copy(0.88f) else MallTheme.colors.scrim.copy(alpha = 0.55f))
                     .clickable { voiceMuted = !voiceMuted },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (voiceMuted) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
                     contentDescription = if (voiceMuted) stringResource(R.string.nav_voice_unmute) else stringResource(R.string.nav_voice_mute),
-                    tint = Color.White,
+                    tint = MallTheme.colors.onScrim,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -239,12 +233,12 @@ private fun OrientationOverlay(orientationState: OrientationUiState) {
     Box(
         Modifier
             .fillMaxSize()
-            .background(NavSurface.copy(alpha = 0.94f)),
+            .background(MallTheme.colors.scrimSurface.copy(alpha = 0.94f)),
         contentAlignment = Alignment.Center
     ) {
         Card(
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = NavCard),
+            colors = CardDefaults.cardColors(containerColor = MallTheme.colors.scrimCard),
             elevation = CardDefaults.cardElevation(16.dp),
             modifier = Modifier.padding(horizontal = 28.dp)
         ) {
@@ -260,13 +254,13 @@ private fun OrientationOverlay(orientationState: OrientationUiState) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = NavBlue,
+                    tint = MallTheme.colors.accentText,
                     modifier = Modifier.size(56.dp)
                 )
                 Spacer(Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.nav_get_oriented),
-                    color = Color.White.copy(0.7f),
+                    color = MallTheme.colors.onScrim.copy(0.7f),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -290,14 +284,14 @@ private fun FloorTransitionSheet(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(0.6f)),
+            .background(MallTheme.colors.scrim.copy(alpha = 0.6f)),
         contentAlignment = Alignment.BottomCenter
     ) {
         Column(
             Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-                .background(NavCard)
+                .background(MallTheme.colors.scrimCard)
                 .padding(horizontal = 24.dp, vertical = 8.dp)
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -305,20 +299,20 @@ private fun FloorTransitionSheet(
             Icon(
                 Icons.Default.Elevator,
                 contentDescription = null,
-                tint = NavBlue,
+                tint = MallTheme.colors.accentText,
                 modifier = Modifier.size(40.dp)
             )
             Spacer(Modifier.height(12.dp))
             Text(
                 text = stringResource(R.string.nav_floor_change),
-                color = Color.White,
+                color = MallTheme.colors.onScrim,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
             Spacer(Modifier.height(12.dp))
             Text(
                 text = message,
-                color = Color.White.copy(0.85f),
+                color = MallTheme.colors.onScrim.copy(0.85f),
                 fontSize = 15.sp,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 lineHeight = 22.sp
@@ -327,7 +321,10 @@ private fun FloorTransitionSheet(
             Button(
                 onClick = onContinue,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = NavBlue)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MallTheme.colors.accent,
+                    contentColor = MallTheme.colors.onAccent
+                )
             ) {
                 Text(
                     stringResource(R.string.nav_continue_on_floor, toFloorLabel),
@@ -369,8 +366,8 @@ private fun MapLayer(state: NavSessionState, alpha: Float, modifier: Modifier = 
     }
 
     if (mapBitmap == null) {
-        Box(modifier.graphicsLayer { this.alpha = alpha }.background(NavSurface), Alignment.Center) {
-            Text(stringResource(R.string.map_unavailable), color = Color.White.copy(0.4f), fontSize = 13.sp)
+        Box(modifier.graphicsLayer { this.alpha = alpha }.background(MallTheme.colors.scrimSurface), Alignment.Center) {
+            Text(stringResource(R.string.map_unavailable), color = MallTheme.colors.onScrimMuted, fontSize = 13.sp)
         }
         return
     }
@@ -457,15 +454,15 @@ private fun NavigationHud(
         ) {
             Surface(
                 shape = CircleShape,
-                color = Color.Black.copy(0.45f),
+                color = MallTheme.colors.scrim.copy(alpha = 0.45f),
                 modifier = Modifier.size(40.dp).clickable { onBackClick() }
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White, modifier = Modifier.padding(8.dp))
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MallTheme.colors.onScrim, modifier = Modifier.padding(8.dp))
             }
             
             Surface(
                 shape = RoundedCornerShape(20.dp),
-                color = Color.Black.copy(0.45f)
+                color = MallTheme.colors.scrim.copy(alpha = 0.45f)
             ) {
                 Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp)) {
                     HudTab(stringResource(R.string.map_mode), !isCameraMode) { onModeSelected(NavigationModeSelection.MAP) }
@@ -482,11 +479,11 @@ private fun NavigationHud(
                 .navigationBarsPadding()
                 .padding(16.dp),
             shape = RoundedCornerShape(24.dp),
-            color = NavCard,
+            color = MallTheme.colors.scrimCard,
             tonalElevation = 8.dp
         ) {
             Column(Modifier.padding(20.dp)) {
-                Text(state.destinationName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(state.destinationName, color = MallTheme.colors.onScrim, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -500,7 +497,7 @@ private fun NavigationHud(
                             state.walkMinutes,
                             WesternDigits.format(state.walkMinutes)
                         ),
-                        color = Color.White.copy(0.6f)
+                        color = MallTheme.colors.onScrimMuted
                     )
                 }
             }
@@ -512,12 +509,12 @@ private fun NavigationHud(
 private fun HudTab(label: String, selected: Boolean, onClick: () -> Unit) {
     Surface(
         shape = CircleShape,
-        color = if (selected) NavBlue else Color.Transparent,
+        color = if (selected) MallTheme.colors.accent else Color.Transparent,
         modifier = Modifier.clickable { onClick() }
     ) {
         Text(
             label,
-            color = if (selected) Color.White else Color.White.copy(0.6f),
+            color = if (selected) MallTheme.colors.onAccent else MallTheme.colors.onScrimMuted,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold

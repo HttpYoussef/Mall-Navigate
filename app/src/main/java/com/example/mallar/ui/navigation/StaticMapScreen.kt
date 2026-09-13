@@ -35,19 +35,20 @@ import com.example.mallar.data.MallGraphRepository
 import com.example.mallar.data.WesternDigits
 import com.example.mallar.data.bidiIsolated
 import com.example.mallar.data.floorDisplayLabel
-import com.example.mallar.ui.theme.Teal
+import com.example.mallar.ui.localization.NavigationState
+import com.example.mallar.ui.theme.*
 import com.example.mallar.utils.CoordinateTransformer
 import com.example.mallar.utils.FloorMapAssets
-import com.example.mallar.ui.theme.White
-import com.example.mallar.ui.theme.RedAccent
-import com.example.mallar.ui.localization.NavigationState
 
-private val PathTeal = Color(0xFF00897B)
-private val StartGreen = Color(0xFF43A047)
-private val EndRed = Color(0xFFE53935)
+private val PathTeal = Color(0xFF00897B) // theme-lint:allow always-dark HUD indicator, fixed by design
+private val PathOutline = Color(0xFF004D40) // theme-lint:allow always-dark HUD indicator, fixed by design
+private val DebugEdgeColor = Color(0xFFFFFF00) // theme-lint:allow debug-only graph overlay, fixed by design
+private val DebugNodeColor = Color(0xFF00FFFF) // theme-lint:allow debug-only graph overlay, fixed by design
+private val DebugShopNodeColor = Color(0xFFFF00FF) // theme-lint:allow debug-only graph overlay, fixed by design
 
 @Composable
 fun StaticMapScreen(onBackClick: () -> Unit) {
+    DarkSystemBars()
     val context = LocalContext.current
 
     val pathData = NavigationState.aStarPath
@@ -80,15 +81,18 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
     var offset by remember { mutableStateOf(Offset.Zero) }
     var reCenterTrigger by remember { mutableStateOf(0) }
 
-    // Canvas draw blocks are not @Composable — resolve label strings here and capture them.
+    // Canvas draw blocks are not @Composable — resolve label strings and colors here and capture them.
     val startFallbackLabel = stringResource(R.string.nav_start)
     val destFallbackLabel = stringResource(R.string.nav_destination)
+    val onScrimColor = MallTheme.colors.onScrim
+    val startMarkerColor = MallTheme.colors.success
+    val endMarkerColor = MallTheme.colors.error
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     var isDebugMode by remember { mutableStateOf(false) }
  
     // Auto-zoom to fit the path or entire map on first load/re-center
     val density = LocalDensity.current
-    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(Color(0xFF121212))) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(MallTheme.colors.scrimSurface)) {
         val canvasWidth = with(density) { maxWidth.toPx() }
         val canvasHeight = with(density) { maxHeight.toPx() }
  
@@ -169,7 +173,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                             val x2 = CoordinateTransformer.transformX(n2.x)
                             val y2 = CoordinateTransformer.transformY(n2.y)
                             drawLine(
-                                color = Color.Yellow.copy(alpha = 0.5f),
+                                color = DebugEdgeColor.copy(alpha = 0.5f), // theme-lint:allow debug-only graph overlay
                                 start = Offset(x1, y1),
                                 end = Offset(x2, y2),
                                 strokeWidth = 2f / scale
@@ -180,7 +184,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                         val nx = CoordinateTransformer.transformX(node.x)
                         val ny = CoordinateTransformer.transformY(node.y)
                         drawCircle(
-                            color = if (node.shopId != null) Color.Cyan else Color.Magenta,
+                            color = if (node.shopId != null) DebugShopNodeColor else DebugNodeColor,
                             radius = 4f / scale,
                             center = Offset(nx, ny)
                         )
@@ -210,7 +214,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                             // Draw outline
                             drawPath(
                                 path = outlinePath,
-                                color = Color(0xFF004D40),
+                                color = PathOutline,
                                 style = Stroke(
                                     width = 12f / scale,
                                     cap = androidx.compose.ui.graphics.StrokeCap.Round,
@@ -230,18 +234,18 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
 
                             // ── Start marker (green) with white outline ────────────
                             drawCircle(
-                                color = Color.White,
+                                color = onScrimColor,
                                 radius = 16f / scale,
                                 center = Offset(startX, startY)
                             )
                             drawCircle(
-                                color = StartGreen,
+                                color = startMarkerColor,
                                 radius = 12f / scale,
                                 center = Offset(startX, startY)
                             )
                             // Inner white dot
                             drawCircle(
-                                color = Color.White,
+                                color = onScrimColor,
                                 radius = 4f / scale,
                                 center = Offset(startX, startY)
                             )
@@ -254,18 +258,18 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                                 endX = CoordinateTransformer.transformX(lastNode.x)
                                 endY = CoordinateTransformer.transformY(lastNode.y)
                                 drawCircle(
-                                    color = Color.White,
+                                    color = onScrimColor,
                                     radius = 16f / scale,
                                     center = Offset(endX, endY)
                                 )
                                 drawCircle(
-                                    color = EndRed,
+                                    color = endMarkerColor,
                                     radius = 12f / scale,
                                     center = Offset(endX, endY)
                                 )
                                 // Inner white dot
                                 drawCircle(
-                                    color = Color.White,
+                                    color = onScrimColor,
                                     radius = 4f / scale,
                                     center = Offset(endX, endY)
                                 )
@@ -323,7 +327,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                                     lineTo(midX - ndx - perpX, midY - ndy - perpY) // right base
                                     close()
                                 }
-                                drawPath(arrowPath, color = Color.White)
+                                drawPath(arrowPath, color = onScrimColor)
                             }
                         }
                 }
@@ -333,7 +337,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
         if (mapBitmap == null) {
             Text(
                 stringResource(R.string.map_unavailable),
-                color = White.copy(0.6f),
+                color = MallTheme.colors.onScrimMuted,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -351,20 +355,20 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                     onClick = onBackClick,
                     modifier = Modifier.size(48.dp),
                     shape = CircleShape,
-                    color = Color.Black.copy(alpha = 0.6f)
+                    color = MallTheme.colors.scrim.copy(alpha = 0.6f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = MallTheme.colors.onScrim)
                     }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Surface(
                     shape = RoundedCornerShape(24.dp),
-                    color = Color.Black.copy(alpha = 0.6f)
+                    color = MallTheme.colors.scrim.copy(alpha = 0.6f)
                 ) {
                     Text(
                         stringResource(R.string.nav_route_map_title, floorDisplayLabel(displayFloor)),
-                        color = White,
+                        color = MallTheme.colors.onScrim,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
@@ -376,10 +380,14 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                     onClick = { isDebugMode = !isDebugMode },
                     modifier = Modifier.size(48.dp),
                     shape = CircleShape,
-                    color = if (isDebugMode) Teal.copy(alpha = 0.8f) else Color.Black.copy(alpha = 0.6f)
+                    color = if (isDebugMode) {
+                        MallTheme.colors.accent.copy(alpha = 0.8f) // theme-lint:allow accent used at reduced alpha for toggle state
+                    } else {
+                        MallTheme.colors.scrim.copy(alpha = 0.6f)
+                    }
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text("BUG", color = White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text("BUG", color = MallTheme.colors.onScrim, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -387,10 +395,10 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                     onClick = { reCenterTrigger++ },
                     modifier = Modifier.size(48.dp),
                     shape = CircleShape,
-                    color = Color.Black.copy(alpha = 0.6f)
+                    color = MallTheme.colors.scrim.copy(alpha = 0.6f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.CenterFocusStrong, stringResource(R.string.re_center), tint = White)
+                        Icon(Icons.Default.CenterFocusStrong, stringResource(R.string.re_center), tint = MallTheme.colors.onScrim)
                     }
                 }
             }
@@ -404,8 +412,8 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                     .fillMaxWidth()
                     .navigationBarsPadding(),
                 shape = RoundedCornerShape(24.dp),
-                color = Color.Black.copy(alpha = 0.85f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, White.copy(alpha = 0.1f))
+                color = MallTheme.colors.scrim.copy(alpha = 0.85f),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MallTheme.colors.onScrimMuted)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
                     NavigationState.startPlace?.brand?.let { startBrand ->
@@ -413,12 +421,12 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                             Box(
                                 modifier = Modifier
                                     .size(10.dp)
-                                    .background(StartGreen, CircleShape)
+                                    .background(MallTheme.colors.success, CircleShape)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 stringResource(R.string.from_label, startBrand.bidiIsolated()),
-                                color = White, fontSize = 14.sp, fontWeight = FontWeight.Medium
+                                color = MallTheme.colors.onScrim, fontSize = 14.sp, fontWeight = FontWeight.Medium
                             )
                         }
                         Spacer(modifier = Modifier.height(8.dp))
@@ -428,12 +436,12 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                             Box(
                                 modifier = Modifier
                                     .size(10.dp)
-                                    .background(EndRed, CircleShape)
+                                    .background(MallTheme.colors.error, CircleShape)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 stringResource(R.string.to_label, destBrand.bidiIsolated()),
-                                color = White, fontSize = 14.sp, fontWeight = FontWeight.Medium
+                                color = MallTheme.colors.onScrim, fontSize = 14.sp, fontWeight = FontWeight.Medium
                             )
                         }
                         Spacer(modifier = Modifier.height(12.dp))
@@ -447,14 +455,14 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
                                 R.string.nav_distance_label,
                                 WesternDigits.format(NavigationState.estimatedDistance)
                             ),
-                            color = White.copy(alpha = 0.7f), fontSize = 13.sp
+                            color = MallTheme.colors.onScrimMuted, fontSize = 13.sp
                         )
                         Text(
                             stringResource(
                                 R.string.nav_est_time_label,
                                 WesternDigits.format(NavigationState.estimatedMinutes)
                             ),
-                            color = White.copy(alpha = 0.7f), fontSize = 13.sp
+                            color = MallTheme.colors.onScrimMuted, fontSize = 13.sp
                         )
                     }
                 }
@@ -463,7 +471,7 @@ fun StaticMapScreen(onBackClick: () -> Unit) {
 
         Text(
             stringResource(R.string.nav_map_gesture_hint),
-            color = White.copy(alpha = 0.5f),
+            color = MallTheme.colors.onScrimMuted,
             fontSize = 12.sp,
             modifier = Modifier
                 .align(Alignment.BottomCenter)

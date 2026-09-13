@@ -1,7 +1,5 @@
 app/src/main/java/com/example/mallar/ui/components/StoreLogo.kt:4
 app/src/main/java/com/example/mallar/ui/home/HomeSharedComponents.kt:56
-app/src/main/java/com/example/mallar/ui/navigation/UnifiedNavigationScreen.kt:27
-app/src/main/java/com/example/mallar/ui/navigation/StaticMapScreen.kt:29
 app/src/main/java/com/example/mallar/ui/chatbot/ChatBottomSheet.kt:21
 app/src/main/java/com/example/mallar/ui/home/StoreDetailScreen.kt:13
 app/src/main/java/com/example/mallar/voice/VoiceAssistantOverlay.kt:28
