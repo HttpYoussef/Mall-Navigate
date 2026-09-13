@@ -280,7 +280,7 @@ _Frontier: **none — charting done.** Execution phase: dispatch Batch 00 to `ag
 | 08 | Parking suite ×4 (54 literals) | **signed off** (`833f549`) |
 | 09 | Localization / first-run / camera ×5 | **signed off** (`0e41474`) |
 | 10 | Navigation HUD & map chrome ×2 | **signed off** (`c254a30`) |
-| 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | landed (`5934f6e`) — awaiting device sign-off |
+| 11 | Bespoke-dark overlays (ChatBottomSheet, StoreDetail, VoiceAssistant) | **signed off** (`5934f6e`) |
 | 12 | Lint-gate hard-error flip | pending |
 
 ## Not yet specified
