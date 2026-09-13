@@ -6,7 +6,6 @@ import androidx.compose.ui.graphics.Color
 import com.example.mallar.ar.model.RouteNodeMetadata
 import com.example.mallar.ar.render.FloorPlaneConfidenceMonitor
 import com.example.mallar.ar.render.GuidanceVisualFactory
-import com.example.mallar.ar.render.RenderPoseSmoother
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.Pose
@@ -16,9 +15,11 @@ import io.github.sceneview.ar.ARSceneView
 import io.github.sceneview.ar.node.AnchorNode
 import io.github.sceneview.material.setColor
 import io.github.sceneview.math.Position
+import io.github.sceneview.math.Rotation
 import io.github.sceneview.node.Node
 import io.github.sceneview.node.RenderableNode
 import dev.romainguy.kotlin.math.Float3
+import kotlin.math.hypot
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -36,7 +37,6 @@ class ArAnchorRenderer(
     private val context: Context,
     private val config: AnchorWindowConfig = AnchorWindowConfig.forTier(DeviceTier.detect(context)),
     private val planner: AnchorWindowPlanner = AnchorWindowPlanner(config),
-    val poseSmoother: RenderPoseSmoother = RenderPoseSmoother(minCutoffHz = if (config.smoothingAlpha > 0.2f) 1.5 else 1.0),
     val planeConfidenceMonitor: FloorPlaneConfidenceMonitor = FloorPlaneConfidenceMonitor(),
     val visualFactory: GuidanceVisualFactory = GuidanceVisualFactory(context)
 ) {
@@ -45,7 +45,7 @@ class ArAnchorRenderer(
         private const val FADE_STEP = 1f / 8f
     }
 
-    private data class ManagedAnchor(
+    internal data class ManagedAnchor(
         val spec: AnchorSpec,
         val anchorNode: AnchorNode,
         val marker: Node,
@@ -58,8 +58,8 @@ class ArAnchorRenderer(
         var lastTransformAcceptedAt: Long = Long.MIN_VALUE
     )
 
-    private val anchors = LinkedHashMap<Int, ManagedAnchor>()
-    private var lastTransformAcceptedAt = Long.MIN_VALUE
+    internal val anchors = LinkedHashMap<Int, ManagedAnchor>()
+    internal var lastTransformAcceptedAt = Long.MIN_VALUE
     private var lastPlanGeneration = Long.MIN_VALUE
 
     // Phase 8 Supervisory States
@@ -76,6 +76,10 @@ class ArAnchorRenderer(
             "Node#${managed.spec.node.nodeId}(kind=${managed.spec.kind}, alpha=${managed.alpha}, world=(${managed.initialWorldX}, ${managed.initialWorldZ}))"
         }
     }
+
+    fun getMarker(nodeId: Int): Node? = anchors[nodeId]?.marker
+
+    fun getMarkerRotation(nodeId: Int): Rotation? = anchors[nodeId]?.marker?.rotation
 
     fun setTransitionMode(enabled: Boolean) {
         if (isTransitionMode == enabled) return
@@ -116,24 +120,55 @@ class ArAnchorRenderer(
     }
 
     fun update(
-        sceneView: ARSceneView,
-        session: Session,
-        frame: Frame,
-        cameraPose: Pose,
-        localPose: LocalTrackingPose,
+        sceneView: ARSceneView? = null,
+        session: Session? = null,
+        frame: Frame? = null,
+        cameraPose: Pose = Pose.IDENTITY,
+        localPose: LocalTrackingPose = LocalTrackingPose(0.0, 0.0, 0f, 0L),
         transform: FacilityTransform,
         transformRevision: Long,
         route: List<RouteNodeMetadata>
     ) {
+        val transformCorrectionTriggered = transformRevision != lastTransformAcceptedAt && lastTransformAcceptedAt != Long.MIN_VALUE
         // If in transition mode or arrived, pause regular route chevron reconciliation
         if (!isTransitionMode && !isArrived) {
             val facilityPosition = transform.facilityPosition(localPose, config.pixelsPerMeter)
             val plan = planner.plan(route, facilityPosition.first, facilityPosition.second)
             if (plan.generation != lastPlanGeneration) {
+                val routeIndexRange = if (plan.active.isNotEmpty()) {
+                    "${plan.active.first().routeIndex}..${plan.active.last().routeIndex}"
+                } else {
+                    "empty"
+                }
                 Log.d(TAG, "Anchor plan updated: gen=${plan.generation}, routeSize=${route.size}, " +
-                    "plannedActive=${plan.active.size}, currentAnchors=${anchors.size}, " +
-                    "userFacilityPos=(${facilityPosition.first}, ${facilityPosition.second})")
-                reconcile(sceneView, session, frame, cameraPose, localPose, transform, transformRevision, plan, route)
+                    "cameraPose=(${cameraPose.tx()}, ${cameraPose.ty()}, ${cameraPose.tz()}), " +
+                    "facilityPosition=(${facilityPosition.first}, ${facilityPosition.second}), " +
+                    "transformRevision=$transformRevision, " +
+                    "transformCorrectionTriggered=$transformCorrectionTriggered, " +
+                    "routeIndexRange=$routeIndexRange, " +
+                    "activeAnchorNodeIds=${anchors.keys}, " +
+                    "windowNodeIds=${plan.nodeIds}, " +
+                    "plannedActive=${plan.active.size}, currentAnchors=${anchors.size}")
+                if (sceneView != null && session != null) {
+                    reconcile(sceneView, session, frame, cameraPose, localPose, transform, transformRevision, plan, route)
+                }
+                anchors.forEach { (nodeId, managed) ->
+                    val pose = runCatching { managed.anchorNode.anchor?.pose }.getOrNull()
+                    val (worldX, worldY, worldZ) = if (pose != null) {
+                        Triple(pose.tx(), pose.ty(), pose.tz())
+                    } else {
+                        val (rx, rz) = transform.worldPositionFor(
+                            managed.spec.node.x,
+                            managed.spec.node.y,
+                            config.pixelsPerMeter
+                        )
+                        Triple(rx, runCatching { managed.anchorNode.position.y }.getOrDefault(0f), rz)
+                    }
+                    val dx = worldX - cameraPose.tx()
+                    val dz = worldZ - cameraPose.tz()
+                    val planarDist = hypot(dx, dz)
+                    Log.d(TAG, "Active anchor placed: nodeId=$nodeId, world=($worldX, $worldY, $worldZ), cameraDist=${planarDist}m")
+                }
                 lastPlanGeneration = plan.generation
             }
         }
@@ -152,6 +187,8 @@ class ArAnchorRenderer(
                     (newWorldZ - managed.initialWorldZ).toDouble()
                 )
                 managed.correction.begin(currentCorrection(managed), targetCorrection)
+                val newHeadingDeg = computeMarkerHeadingDeg(managed.spec, newWorldX, newWorldZ, transform, route)
+                managed.marker.rotation = Rotation(-90f, newHeadingDeg, 0f)
                 managed.lastTransformAcceptedAt = transformRevision
             }
         }
@@ -229,7 +266,7 @@ class ArAnchorRenderer(
     private fun reconcile(
         sceneView: ARSceneView,
         session: Session,
-        frame: Frame,
+        frame: Frame?,
         cameraPose: Pose,
         localPose: LocalTrackingPose,
         transform: FacilityTransform,
@@ -255,15 +292,7 @@ class ArAnchorRenderer(
             )
             
             // Calculate next waypoint position in ARCore World Space to determine corridor tangent heading
-            val (nextWorldX, nextWorldZ) = if (spec.routeIndex < route.lastIndex) {
-                transform.worldPositionFor(route[spec.routeIndex + 1].x, route[spec.routeIndex + 1].y, config.pixelsPerMeter)
-            } else if (spec.routeIndex > 0) {
-                val (prevX, prevZ) = transform.worldPositionFor(route[spec.routeIndex - 1].x, route[spec.routeIndex - 1].y, config.pixelsPerMeter)
-                worldX + (worldX - prevX) to worldZ + (worldZ - prevZ)
-            } else {
-                worldX to worldZ + 1.0f
-            }
-            val headingDeg = GuidanceVisualFactory.computeWorldHeadingDeg(worldX, worldZ, nextWorldX, nextWorldZ)
+            val headingDeg = computeMarkerHeadingDeg(spec, worldX, worldZ, transform, route)
 
             val (floorY, plane) = planeConfidenceMonitor.resolveFloorElevation(
                 session,
@@ -318,12 +347,29 @@ class ArAnchorRenderer(
         )
     }
 
+    private fun computeMarkerHeadingDeg(
+        spec: AnchorSpec,
+        worldX: Float,
+        worldZ: Float,
+        transform: FacilityTransform,
+        route: List<RouteNodeMetadata>
+    ): Float {
+        val (nextWorldX, nextWorldZ) = if (spec.routeIndex < route.lastIndex) {
+            transform.worldPositionFor(route[spec.routeIndex + 1].x, route[spec.routeIndex + 1].y, config.pixelsPerMeter)
+        } else if (spec.routeIndex > 0) {
+            val (prevX, prevZ) = transform.worldPositionFor(route[spec.routeIndex - 1].x, route[spec.routeIndex - 1].y, config.pixelsPerMeter)
+            worldX + (worldX - prevX) to worldZ + (worldZ - prevZ)
+        } else {
+            worldX to worldZ + 1.0f
+        }
+        return GuidanceVisualFactory.computeWorldHeadingDeg(worldX, worldZ, nextWorldX, nextWorldZ)
+    }
+
     fun dispose() {
         arrivalAnchorNode?.destroy()
         arrivalAnchorNode = null
         anchors.clear()
         visualFactory.dispose()
-        poseSmoother.reset()
         planeConfidenceMonitor.reset()
         lastPlanGeneration = Long.MIN_VALUE
         lastTransformAcceptedAt = Long.MIN_VALUE
@@ -338,7 +384,6 @@ class ArAnchorRenderer(
         anchors.values.forEach { managed -> managed.anchorNode.destroy() }
         anchors.clear()
         visualFactory.dispose()
-        poseSmoother.reset()
         planeConfidenceMonitor.reset()
         lastPlanGeneration = Long.MIN_VALUE
         lastTransformAcceptedAt = Long.MIN_VALUE

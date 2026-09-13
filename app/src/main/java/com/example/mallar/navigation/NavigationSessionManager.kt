@@ -168,6 +168,7 @@ class NavigationSessionManager(
     fun onStep(totalSteps: Long, strideLengthM: Float) {
         val tracker = positionTracker ?: return
         val state = _sessionState.value
+        Log.d(TAG, "onStep: currentSegmentIdx=${state.segmentIdx}")
         
         if (state.isPausedForFloorTransition) {
             _sessionState.update { it.copy(totalSteps = totalSteps) }
@@ -227,6 +228,11 @@ class NavigationSessionManager(
         val (smoothX, smoothY) = smoother.smoothPosition(snapResult.snappedX, snapResult.snappedY)
         val headingForSmooth = positionTracker?.currentHeadingDeg ?: state.headingDeg
         val smoothHeading = smoother.smoothHeading(headingForSmooth)
+
+        Log.d(
+            TAG,
+            "processNavigationUpdate: snapped=(${snapResult.snappedX}, ${snapResult.snappedY}), smoothed=($smoothX, $smoothY)"
+        )
 
         val finalNode = path.lastOrNull()
         if (finalNode != null) {

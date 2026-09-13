@@ -111,16 +111,16 @@ class FixValidationGate(
         val x = candidate.facilityX
         val y = candidate.facilityY
         if (x == null || y == null || !x.isFinite() || !y.isFinite()) {
-            return reject(FixRejectionReason.MISSING_POSITION)
+            return reject(FixRejectionReason.MISSING_POSITION, candidate)
         }
 
         val nearest = MallGraphRepository.findNearestNode(graph, x, y)
         if (nearest == null || hypot(nearest.x - x, nearest.y - y) > graphTolerancePx) {
-            return reject(FixRejectionReason.GRAPH_IMPLAUSIBLE)
+            return reject(FixRejectionReason.GRAPH_IMPLAUSIBLE, candidate)
         }
         candidate.bestStartNode?.let { candidateNode ->
             if (graph.nodes.none { it.id == candidateNode.id }) {
-                return reject(FixRejectionReason.GRAPH_IMPLAUSIBLE)
+                return reject(FixRejectionReason.GRAPH_IMPLAUSIBLE, candidate)
             }
         }
 
@@ -129,7 +129,7 @@ class FixValidationGate(
             val elapsedSec = ((nowMs - previous.acceptedAtMs).coerceAtLeast(1L)) / 1000.0
             val displacementM = hypot(x - previous.facilityX, y - previous.facilityY) / pixelsPerMeter
             if (displacementM / elapsedSec > maxImpliedSpeedMps) {
-                return reject(FixRejectionReason.DISPLACEMENT_IMPLAUSIBLE)
+                return reject(FixRejectionReason.DISPLACEMENT_IMPLAUSIBLE, candidate)
             }
         }
 
@@ -139,19 +139,25 @@ class FixValidationGate(
             confirmedTolerancePx
         }
         if (hypot(nearest.x - x, nearest.y - y) > tierTolerance) {
-            return reject(FixRejectionReason.TIER_TOLERANCE_EXCEEDED)
+            return reject(FixRejectionReason.TIER_TOLERANCE_EXCEEDED, candidate)
+        }
+
+        val reconciledHeadingDeg = if (candidate.headingDeg != null) {
+            candidate.headingDeg - localPose.headingDeg
+        } else {
+            previous?.headingDeg ?: localPose.headingDeg
         }
 
         val transform = FacilityTransform(
             facilityX = x,
             facilityY = y,
-            headingDeg = candidate.headingDeg ?: previous?.headingDeg ?: localPose.headingDeg,
+            headingDeg = reconciledHeadingDeg,
             localOrigin = localPose,
             tier = candidate.tier,
             acceptedAtMs = nowMs
         )
         currentTransform = transform
-        Log.d(TAG, "Accepted ${candidate.tier} fix at ($x,$y), landmarks=${candidate.landmarkCount}")
+        Log.d(TAG, "Accepted ${candidate.tier} fix at ($x,$y), candidateHeading=${candidate.headingDeg}, landmarks=${candidate.landmarkCount}")
         return FixValidationDecision.Accepted(transform)
     }
 
@@ -165,8 +171,8 @@ class FixValidationGate(
         currentTransform = transform
     }
 
-    private fun reject(reason: FixRejectionReason): FixValidationDecision.Rejected {
-        Log.d(TAG, "Rejected candidate fix: $reason")
+    private fun reject(reason: FixRejectionReason, candidate: CandidateFix): FixValidationDecision.Rejected {
+        Log.d(TAG, "Rejected candidate fix: $reason, candidateHeading=${candidate.headingDeg}")
         return FixValidationDecision.Rejected(reason)
     }
 }
@@ -239,15 +245,21 @@ class LocalizationLayer(
         startNode: GraphNode,
         initialHeadingDeg: Float?,
         localPose: LocalTrackingPose,
-        nowMs: Long = localPose.timestampMs
+        nowMs: Long = localPose.timestampMs,
+        landmarkCount: Int = 0
     ) {
+        val reconciledHeadingDeg = if (initialHeadingDeg != null) {
+            initialHeadingDeg - localPose.headingDeg
+        } else {
+            localPose.headingDeg
+        }
         gate.seed(
             FacilityTransform(
                 facilityX = startNode.x,
                 facilityY = startNode.y,
-                headingDeg = initialHeadingDeg ?: localPose.headingDeg,
+                headingDeg = reconciledHeadingDeg,
                 localOrigin = localPose,
-                tier = FixConfidenceTier.CONFIRMED,
+                tier = FixConfidenceTier.fromLandmarkCount(landmarkCount),
                 acceptedAtMs = nowMs
             )
         )
@@ -281,7 +293,12 @@ class LocalizationLayer(
     ): FixValidationDecision {
         return try {
             gate.validateAndApply(candidate, localPose, nowMs).also { decision ->
-                if (decision is FixValidationDecision.Accepted) {
+                val accepted = decision is FixValidationDecision.Accepted
+                Log.d(
+                    TAG,
+                    "Periodic fix evaluated: accepted=$accepted, candidateHeading=${candidate.headingDeg}, decision=$decision"
+                )
+                if (accepted) {
                     revision++
                     consecutiveRejections = 0
                 } else {

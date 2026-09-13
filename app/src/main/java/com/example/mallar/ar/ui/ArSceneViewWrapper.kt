@@ -44,6 +44,8 @@ import kotlin.math.atan2
  * Handles sequential camera handoff and Android lifecycle integration.
  * Phase 8 integrates Module 8 DriftRecoverySupervisor into frame update loop.
  */
+private const val TAG = "ArSceneViewWrapper"
+
 @Composable
 fun ArSceneViewWrapper(
     modifier: Modifier = Modifier,
@@ -52,6 +54,7 @@ fun ArSceneViewWrapper(
     routePathLayer: RoutePathLayer? = null,
     initialStartNode: GraphNode? = null,
     initialHeadingDeg: Float? = null,
+    initialLandmarkCount: Int = 0,
     active: Boolean = true,
     supervisor: DriftRecoverySupervisor? = null,
     driftState: DriftMonitor.DriftState? = null
@@ -66,6 +69,8 @@ fun ArSceneViewWrapper(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
+            planeRenderer.isEnabled = false
+            planeRenderer.isVisible = false
         }
     }
 
@@ -119,6 +124,14 @@ fun ArSceneViewWrapper(
                 camera.trackingFailureReason
             )
 
+            val qx = camera.pose.qx()
+            val qy = camera.pose.qy()
+            val qz = camera.pose.qz()
+            val qw = camera.pose.qw()
+            val sinyCosp = 2.0 * (qw * qy + qx * qz)
+            val cosyCosp = 1.0 - 2.0 * (qy * qy + qz * qz)
+            val cameraYawDeg = Math.toDegrees(atan2(sinyCosp, cosyCosp)).toFloat()
+
             // Phase 5 slow localization cycle. The camera image is copied from
             // this ARCore frame, then recognition runs off the render thread.
             if (localizationLayer != null && graph != null && camera.trackingState == TrackingState.TRACKING) {
@@ -127,13 +140,13 @@ fun ArSceneViewWrapper(
                 val localPose = LocalTrackingPose(
                     xMeters = pose.tx().toDouble(),
                     yMeters = pose.tz().toDouble(),
-                    headingDeg = 0f,
+                    headingDeg = cameraYawDeg,
                     timestampMs = now
                 )
                 if (localizationLayer.transform == null && initialStartNode != null) {
-                    localizationLayer.initializeFromScan(initialStartNode, initialHeadingDeg, localPose, now)
+                    localizationLayer.initializeFromScan(initialStartNode, initialHeadingDeg, localPose, now, initialLandmarkCount)
                     supervisor?.onInitialFixAccepted(now)
-                    Log.d("ArSceneViewWrapper", "Initialized transform from start node #${initialStartNode.id} (${initialStartNode.x}, ${initialStartNode.y})")
+                    Log.d(TAG, "Initialized transform from start node #${initialStartNode.id} (${initialStartNode.x}, ${initialStartNode.y})")
                 }
                 if (localizationLayer.beginPeriodicRefix(now, localPose)) {
                     val imageSnapshot = sessionManager.copyCameraImage(frame)
@@ -176,13 +189,6 @@ fun ArSceneViewWrapper(
 
             // Phase 8 Supervisory Layer evaluation
             if (supervisor != null) {
-                val qx = camera.pose.qx()
-                val qy = camera.pose.qy()
-                val qz = camera.pose.qz()
-                val qw = camera.pose.qw()
-                val sinyCosp = 2.0 * (qw * qy + qx * qz)
-                val cosyCosp = 1.0 - 2.0 * (qy * qy + qz * qz)
-                val cameraYawDeg = Math.toDegrees(atan2(sinyCosp, cosyCosp)).toFloat()
                 val userFacilityHeadingDeg = (localizationLayer?.transform?.headingDeg ?: 0f) + cameraYawDeg
 
                 val instruction = supervisor.evaluate(
@@ -241,12 +247,14 @@ fun ArSceneViewWrapper(
                 }
             }
 
-            // Periodic diagnostic log every 2 seconds
-            if (camera.trackingState == TrackingState.TRACKING && frameNow - lastDiagnosticLogMs >= 2000L) {
+            // Periodic diagnostic log once per second
+            if (camera.trackingState == TrackingState.TRACKING && frameNow - lastDiagnosticLogMs >= 1000L) {
                 lastDiagnosticLogMs = frameNow
                 Log.d(
-                    "ArSceneViewWrapper",
-                    "Diagnostics: transformReady=${localizationLayer?.transform != null}, " +
+                    TAG,
+                    "Diagnostics: localPose=(x=${camera.pose.tx()}, y=${camera.pose.tz()}, heading=$cameraYawDeg), " +
+                        "transformRevision=${localizationLayer?.transformRevision}, " +
+                        "transformReady=${localizationLayer?.transform != null}, " +
                         "routeNodes=${routePathLayer?.getRouteMetadata()?.size ?: 0}, " +
                         "activeAnchors=${anchorRenderer.activeAnchorCount}, " +
                         "supervisorState=${supervisor?.state}, " +
@@ -264,7 +272,7 @@ fun ArSceneViewWrapper(
                 sceneView.setManagedSession(session)
             }
         } catch (e: Exception) {
-            Log.e("ArSceneViewWrapper", "Error establishing managed ARSession", e)
+            Log.e(TAG, "Error establishing managed ARSession", e)
         }
         lifecycleOwner.lifecycle.addObserver(observer)
 
@@ -298,10 +306,18 @@ fun ArSceneViewWrapper(
     )
 }
 
-private fun localPoseFor(pose: com.google.ar.core.Pose, timestampMs: Long): LocalTrackingPose =
-    LocalTrackingPose(
+private fun localPoseFor(pose: com.google.ar.core.Pose, timestampMs: Long): LocalTrackingPose {
+    val qx = pose.qx()
+    val qy = pose.qy()
+    val qz = pose.qz()
+    val qw = pose.qw()
+    val sinyCosp = 2.0 * (qw * qy + qx * qz)
+    val cosyCosp = 1.0 - 2.0 * (qy * qy + qz * qz)
+    val cameraYawDeg = Math.toDegrees(atan2(sinyCosp, cosyCosp)).toFloat()
+    return LocalTrackingPose(
         xMeters = pose.tx().toDouble(),
         yMeters = pose.tz().toDouble(),
-        headingDeg = 0f,
+        headingDeg = cameraYawDeg,
         timestampMs = timestampMs
     )
+}
