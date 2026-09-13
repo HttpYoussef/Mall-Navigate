@@ -32,15 +32,13 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import com.example.mallar.R
 import com.example.mallar.data.StartupState
-import com.example.mallar.ui.theme.DarkSystemBars
+import com.example.mallar.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 // ── Design Tokens ────────────────────────────────────────────────────────────
-private val DesignNavy = Color(0xFF06131A)
-private val DesignPurple = Color(0xFF9D50FF)
-private val DesignCyan = Color(0xFF19D3E6)
+private val SplashVignetteDark = Color(0xFF0D1E26) // theme-lint:allow bespoke illustration fill (splash atmosphere)
 
 /**
  * High-fidelity Splash Screen optimized for performance and stability.
@@ -103,7 +101,7 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DesignNavy)
+            .background(DarkTeal)
             .graphicsLayer { alpha = mainAlpha.value }
     ) {
         // ── 1. Atmospheric Background Layer ──────────────────────────────────
@@ -126,10 +124,10 @@ fun SplashScreen(
             Box(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 60.dp)) {
                 Button(
                     onClick = onRetry,
-                    colors = ButtonDefaults.buttonColors(containerColor = DesignPurple.copy(alpha = 0.2f)),
-                    border = BorderStroke(1.dp, DesignPurple.copy(alpha = 0.5f))
+                    colors = ButtonDefaults.buttonColors(containerColor = Teal.copy(alpha = 0.2f)), // theme-lint:allow splash fixed-identity accent
+                    border = BorderStroke(1.dp, Teal.copy(alpha = 0.5f)) // theme-lint:allow splash fixed-identity accent
                 ) {
-                    Text(stringResource(R.string.splash_retry_connection), color = Color.White)
+                    Text(stringResource(R.string.splash_retry_connection), color = White)
                 }
             }
         }
@@ -154,7 +152,7 @@ private fun AtmosphericLayer(particles: List<Particle>) {
         // Base Vignette (Radial gradients can be cached but small ones are cheap)
         drawRect(
             brush = Brush.radialGradient(
-                colors = listOf(Color(0xFF0D1E26), DesignNavy),
+                colors = listOf(SplashVignetteDark, DarkTeal),
                 center = Offset(w / 2, h / 2),
                 radius = w * 1.5f
             )
@@ -165,14 +163,14 @@ private fun AtmosphericLayer(particles: List<Particle>) {
             val x = (p.x * w + drift * p.speed) % w
             val y = (p.y * h + drift * 0.5f * p.speed) % h
             drawCircle(
-                color = Color.White.copy(alpha = p.alpha),
+                color = White.copy(alpha = p.alpha), // theme-lint:allow decorative splash particle
                 radius = p.size,
                 center = Offset(x, y)
             )
         }
 
         // Faint Building Wireframes
-        val buildingColor = Color.White.copy(alpha = 0.05f)
+        val buildingColor = White.copy(alpha = 0.05f) // theme-lint:allow decorative splash wireframe
         drawRect(buildingColor, Offset(w * 0.05f, h * 0.3f), Size(w * 0.15f, h * 0.4f), style = Stroke(1f))
         drawRect(buildingColor, Offset(w * 0.8f, h * 0.25f), Size(w * 0.15f, h * 0.5f), style = Stroke(1f))
     }
@@ -194,7 +192,7 @@ private fun PerspectiveFloor(progressProvider: () -> Float) {
         val gridAlpha = 0.08f
         for (i in 0..12) {
             drawLine(
-                color = DesignCyan.copy(alpha = gridAlpha),
+                color = TealLight.copy(alpha = gridAlpha), // theme-lint:allow decorative splash grid
                 start = Offset(w / 2, horizonY),
                 end = Offset((w / 12) * i, h),
                 strokeWidth = 1f
@@ -202,7 +200,7 @@ private fun PerspectiveFloor(progressProvider: () -> Float) {
         }
         for (i in 1..8) {
             val y = horizonY + (h - horizonY) * (i * i / 64f)
-            drawLine(color = DesignPurple.copy(alpha = gridAlpha), start = Offset(0f, y), end = Offset(w, y), strokeWidth = 1f)
+            drawLine(color = Teal.copy(alpha = gridAlpha), start = Offset(0f, y), end = Offset(w, y), strokeWidth = 1f) // theme-lint:allow decorative splash grid
         }
 
         // Glowing Navigation Path (re-calculate only when size changes)
@@ -221,14 +219,14 @@ private fun PerspectiveFloor(progressProvider: () -> Float) {
             // but we use progress to drive a DashPathEffect which is standard.
             val drawEffect = PathEffect.dashPathEffect(floatArrayOf(pathLength * progress, pathLength), 0f)
             
-            drawPath(path, DesignPurple.copy(alpha = 0.15f), style = Stroke(24f, cap = StrokeCap.Round, pathEffect = drawEffect))
-            drawPath(path, DesignPurple.copy(alpha = 0.4f), style = Stroke(10f, cap = StrokeCap.Round, pathEffect = drawEffect))
-            drawPath(path, Color.White.copy(alpha = 0.9f), style = Stroke(3f, cap = StrokeCap.Round, pathEffect = drawEffect))
+            drawPath(path, Teal.copy(alpha = 0.15f), style = Stroke(24f, cap = StrokeCap.Round, pathEffect = drawEffect)) // theme-lint:allow decorative splash path
+            drawPath(path, Teal.copy(alpha = 0.4f), style = Stroke(10f, cap = StrokeCap.Round, pathEffect = drawEffect)) // theme-lint:allow decorative splash path
+            drawPath(path, White.copy(alpha = 0.9f), style = Stroke(3f, cap = StrokeCap.Round, pathEffect = drawEffect)) // theme-lint:allow decorative splash path
         }
         
         if (progress > 0.8f) {
-            drawCircle(DesignPurple, 8f, Offset(w * 0.72f, h * 0.68f))
-            drawCircle(DesignPurple.copy(alpha = 0.3f), 20f, Offset(w * 0.72f, h * 0.68f))
+            drawCircle(Teal, 8f, Offset(w * 0.72f, h * 0.68f))
+            drawCircle(Teal.copy(alpha = 0.3f), 20f, Offset(w * 0.72f, h * 0.68f)) // theme-lint:allow decorative splash path dot
         }
     }
 }
@@ -259,13 +257,13 @@ private fun TopLeftMark() {
                         lineTo(0f, s)
                     }
                 }
-                drawPath(p, DesignCyan, style = Stroke(2.dp.toPx(), cap = StrokeCap.Round))
+                drawPath(p, TealLight, style = Stroke(2.dp.toPx(), cap = StrokeCap.Round))
                 if (isRtl) {
-                    drawCircle(DesignCyan, 4f, Offset(0f, 0f))
-                    drawCircle(DesignCyan, 4f, Offset(s, s))
+                    drawCircle(TealLight, 4f, Offset(0f, 0f))
+                    drawCircle(TealLight, 4f, Offset(s, s))
                 } else {
-                    drawCircle(DesignCyan, 4f, Offset(s, 0f))
-                    drawCircle(DesignCyan, 4f, Offset(0f, s))
+                    drawCircle(TealLight, 4f, Offset(s, 0f))
+                    drawCircle(TealLight, 4f, Offset(0f, s))
                 }
             }
 
@@ -273,21 +271,21 @@ private fun TopLeftMark() {
                 Text(
                     text = stringResource(R.string.splash_navigate),
                     style = TextStyle(
-                        color = Color.White,
+                        color = White,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp,
-                        shadow = Shadow(DesignCyan.copy(alpha = 0.5f), blurRadius = 20f)
+                        shadow = Shadow(TealLight.copy(alpha = 0.5f), blurRadius = 20f) // theme-lint:allow decorative splash wordmark shadow
                     )
                 )
                 Text(
                     text = stringResource(R.string.splash_through_anywhere),
                     style = TextStyle(
-                        color = Color.White,
+                        color = White,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp,
-                        shadow = Shadow(DesignPurple.copy(alpha = 0.5f), blurRadius = 20f)
+                        shadow = Shadow(Teal.copy(alpha = 0.5f), blurRadius = 20f) // theme-lint:allow decorative splash wordmark shadow
                     )
                 )
             }
@@ -323,7 +321,7 @@ private fun CenterIdentity(
                     .graphicsLayer { alpha = glowProvider() * 0.35f }
                     .background(
                         Brush.radialGradient(
-                            colors = listOf(DesignPurple, Color.Transparent)
+                            colors = listOf(Teal, Color.Transparent)
                         ),
                         CircleShape
                     )
@@ -343,7 +341,7 @@ private fun CenterIdentity(
         Text(
             text = stringResource(R.string.app_wordmark),
             style = TextStyle(
-                color = Color.White,
+                color = White,
                 fontSize = 42.sp,
                 fontWeight = FontWeight.ExtraBold,
                 letterSpacing = 2.sp
@@ -353,7 +351,7 @@ private fun CenterIdentity(
         Text(
             text = stringResource(R.string.splash_indoor_navigation),
             style = TextStyle(
-                color = Color.White.copy(alpha = 0.6f),
+                color = White.copy(alpha = 0.6f), // theme-lint:allow decorative splash subtitle
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 letterSpacing = 6.sp

@@ -81,6 +81,8 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
+private val MapButtonSecondary = Color(0xFF455A64) // theme-lint:allow decorative secondary-action fill, distinct from primary teal CTA
+
 // ── Global navigation state (start + end + A* path) ──────────────────────────────
 object NavigationState {
     var startPlace: Place?           = null
@@ -156,6 +158,9 @@ fun LogoScanScreen(
     }
 
     var flow               by remember { mutableStateOf(ScreenFlow.CAMERA_IDLE) }
+    if (flow != ScreenFlow.PICK_DESTINATION && flow != ScreenFlow.DESTINATION_DETAIL) {
+        DarkSystemBars()
+    }
     var scanState          by remember { mutableStateOf(ScanState.IDLE) }
     var detectedBrand      by remember { mutableStateOf<String?>(null) }
     var detectedScore      by remember { mutableStateOf(0f) }
@@ -333,7 +338,7 @@ fun LogoScanScreen(
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF5F7FA))) {
+    Box(modifier = Modifier.fillMaxSize().background(MallTheme.colors.scrimSurface)) {
 
         // CAMERA PREVIEW
         AndroidView(factory = { previewView }, modifier = Modifier.fillMaxSize())
@@ -346,10 +351,10 @@ fun LogoScanScreen(
         AnimatedVisibility(visible = isMallDataLoading, modifier = Modifier.align(Alignment.Center),
             enter = fadeIn(), exit = fadeOut()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                CircularProgressIndicator(color = Teal, modifier = Modifier.size(48.dp), strokeWidth = 3.dp)
+                CircularProgressIndicator(color = MallTheme.colors.accentText, modifier = Modifier.size(48.dp), strokeWidth = 3.dp)
                 Spacer(Modifier.height(12.dp))
-                Surface(shape = RoundedCornerShape(20.dp), color = Color.Black.copy(0.7f)) {
-                    Text("Initialising mall map…", color = White, fontSize = 14.sp,
+                Surface(shape = RoundedCornerShape(20.dp), color = MallTheme.colors.scrim.copy(alpha = 0.7f)) {
+                    Text("Initialising mall map…", color = MallTheme.colors.onScrim, fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp))
                 }
@@ -364,10 +369,10 @@ fun LogoScanScreen(
             exit = fadeOut()
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                CircularProgressIndicator(color = Teal, modifier = Modifier.size(40.dp), strokeWidth = 3.dp)
+                CircularProgressIndicator(color = MallTheme.colors.accentText, modifier = Modifier.size(40.dp), strokeWidth = 3.dp)
                 Spacer(Modifier.height(10.dp))
-                Surface(shape = RoundedCornerShape(20.dp), color = Color.Black.copy(0.65f)) {
-                    Text("Loading logo scanner…", color = White, fontSize = 13.sp,
+                Surface(shape = RoundedCornerShape(20.dp), color = MallTheme.colors.scrim.copy(alpha = 0.65f)) {
+                    Text("Loading logo scanner…", color = MallTheme.colors.onScrim, fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(horizontal = 18.dp, vertical = 9.dp))
                 }
@@ -380,9 +385,9 @@ fun LogoScanScreen(
             LaunchedEffect(scanState) {
                 if (scanState == ScanState.NOT_FOUND) { kotlinx.coroutines.delay(2500); scanState = ScanState.IDLE }
             }
-            Surface(shape = RoundedCornerShape(20.dp), color = Color(0xFFB71C1C).copy(0.9f)) {
+            Surface(shape = RoundedCornerShape(20.dp), color = MallTheme.colors.error.copy(alpha = 0.9f)) { // theme-lint:allow decorative not-found banner
                 Text("No logo recognised — point camera at a store sign and try again",
-                    color = White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                    color = MallTheme.colors.onScrim, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 14.dp))
             }
@@ -392,10 +397,10 @@ fun LogoScanScreen(
         AnimatedVisibility(visible = scanState == ScanState.SCANNING,
             modifier = Modifier.align(Alignment.Center), enter = fadeIn(), exit = fadeOut()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                CircularProgressIndicator(color = Teal, modifier = Modifier.size(56.dp), strokeWidth = 4.dp)
+                CircularProgressIndicator(color = MallTheme.colors.accentText, modifier = Modifier.size(56.dp), strokeWidth = 4.dp)
                 Spacer(Modifier.height(14.dp))
-                Surface(shape = RoundedCornerShape(20.dp), color = Color.Black.copy(0.6f)) {
-                    Text("Scanning logo…", color = White, fontWeight = FontWeight.SemiBold,
+                Surface(shape = RoundedCornerShape(20.dp), color = MallTheme.colors.scrim.copy(alpha = 0.6f)) {
+                    Text("Scanning logo…", color = MallTheme.colors.onScrim, fontWeight = FontWeight.SemiBold,
                         fontSize = 15.sp,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp))
                 }
@@ -406,15 +411,15 @@ fun LogoScanScreen(
         AnimatedVisibility(visible = scanState == ScanState.LOCALIZING,
             modifier = Modifier.align(Alignment.Center), enter = fadeIn(), exit = fadeOut()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                CircularProgressIndicator(color = Teal, modifier = Modifier.size(64.dp), strokeWidth = 5.dp)
+                CircularProgressIndicator(color = MallTheme.colors.accentText, modifier = Modifier.size(64.dp), strokeWidth = 5.dp)
                 Spacer(Modifier.height(14.dp))
-                Surface(shape = RoundedCornerShape(20.dp), color = Color.Black.copy(0.75f)) {
+                Surface(shape = RoundedCornerShape(20.dp), color = MallTheme.colors.scrim.copy(alpha = 0.75f)) {
                     Column(Modifier.padding(horizontal = 24.dp, vertical = 14.dp),
                         horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("🔎 Detecting landmarks…", color = White,
+                        Text("🔎 Detecting landmarks…", color = MallTheme.colors.onScrim,
                             fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
                         Spacer(Modifier.height(4.dp))
-                        Text("Estimating your position", color = White.copy(0.75f), fontSize = 12.sp)
+                        Text("Estimating your position", color = MallTheme.colors.onScrimMuted, fontSize = 12.sp)
                     }
                 }
             }
@@ -505,7 +510,7 @@ fun LogoScanScreen(
                             },
                             modifier = Modifier.fillMaxWidth().height(52.dp),
                             shape = RoundedCornerShape(26.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = if (detectedPlace != null) Teal else Color.Gray)
+                            colors = ButtonDefaults.buttonColors(containerColor = if (detectedPlace != null) MallTheme.colors.accent else MallTheme.colors.textDisabled)
                         ) {
                             Text(if (detectedPlace != null) "Yes, I'm here" else "Not found — Scan Again",
                                 fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = White)
@@ -533,42 +538,42 @@ fun LogoScanScreen(
         AnimatedVisibility(visible = flow == ScreenFlow.PICK_DESTINATION && !preselectedDestination,
             enter = fadeIn(tween(200)) + slideInVertically(tween(250)) { it / 10 },
             exit  = fadeOut(tween(150)) + slideOutVertically(tween(200)) { it / 10 }) {
-            Column(Modifier.fillMaxSize().background(if (isDarkMode) com.example.mallar.ui.theme.DarkBackground else White)) {
-                Column(Modifier.fillMaxWidth().background(if (isDarkMode) com.example.mallar.ui.theme.DarkSurface else Teal).statusBarsPadding()
+            Column(Modifier.fillMaxSize().background(MallTheme.colors.screenBackground)) {
+                Column(Modifier.fillMaxWidth().background(if (isDarkMode) MallTheme.colors.surface else MallTheme.colors.accent).statusBarsPadding()
                     .padding(horizontal = 14.dp, vertical = 12.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(onClick = { flow = ScreenFlow.SCAN_CONFIRM; searchQuery = "" },
                             modifier = Modifier.size(40.dp), shape = CircleShape,
-                            color = White.copy(0.25f)) {
+                            color = MallTheme.colors.onAccent.copy(alpha = 0.25f)) { // theme-lint:allow decorative header back-button tint
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = White)
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MallTheme.colors.onAccent)
                             }
                         }
                         Spacer(Modifier.width(10.dp))
                         Column {
                             Text("From: ${startPlace?.brand ?: "My Location"}",
-                                color = White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                            Text("Where do you want to go?", color = White.copy(0.8f), fontSize = 11.sp)
+                                color = MallTheme.colors.onAccent, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("Where do you want to go?", color = MallTheme.colors.onAccent.copy(alpha = 0.8f), fontSize = 11.sp) // theme-lint:allow decorative header back-button tint
                         }
                     }
                     Spacer(Modifier.height(10.dp))
                     Surface(Modifier.fillMaxWidth().height(46.dp).shadow(if (isDarkMode) 0.dp else 6.dp, RoundedCornerShape(23.dp)),
-                        RoundedCornerShape(23.dp), color = if (isDarkMode) com.example.mallar.ui.theme.DarkCard else White) {
+                        RoundedCornerShape(23.dp), color = MallTheme.colors.surface) {
                         Row(Modifier.fillMaxSize().padding(horizontal = 14.dp),
                             verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.Search, null, tint = TextSecondary.copy(0.6f), modifier = Modifier.size(18.dp))
+                            Icon(Icons.Filled.Search, null, tint = MallTheme.colors.textSecondary, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
                             BasicTextField(value = searchQuery, onValueChange = { searchQuery = it },
-                                textStyle = LocalTextStyle.current.copy(fontSize = 15.sp, color = if (isDarkMode) com.example.mallar.ui.theme.DarkTextPrimary else TextPrimary),
+                                textStyle = LocalTextStyle.current.copy(fontSize = 15.sp, color = MallTheme.colors.textPrimary),
                                 modifier = Modifier.weight(1f), singleLine = true,
                                 decorationBox = { inner ->
                                     if (searchQuery.isEmpty()) Text("Search destination…",
-                                        color = TextSecondary.copy(0.5f), fontSize = 15.sp)
+                                        color = MallTheme.colors.textSecondary, fontSize = 15.sp)
                                     inner()
                                 })
                             if (searchQuery.isNotEmpty()) {
                                 IconButton(onClick = { searchQuery = "" }, modifier = Modifier.size(28.dp)) {
-                                    Icon(Icons.Filled.Close, null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Filled.Close, null, tint = MallTheme.colors.textSecondary, modifier = Modifier.size(16.dp))
                                 }
                             }
                         }
@@ -579,13 +584,13 @@ fun LogoScanScreen(
                     itemsIndexed(filteredPlaces) { _, place ->
                         DestinationRow(place = place, startPlace = startPlace, mallGraph = mallGraph,
                             onClick = { destination = place; flow = ScreenFlow.DESTINATION_DETAIL })
-                        HorizontalDivider(color = DividerColor.copy(0.4f), thickness = 0.7.dp,
+                        HorizontalDivider(color = MallTheme.colors.divider, thickness = 0.7.dp,
                             modifier = Modifier.padding(start = 82.dp))
                     }
                     if (filteredPlaces.isEmpty()) {
                         item {
                             Box(Modifier.fillMaxWidth().padding(top = 60.dp), Alignment.Center) {
-                                Text("No stores found", color = TextSecondary, fontSize = 16.sp)
+                                Text("No stores found", color = MallTheme.colors.textSecondary, fontSize = 16.sp)
                             }
                         }
                     }
@@ -601,7 +606,7 @@ fun LogoScanScreen(
             exit  = fadeOut(tween(150))) {
             val dest = destination
             if (dest != null) {
-                Box(Modifier.fillMaxSize().background(if (isDarkMode) com.example.mallar.ui.theme.DarkBackground else Color(0xFFF5F7FA))) {
+                Box(Modifier.fillMaxSize().background(MallTheme.colors.screenBackground)) {
                     Row(Modifier.fillMaxWidth().statusBarsPadding()
                         .padding(horizontal = 14.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically) {
@@ -614,25 +619,25 @@ fun LogoScanScreen(
                                 destination = null
                             }
                         },
-                            modifier = Modifier.size(42.dp), shape = CircleShape, color = if (isDarkMode) com.example.mallar.ui.theme.DarkCard else White.copy(0.9f)) {
+                            modifier = Modifier.size(42.dp), shape = CircleShape, color = MallTheme.colors.surface) {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = if (isDarkMode) White else TextPrimary)
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MallTheme.colors.textPrimary)
                             }
                         }
                         Spacer(Modifier.width(10.dp))
                         Surface(Modifier.weight(1f).height(44.dp).shadow(if (isDarkMode) 0.dp else 6.dp, RoundedCornerShape(22.dp)),
-                            RoundedCornerShape(22.dp), color = if (isDarkMode) com.example.mallar.ui.theme.DarkCard else White) {
+                            RoundedCornerShape(22.dp), color = MallTheme.colors.surface) {
                             Box(Modifier.fillMaxSize().padding(horizontal = 16.dp), Alignment.CenterStart) {
-                                Text(dest.brand, color = if (isDarkMode) White else TextPrimary, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+                                Text(dest.brand, color = MallTheme.colors.textPrimary, fontWeight = FontWeight.Medium, fontSize = 15.sp)
                             }
                         }
                     }
                     Surface(Modifier.fillMaxWidth().align(Alignment.Center)
                         .padding(horizontal = 16.dp).shadow(if (isDarkMode) 0.dp else 24.dp, RoundedCornerShape(28.dp)),
-                        RoundedCornerShape(28.dp), color = if (isDarkMode) com.example.mallar.ui.theme.DarkCard else White) {
+                        RoundedCornerShape(28.dp), color = MallTheme.colors.surface) {
                         Column(Modifier.padding(20.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Surface(Modifier.size(70.dp), RoundedCornerShape(16.dp), color = SurfaceLight) {
+                                Surface(Modifier.size(70.dp), RoundedCornerShape(16.dp), color = MallTheme.colors.imagePlaceholder) {
                                     AsyncImage(
                                         model = ImageRequest.Builder(context)
                                             .data("file:///android_asset/${dest.logo}").crossfade(true).build(),
@@ -641,16 +646,16 @@ fun LogoScanScreen(
                                 }
                                 Spacer(Modifier.width(14.dp))
                                 Column(Modifier.weight(1f)) {
-                                    Text(dest.brand, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = if (isDarkMode) White else TextPrimary)
+                                    Text(dest.brand, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = MallTheme.colors.textPrimary)
                                     Spacer(Modifier.height(4.dp))
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Filled.LocationOn, null, tint = RedAccent, modifier = Modifier.size(14.dp))
                                         Spacer(Modifier.width(3.dp))
-                                        Text("${destDistM}m", color = if (isDarkMode) White.copy(0.7f) else TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                        Text("${destDistM}m", color = MallTheme.colors.textSecondary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                         Spacer(Modifier.width(12.dp))
                                         Icon(Icons.Filled.AccessTime, null, tint = RedAccent, modifier = Modifier.size(14.dp))
                                         Spacer(Modifier.width(3.dp))
-                                        Text("${destMins}min", color = if (isDarkMode) White.copy(0.7f) else TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                        Text("${destMins}min", color = MallTheme.colors.textSecondary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                                 Surface(onClick = {
@@ -662,20 +667,20 @@ fun LogoScanScreen(
                                         destination = null
                                     }
                                 },
-                                    modifier = Modifier.size(32.dp), shape = CircleShape, color = SurfaceLight) {
+                                    modifier = Modifier.size(32.dp), shape = CircleShape, color = MallTheme.colors.surface) {
                                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Filled.Close, null, tint = TextSecondary, modifier = Modifier.size(14.dp))
+                                        Icon(Icons.Filled.Close, null, tint = MallTheme.colors.textSecondary, modifier = Modifier.size(14.dp))
                                     }
                                 }
                             }
                             if (startPlace != null) {
                                 Spacer(Modifier.height(10.dp))
-                                Surface(shape = RoundedCornerShape(12.dp), color = Teal.copy(0.08f)) {
+                                Surface(shape = RoundedCornerShape(12.dp), color = MallTheme.colors.accent.copy(alpha = 0.08f)) { // theme-lint:allow decorative icon-badge tint
                                     Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                                         verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(Icons.Filled.MyLocation, null, tint = Teal, modifier = Modifier.size(16.dp))
+                                        Icon(Icons.Filled.MyLocation, null, tint = MallTheme.colors.accent, modifier = Modifier.size(16.dp))
                                         Spacer(Modifier.width(8.dp))
-                                        Text("From: ${startPlace!!.brand}", color = Teal, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                        Text("From: ${startPlace!!.brand}", color = MallTheme.colors.accent, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }
@@ -685,18 +690,18 @@ fun LogoScanScreen(
                                     onClick = { startNavigation(context, mallGraph, startPlace, destination, destDistM, onStoreSelected, useAr = true) },
                                     modifier = Modifier.weight(1f).height(54.dp),
                                     shape = RoundedCornerShape(27.dp),
-                                    colors = ButtonDefaults.buttonColors(containerColor = Teal)
+                                    colors = ButtonDefaults.buttonColors(containerColor = MallTheme.colors.accent)
                                 ) {
-                                    Icon(Icons.Filled.ViewInAr, null, tint = White, modifier = Modifier.size(18.dp))
+                                    Icon(Icons.Filled.ViewInAr, null, tint = MallTheme.colors.onAccent, modifier = Modifier.size(18.dp))
                                     Spacer(Modifier.width(8.dp))
-                                    Text("AR", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = White)
+                                    Text("AR", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = MallTheme.colors.onAccent)
                                 }
                                 Spacer(Modifier.width(12.dp))
                                 Button(
                                     onClick = { startNavigation(context, mallGraph, startPlace, destination, destDistM, onStoreSelected, useAr = false) },
                                     modifier = Modifier.weight(1f).height(54.dp),
                                     shape = RoundedCornerShape(27.dp),
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF455A64))
+                                    colors = ButtonDefaults.buttonColors(containerColor = MapButtonSecondary)
                                 ) {
                                     Icon(Icons.Filled.Map, null, tint = White, modifier = Modifier.size(18.dp))
                                     Spacer(Modifier.width(8.dp))
@@ -704,7 +709,7 @@ fun LogoScanScreen(
                                 }
                             }
                             Spacer(Modifier.height(10.dp))
-                            Text("Choose your navigation mode", color = TextSecondary, fontSize = 13.sp,
+                            Text("Choose your navigation mode", color = MallTheme.colors.textSecondary, fontSize = 13.sp,
                                 textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                         }
                     }
@@ -725,35 +730,35 @@ fun LogoScanScreen(
             enter = fadeIn(tween(400)), exit = fadeOut(tween(200))) {
             Column(horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(bottom = 220.dp)) {
+                val reticleColor = MallTheme.colors.accentText
                 Canvas(modifier = Modifier.size(72.dp)) {
                     val s   = size.minDimension
                     val c   = center
                     val r   = s * 0.40f
                     val arm = s * 0.20f
                     val gap = s * 0.12f
-                    val col = Color(0xFF00BCD4)
                     listOf(-1f to -1f, 1f to -1f, -1f to 1f, 1f to 1f).forEach { (sx, sy) ->
-                        drawLine(col, Offset(c.x + sx * gap, c.y + sy * r),
+                        drawLine(reticleColor, Offset(c.x + sx * gap, c.y + sy * r),
                             Offset(c.x + sx * (gap + arm), c.y + sy * r), strokeWidth = 3.5f, cap = StrokeCap.Round)
-                        drawLine(col, Offset(c.x + sx * r, c.y + sy * gap),
+                        drawLine(reticleColor, Offset(c.x + sx * r, c.y + sy * gap),
                             Offset(c.x + sx * r, c.y + sy * (gap + arm)), strokeWidth = 3.5f, cap = StrokeCap.Round)
                     }
-                    drawCircle(col, radius = s * 0.06f, center = c)
+                    drawCircle(reticleColor, radius = s * 0.06f, center = c)
                 }
                 Spacer(Modifier.height(20.dp))
                 Surface(
                     shape = RoundedCornerShape(20.dp),
-                    color = if (isDarkMode) com.example.mallar.ui.theme.DarkCard.copy(alpha = 0.88f) else White.copy(alpha = 0.88f),
-                    shadowElevation = if (isDarkMode) 0.dp else 2.dp
+                    color = MallTheme.colors.scrimCard.copy(alpha = 0.88f),
+                    shadowElevation = 0.dp
                 ) {
                     Text(
                         buildAnnotatedString {
-                            withStyle(SpanStyle(color = if (isDarkMode) White else TextPrimary, fontSize = 18.sp)) { append("Point your camera at a ") }
-                            withStyle(SpanStyle(color = Teal, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)) { append("store logo") }
+                            withStyle(SpanStyle(color = MallTheme.colors.onScrim, fontSize = 18.sp)) { append("Point your camera at a ") }
+                            withStyle(SpanStyle(color = MallTheme.colors.accentText, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)) { append("store logo") }
                             if (preselectedDestination) {
-                                withStyle(SpanStyle(color = TextSecondary, fontSize = 16.sp)) { append("\nto confirm where you are") }
+                                withStyle(SpanStyle(color = MallTheme.colors.onScrimMuted, fontSize = 16.sp)) { append("\nto confirm where you are") }
                             } else {
-                                withStyle(SpanStyle(color = TextSecondary, fontSize = 16.sp)) { append("\nto start navigation") }
+                                withStyle(SpanStyle(color = MallTheme.colors.onScrimMuted, fontSize = 16.sp)) { append("\nto start navigation") }
                             }
                         },
                         textAlign = TextAlign.Center,
@@ -775,35 +780,35 @@ fun LogoScanScreen(
                 if (preselectedDestination && NavigationState.selectedPlace != null) {
                     val destPlace = NavigationState.selectedPlace!!
                     Surface(
-                        Modifier.fillMaxWidth().height(54.dp).shadow(if (isDarkMode) 0.dp else 8.dp, RoundedCornerShape(27.dp)),
+                        Modifier.fillMaxWidth().height(54.dp).shadow(0.dp, RoundedCornerShape(27.dp)),
                         RoundedCornerShape(27.dp),
-                        color = if (isDarkMode) com.example.mallar.ui.theme.DarkCard else White
+                        color = MallTheme.colors.scrimCard
                     ) {
                         Row(
                             Modifier.fillMaxSize().padding(horizontal = 18.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Filled.LocationOn, null, tint = Teal, modifier = Modifier.size(20.dp))
+                            Icon(Icons.Filled.LocationOn, null, tint = MallTheme.colors.accentText, modifier = Modifier.size(20.dp))
                             Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
-                                Text("Going to", color = if (isDarkMode) White.copy(0.7f) else TextSecondary, fontSize = 11.sp)
-                                Text(destPlace.brand, color = if (isDarkMode) White else TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                                Text("Going to", color = MallTheme.colors.onScrimMuted, fontSize = 11.sp)
+                                Text(destPlace.brand, color = MallTheme.colors.onScrim, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
                 } else {
                     Surface(
-                        Modifier.fillMaxWidth().height(54.dp).shadow(if (isDarkMode) 0.dp else 8.dp, RoundedCornerShape(27.dp))
+                        Modifier.fillMaxWidth().height(54.dp).shadow(0.dp, RoundedCornerShape(27.dp))
                             .clickable { startPlace = NavigationState.startPlace; searchQuery = ""; flow = ScreenFlow.PICK_DESTINATION },
                         RoundedCornerShape(27.dp),
-                        color = if (isDarkMode) com.example.mallar.ui.theme.DarkCard else White
+                        color = MallTheme.colors.scrimCard
                     ) {
                         Row(Modifier.fillMaxSize().padding(horizontal = 18.dp),
                             verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.Search, null, tint = TextSecondary.copy(0.5f), modifier = Modifier.size(20.dp))
+                            Icon(Icons.Filled.Search, null, tint = MallTheme.colors.onScrimMuted, modifier = Modifier.size(20.dp))
                             Spacer(Modifier.width(10.dp))
-                            Text("Where to go...", color = TextSecondary.copy(0.5f), fontSize = 15.sp, modifier = Modifier.weight(1f))
-                            Box(Modifier.size(34.dp).clip(CircleShape).background(Teal),
+                            Text("Where to go...", color = MallTheme.colors.onScrimMuted, fontSize = 15.sp, modifier = Modifier.weight(1f))
+                            Box(Modifier.size(34.dp).clip(CircleShape).background(MallTheme.colors.accent),
                                 Alignment.Center) {
 
                             }
@@ -813,9 +818,9 @@ fun LogoScanScreen(
 
                 // Centered Scan Logo button panel (Ask Me moved to HomeScreen)
                 Surface(
-                    Modifier.fillMaxWidth().shadow(if (isDarkMode) 0.dp else 6.dp, RoundedCornerShape(24.dp)),
+                    Modifier.fillMaxWidth().shadow(0.dp, RoundedCornerShape(24.dp)),
                     RoundedCornerShape(24.dp),
-                    color = if (isDarkMode) com.example.mallar.ui.theme.DarkCard else White
+                    color = MallTheme.colors.scrimCard
                 ) {
                     Column(
                         Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
@@ -835,15 +840,16 @@ fun LogoScanScreen(
                                 },
                             contentAlignment = Alignment.Center
                         ) {
+                            val scanIconColor = MallTheme.colors.onAccent
                             Canvas(Modifier.size(40.dp)) {
                                 val arm = size.minDimension * 0.32f
                                 val gap = size.minDimension * 0.12f
                                 val s   = size.minDimension * 0.48f
                                 val c   = center
                                 listOf(-1f to -1f, 1f to -1f, -1f to 1f, 1f to 1f).forEach { (sx, sy) ->
-                                    drawLine(Color.White, Offset(c.x + sx * gap, c.y + sy * s),
+                                    drawLine(scanIconColor, Offset(c.x + sx * gap, c.y + sy * s),
                                         Offset(c.x + sx * (gap + arm), c.y + sy * s), strokeWidth = 4f, cap = StrokeCap.Round)
-                                    drawLine(Color.White, Offset(c.x + sx * s, c.y + sy * gap),
+                                    drawLine(scanIconColor, Offset(c.x + sx * s, c.y + sy * gap),
                                         Offset(c.x + sx * s, c.y + sy * (gap + arm)), strokeWidth = 4f, cap = StrokeCap.Round)
                                 }
                             }
@@ -854,7 +860,7 @@ fun LogoScanScreen(
                                 logoDetector == null -> "Loading scanner…"
                                 else                 -> "Scan Logo"
                             },
-                            color = if (isDarkMode) White else TextPrimary,
+                            color = MallTheme.colors.onScrim,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -946,7 +952,7 @@ private fun DestinationRow(
 
     Row(Modifier.fillMaxWidth().clickable { onClick() }.padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        Surface(Modifier.size(60.dp), RoundedCornerShape(13.dp), color = SurfaceLight, shadowElevation = 1.dp) {
+        Surface(Modifier.size(60.dp), RoundedCornerShape(13.dp), color = MallTheme.colors.imagePlaceholder, shadowElevation = 1.dp) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data("file:///android_asset/${place.logo}").crossfade(true).build(),
@@ -955,16 +961,16 @@ private fun DestinationRow(
         }
         Spacer(Modifier.width(14.dp))
         Column {
-            Text(place.brand, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = TextPrimary)
+            Text(place.brand, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MallTheme.colors.textPrimary)
             Spacer(Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Filled.LocationOn, null, tint = RedAccent, modifier = Modifier.size(13.dp))
                 Spacer(Modifier.width(3.dp))
-                Text("${distM}m", color = TextSecondary, fontSize = 12.sp)
+                Text("${distM}m", color = MallTheme.colors.textSecondary, fontSize = 12.sp)
                 Spacer(Modifier.width(10.dp))
                 Icon(Icons.Filled.AccessTime, null, tint = RedAccent, modifier = Modifier.size(13.dp))
                 Spacer(Modifier.width(3.dp))
-                Text("${mins}min", color = TextSecondary, fontSize = 12.sp)
+                Text("${mins}min", color = MallTheme.colors.textSecondary, fontSize = 12.sp)
             }
         }
     }

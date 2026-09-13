@@ -39,6 +39,10 @@ import com.example.mallar.R
 import com.example.mallar.ui.theme.*
 import kotlinx.coroutines.delay
 
+private val PermissionCameraAccent = Color(0xFF167D92) // theme-lint:allow per-permission brand accent, fixed by design
+private val PermissionLocationAccent = Color(0xFF2099B9) // theme-lint:allow per-permission brand accent, fixed by design
+private val PermissionMotionAccent = Color(0xFFC39D51) // theme-lint:allow per-permission brand accent, fixed by design
+
 @Composable
 fun PermissionsScreen(onContinueClick: () -> Unit) {
     val context = LocalContext.current
@@ -144,7 +148,7 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
                 ) {
                     Text(
                         text = buildAnnotatedString {
-                            withStyle(SpanStyle(color = Teal, fontWeight = FontWeight.ExtraBold)) {
+                            withStyle(SpanStyle(color = MallTheme.colors.accentText, fontWeight = FontWeight.ExtraBold)) {
                                 append(androidx.compose.ui.res.stringResource(R.string.app_wordmark))
                                 append(" ")
                             }
@@ -178,7 +182,7 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
                             title = androidx.compose.ui.res.stringResource(R.string.enable_camera),
                             subtitle = androidx.compose.ui.res.stringResource(R.string.permission_camera_subtitle),
                             granted = cameraGranted,
-                            color = Color(0xFF167D92),
+                            color = PermissionCameraAccent,
                             onClick = { cameraLauncher.launch(Manifest.permission.CAMERA) }
                         )
 
@@ -188,7 +192,7 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
                             title = androidx.compose.ui.res.stringResource(R.string.enable_location),
                             subtitle = androidx.compose.ui.res.stringResource(R.string.permission_location_subtitle),
                             granted = locationGranted,
-                            color = Color(0xFF2099B9),
+                            color = PermissionLocationAccent,
                             onClick = { locationLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
                         )
 
@@ -198,7 +202,7 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
                             title = androidx.compose.ui.res.stringResource(R.string.enable_motion),
                             subtitle = androidx.compose.ui.res.stringResource(R.string.permission_motion_subtitle),
                             granted = motionGranted,
-                            color = Color(0xFFC39D51),
+                            color = PermissionMotionAccent,
                             onClick = {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                     motionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
@@ -219,9 +223,8 @@ fun PermissionsScreen(onContinueClick: () -> Unit) {
                             .shadow(if (allGranted) 12.dp else 0.dp, RoundedCornerShape(20.dp)),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Teal,
-                            contentColor = White,
-                            disabledContainerColor = DividerColor
+                            containerColor = MallTheme.colors.accent,
+                            contentColor = MallTheme.colors.onAccent
                         )
                     ) {
                         Text(
@@ -266,10 +269,10 @@ private fun PermissionItemFixed(
                 translationX = translationXAnim.value.dp.toPx()
             },
         shape = RoundedCornerShape(16.dp),
-        color = if (granted) SuccessGreen.copy(alpha = 0.12f) else color.copy(alpha = 0.08f),
+        color = if (granted) MallTheme.colors.success.copy(alpha = 0.12f) else color.copy(alpha = 0.08f), // theme-lint:allow decorative permission-item tint
         border = androidx.compose.foundation.BorderStroke(
             width = 1.dp,
-            color = if (granted) SuccessGreen else color.copy(alpha = 0.3f)
+            color = if (granted) MallTheme.colors.success else color.copy(alpha = 0.3f) // theme-lint:allow decorative permission-item border
         )
     ) {
         Row(
@@ -279,13 +282,13 @@ private fun PermissionItemFixed(
             Box(
                 modifier = Modifier
                     .size(42.dp)
-                    .background(if (granted) SuccessGreen else color, RoundedCornerShape(12.dp)),
+                    .background(if (granted) MallTheme.colors.success else color, RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (granted) Icons.Filled.Check else icon,
                     contentDescription = null,
-                    tint = White,
+                    tint = if (granted) MallTheme.colors.onSuccess else White,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -297,7 +300,7 @@ private fun PermissionItemFixed(
                     text = title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp,
-                    color = if (granted) SuccessGreen else MaterialTheme.colorScheme.onSurface
+                    color = if (granted) MallTheme.colors.successText else MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = subtitle,

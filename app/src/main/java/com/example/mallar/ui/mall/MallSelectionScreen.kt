@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.mallar.R
 import com.example.mallar.data.Mall
 import com.example.mallar.data.StartupState
+import com.example.mallar.ui.theme.MallTheme
 
 // ── String resource helpers ───────────────────────────────────────────────────
 
@@ -40,15 +41,6 @@ private fun mallLocationRes(mall: Mall): Int = when (mall) {
     Mall.CITY_CENTRE_ALMAZA  -> R.string.mall_city_centre_almaza_location
     Mall.MALL_OF_EGYPT       -> R.string.mall_of_egypt_location
 }
-
-// ── Design tokens (kept local — no shared theme dependency needed) ────────────
-
-private val NavyBg         = Color(0xFF06131A)
-private val CardBg         = Color(0xFF0E2231)
-private val AccentPurple   = Color(0xFF9D50FF)
-private val TextMain       = Color(0xFFFFFFFF)
-private val TextSub        = Color(0xFFB0C4D8)
-private val ComingSoonBadge = Color(0xFF9D50FF)
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -72,13 +64,10 @@ fun MallSelectionScreen(
     onMallSelected: (Mall) -> Unit,
     onRetry: () -> Unit,
 ) {
-    // Respect dark-mode preference the same way sibling screens do.
-    val isDarkMode by com.example.mallar.data.AppPreferences.isDarkMode.collectAsState()
-
-    val bg     = if (isDarkMode) NavyBg  else Color(0xFFF4F6FA)
-    val cardBg = if (isDarkMode) CardBg  else Color.White
-    val titleColor  = if (isDarkMode) TextMain else Color(0xFF06131A)
-    val subtitleColor = if (isDarkMode) TextSub else Color(0xFF6B7C93)
+    val bg            = MallTheme.colors.screenBackground
+    val cardBg        = MallTheme.colors.surface
+    val titleColor    = MallTheme.colors.textPrimary
+    val subtitleColor = MallTheme.colors.textSecondary
 
     Box(
         modifier = Modifier
@@ -123,7 +112,6 @@ fun MallSelectionScreen(
                 MallCard(
                     mall          = mall,
                     startupState  = startupState,
-                    isDarkMode    = isDarkMode,
                     cardBg        = cardBg,
                     titleColor    = titleColor,
                     subtitleColor = subtitleColor,
@@ -135,7 +123,7 @@ fun MallSelectionScreen(
                     Spacer(Modifier.height(10.dp))
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = AccentPurple,
+                        color = MallTheme.colors.accent,
                         strokeWidth = 2.5.dp
                     )
                 }
@@ -150,13 +138,13 @@ fun MallSelectionScreen(
                     onClick = onRetry,
                     border = androidx.compose.foundation.BorderStroke(
                         1.dp,
-                        AccentPurple.copy(alpha = 0.7f)
+                        MallTheme.colors.accent.copy(alpha = 0.7f) // theme-lint:allow decorative retry-button border
                     ),
                     modifier = Modifier.semantics { contentDescription = retryLabel }
                 ) {
                     Text(
                         text = retryLabel,
-                        color = if (isDarkMode) Color.White else AccentPurple
+                        color = MallTheme.colors.accentText
                     )
                 }
             }
@@ -170,7 +158,6 @@ fun MallSelectionScreen(
 private fun MallCard(
     mall: Mall,
     startupState: StartupState,
-    isDarkMode: Boolean,
     cardBg: Color,
     titleColor: Color,
     subtitleColor: Color,
@@ -181,11 +168,8 @@ private fun MallCard(
     val tappable  = available && startupState == StartupState.Success
 
     val alpha     = if (available) 1f else 0.45f
-    val borderColor = if (isDarkMode) {
-        if (available) AccentPurple.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.10f)
-    } else {
-        if (available) AccentPurple.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.08f)
-    }
+    val borderColor = if (available) MallTheme.colors.accent.copy(alpha = 0.4f) // theme-lint:allow decorative card border
+                      else MallTheme.colors.border
 
     val mallName     = stringResource(mallNameRes(mall))
     val mallLocation = stringResource(mallLocationRes(mall))
@@ -232,7 +216,7 @@ private fun MallCard(
             Icon(
                 imageVector = Icons.Outlined.Storefront,
                 contentDescription = null, // decorative
-                tint = if (isDarkMode) AccentPurple.copy(alpha = 0.8f) else AccentPurple,
+                tint = MallTheme.colors.accent,
                 modifier = Modifier.size(36.dp)
             )
 
@@ -259,19 +243,19 @@ private fun MallCard(
                 Box(
                     modifier = Modifier
                         .background(
-                            ComingSoonBadge.copy(alpha = 0.15f),
+                            MallTheme.colors.accent.copy(alpha = 0.15f), // theme-lint:allow decorative badge tint
                             RoundedCornerShape(8.dp)
                         )
                         .border(
                             1.dp,
-                            ComingSoonBadge.copy(alpha = 0.4f),
+                            MallTheme.colors.accent.copy(alpha = 0.4f), // theme-lint:allow decorative badge tint
                             RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = comingSoon,
-                        color = ComingSoonBadge,
+                        color = MallTheme.colors.accent,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.SemiBold
                     )

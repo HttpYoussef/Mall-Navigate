@@ -79,7 +79,7 @@ fun LocalizationConfirmScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.55f))
+            .background(MallTheme.colors.scrim.copy(alpha = 0.55f))
             .clickable(onClick = onDismiss)  // tap outside to dismiss
     ) {
         // Bottom sheet style card
@@ -90,7 +90,7 @@ fun LocalizationConfirmScreen(
                 .clickable { /* consume click so it doesn't dismiss */ }
                 .shadow(24.dp, RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)),
             shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            color = White
+            color = MallTheme.colors.scrimCard
         ) {
             Column(modifier = Modifier.navigationBarsPadding()) {
 
@@ -106,7 +106,7 @@ fun LocalizationConfirmScreen(
                             .width(40.dp)
                             .height(4.dp)
                             .clip(CircleShape)
-                            .background(TextSecondary.copy(alpha = 0.3f))
+                            .background(MallTheme.colors.onScrimMuted.copy(alpha = 0.3f)) // theme-lint:allow decorative drag handle
                     )
                 }
 
@@ -121,13 +121,13 @@ fun LocalizationConfirmScreen(
                         onClick     = onDismiss,
                         modifier    = Modifier.size(36.dp),
                         shape       = CircleShape,
-                        color       = SurfaceLight
+                        color       = MallTheme.colors.onScrim.copy(alpha = 0.15f) // theme-lint:allow decorative always-dark chrome
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
-                                tint     = TextPrimary,
+                                tint     = MallTheme.colors.onScrim,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -138,12 +138,12 @@ fun LocalizationConfirmScreen(
                             text       = "Where are you standing?",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize   = 18.sp,
-                            color      = TextPrimary
+                            color      = MallTheme.colors.onScrim
                         )
                         Text(
                             text     = result.confidenceReason,
                             fontSize = 12.sp,
-                            color    = TextSecondary
+                            color    = MallTheme.colors.onScrimMuted
                         )
                     }
                 }
@@ -160,7 +160,7 @@ fun LocalizationConfirmScreen(
                     else
                         "We detected this store. Is this where you are?",
                     fontSize   = 14.sp,
-                    color      = TextSecondary,
+                    color      = MallTheme.colors.onScrimMuted,
                     modifier   = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp),
@@ -193,13 +193,13 @@ fun LocalizationConfirmScreen(
                         .height(52.dp)
                         .padding(horizontal = 16.dp),
                     shape     = RoundedCornerShape(26.dp),
-                    border    = androidx.compose.foundation.BorderStroke(1.5.dp, Teal)
+                    border    = androidx.compose.foundation.BorderStroke(1.5.dp, MallTheme.colors.accentText)
                 ) {
-                    Icon(Icons.Filled.Refresh, contentDescription = null, tint = Teal, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Filled.Refresh, contentDescription = null, tint = MallTheme.colors.accentText, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(
                         "None of these — scan again",
-                        color      = Teal,
+                        color      = MallTheme.colors.accentText,
                         fontWeight = FontWeight.SemiBold,
                         fontSize   = 14.sp
                     )
@@ -234,7 +234,7 @@ private fun AutoAcceptBanner(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.45f)),
+            .background(MallTheme.colors.scrim.copy(alpha = 0.45f)),
         contentAlignment = Alignment.BottomCenter
     ) {
         Surface(
@@ -243,7 +243,7 @@ private fun AutoAcceptBanner(
                 .padding(16.dp)
                 .shadow(16.dp, RoundedCornerShape(24.dp)),
             shape = RoundedCornerShape(24.dp),
-            color = White
+            color = MallTheme.colors.scrimCard
         ) {
             Column(
                 modifier            = Modifier.padding(20.dp),
@@ -256,8 +256,8 @@ private fun AutoAcceptBanner(
                         .clip(CircleShape)
                         .background(
                             Brush.radialGradient(listOf(
-                                Color(0xFF00C853).copy(alpha = 0.15f),
-                                Color(0xFF00C853).copy(alpha = 0.05f)
+                                MallTheme.colors.successText.copy(alpha = 0.15f), // theme-lint:allow decorative success glow
+                                MallTheme.colors.successText.copy(alpha = 0.05f) // theme-lint:allow decorative success glow
                             ))
                         ),
                     contentAlignment  = Alignment.Center
@@ -265,7 +265,7 @@ private fun AutoAcceptBanner(
                     Icon(
                         Icons.Filled.CheckCircle,
                         contentDescription = null,
-                        tint     = Color(0xFF00C853),
+                        tint     = MallTheme.colors.successText,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -276,13 +276,13 @@ private fun AutoAcceptBanner(
                     "Location Confirmed!",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize   = 20.sp,
-                    color      = TextPrimary
+                    color      = MallTheme.colors.onScrim
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     "High confidence: ${"%.0f".format(confidence * 100)}%",
                     fontSize = 13.sp,
-                    color    = Color(0xFF00C853),
+                    color    = MallTheme.colors.successText,
                     fontWeight = FontWeight.SemiBold
                 )
 
@@ -295,7 +295,7 @@ private fun AutoAcceptBanner(
                     modifier             = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
-                        .background(SurfaceLight)
+                        .background(MallTheme.colors.onScrim.copy(alpha = 0.06f)) // theme-lint:allow decorative always-dark panel
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
                     val logoPath = detection.place?.logo
@@ -315,13 +315,13 @@ private fun AutoAcceptBanner(
                         Text(
                             text       = "You are near",
                             fontSize   = 12.sp,
-                            color      = TextSecondary
+                            color      = MallTheme.colors.onScrimMuted
                         )
                         Text(
                             text       = detection.brand,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize   = 18.sp,
-                            color      = TextPrimary
+                            color      = MallTheme.colors.onScrim
                         )
                     }
                 }
@@ -331,7 +331,7 @@ private fun AutoAcceptBanner(
                 Text(
                     "Starting navigation in $countdown…",
                     fontSize = 13.sp,
-                    color    = TextSecondary,
+                    color    = MallTheme.colors.onScrimMuted,
                     textAlign = TextAlign.Center
                 )
 
@@ -341,12 +341,12 @@ private fun AutoAcceptBanner(
                     onClick  = onRescan,
                     modifier = Modifier.fillMaxWidth().height(46.dp),
                     shape    = RoundedCornerShape(23.dp),
-                    border   = androidx.compose.foundation.BorderStroke(1.dp, TextSecondary.copy(alpha = 0.4f))
+                    border   = androidx.compose.foundation.BorderStroke(1.dp, MallTheme.colors.onScrimMuted.copy(alpha = 0.4f)) // theme-lint:allow decorative always-dark chrome
                 ) {
                     Text(
                         "Wrong location — scan again",
                         fontSize = 13.sp,
-                        color    = TextSecondary
+                        color    = MallTheme.colors.onScrimMuted
                     )
                 }
             }
@@ -365,8 +365,8 @@ private fun LandmarkCard(
     isTop:     Boolean,
     onClick:   () -> Unit
 ) {
-    val borderColor = if (isTop) Teal.copy(alpha = 0.6f) else Color.Transparent
-    val bgColor     = if (isTop) Teal.copy(alpha = 0.04f) else White
+    val borderColor = if (isTop) MallTheme.colors.accentText.copy(alpha = 0.6f) else Color.Transparent // theme-lint:allow decorative landmark border
+    val bgColor     = if (isTop) MallTheme.colors.accentText.copy(alpha = 0.04f) else MallTheme.colors.scrimCard // theme-lint:allow decorative landmark background
 
     Surface(
         modifier    = Modifier
@@ -386,14 +386,14 @@ private fun LandmarkCard(
                 modifier         = Modifier
                     .size(28.dp)
                     .clip(CircleShape)
-                    .background(if (isTop) Teal else TextSecondary.copy(alpha = 0.15f)),
+                    .background(if (isTop) MallTheme.colors.accent else MallTheme.colors.onScrimMuted.copy(alpha = 0.15f)), // theme-lint:allow decorative rank badge
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text       = "#$rank",
                     fontSize   = 11.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color      = if (isTop) White else TextSecondary
+                    color      = if (isTop) MallTheme.colors.onAccent else MallTheme.colors.onScrimMuted
                 )
             }
 
@@ -404,7 +404,7 @@ private fun LandmarkCard(
             Surface(
                 modifier = Modifier.size(52.dp),
                 shape    = RoundedCornerShape(12.dp),
-                color    = SurfaceLight
+                color    = MallTheme.colors.onScrim.copy(alpha = 0.06f) // theme-lint:allow decorative always-dark panel
             ) {
                 if (logoPath != null) {
                     AsyncImage(
@@ -419,7 +419,7 @@ private fun LandmarkCard(
                     )
                 } else {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Icon(Icons.Filled.Store, null, tint = TextSecondary, modifier = Modifier.size(28.dp))
+                        Icon(Icons.Filled.Store, null, tint = MallTheme.colors.onScrimMuted, modifier = Modifier.size(28.dp))
                     }
                 }
             }
@@ -432,7 +432,7 @@ private fun LandmarkCard(
                     text       = detection.brand,
                     fontWeight = FontWeight.Bold,
                     fontSize   = 15.sp,
-                    color      = TextPrimary
+                    color      = MallTheme.colors.onScrim
                 )
                 Spacer(Modifier.height(3.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -442,7 +442,7 @@ private fun LandmarkCard(
                     Text(
                         text     = "${"%.0f".format(detection.similarity * 100)}% match",
                         fontSize = 11.sp,
-                        color    = TextSecondary
+                        color    = MallTheme.colors.onScrimMuted
                     )
                 }
             }
@@ -453,13 +453,13 @@ private fun LandmarkCard(
             Surface(
                 modifier = Modifier.size(36.dp),
                 shape    = CircleShape,
-                color    = Teal.copy(alpha = if (isTop) 0.12f else 0.07f)
+                color    = MallTheme.colors.accent.copy(alpha = if (isTop) 0.12f else 0.07f) // theme-lint:allow decorative chevron badge
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Filled.ChevronRight,
                         contentDescription = "Select",
-                        tint     = Teal,
+                        tint     = MallTheme.colors.accent,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -475,9 +475,9 @@ private fun LandmarkCard(
 @Composable
 private fun ConfidenceBadge(tier: LocalizationTier, confidence: Float) {
     val (color, label, icon) = when (tier) {
-        LocalizationTier.HIGH   -> Triple(Color(0xFF00C853), "High Confidence", Icons.Filled.CheckCircle)
-        LocalizationTier.MEDIUM -> Triple(Color(0xFFFFA000), "Medium Confidence", Icons.Filled.Info)
-        LocalizationTier.LOW    -> Triple(Color(0xFFE53935), "Low Confidence — Re-scan Recommended", Icons.Filled.Warning)
+        LocalizationTier.HIGH   -> Triple(MallTheme.colors.successText, "High Confidence", Icons.Filled.CheckCircle)
+        LocalizationTier.MEDIUM -> Triple(MallTheme.colors.warningText, "Medium Confidence", Icons.Filled.Info)
+        LocalizationTier.LOW    -> Triple(MallTheme.colors.errorText, "Low Confidence — Re-scan Recommended", Icons.Filled.Warning)
     }
 
     Row(
@@ -485,7 +485,7 @@ private fun ConfidenceBadge(tier: LocalizationTier, confidence: Float) {
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(color.copy(alpha = 0.1f))
+            .background(color.copy(alpha = 0.1f)) // theme-lint:allow decorative confidence badge tint
             .padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment    = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
@@ -508,16 +508,16 @@ private fun ConfidenceBadge(tier: LocalizationTier, confidence: Float) {
 @Composable
 private fun SimilarityBar(similarity: Float) {
     val barColor = when {
-        similarity >= 0.7f -> Color(0xFF00C853)
-        similarity >= 0.5f -> Color(0xFFFFA000)
-        else               -> Color(0xFFE53935)
+        similarity >= 0.7f -> MallTheme.colors.successText
+        similarity >= 0.5f -> MallTheme.colors.warningText
+        else               -> MallTheme.colors.errorText
     }
     Box(
         modifier = Modifier
             .width(60.dp)
             .height(5.dp)
             .clip(CircleShape)
-            .background(TextSecondary.copy(alpha = 0.12f))
+            .background(MallTheme.colors.onScrimMuted.copy(alpha = 0.12f)) // theme-lint:allow decorative similarity track
     ) {
         Box(
             modifier = Modifier
@@ -544,14 +544,14 @@ private fun EmptyDetectionState() {
         Icon(
             Icons.Filled.SearchOff,
             contentDescription = null,
-            tint     = TextSecondary.copy(alpha = 0.4f),
+            tint     = MallTheme.colors.onScrimMuted.copy(alpha = 0.4f), // theme-lint:allow decorative empty-state icon
             modifier = Modifier.size(56.dp)
         )
         Spacer(Modifier.height(12.dp))
         Text(
             "No stores were recognised in the camera frame.\nPlease point the camera at a store sign and try again.",
             fontSize  = 13.sp,
-            color     = TextSecondary,
+            color     = MallTheme.colors.onScrimMuted,
             textAlign = TextAlign.Center
         )
     }
